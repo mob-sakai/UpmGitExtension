@@ -1,0 +1,18 @@
+{
+    "name": "Coffee.UpmGitExtension.EditorTests",
+    "references": [
+        "Coffee.UpmGitExtension.Editor"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

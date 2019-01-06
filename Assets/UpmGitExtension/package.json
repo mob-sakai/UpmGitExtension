@@ -1,0 +1,16 @@
+{
+	"name": "coffee.upm-git-extension",
+	"displayName": "UPM Git Extension",
+	"description": "",
+	"version": "0.1.0",
+	"unity": "2018.3",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mob-sakai/UpmGithubExtension.git"
+	},
+	"src": "Assets/UpmGithubExtension",
+	"author": "mob-sakai <sakai861104@gmail.com> (https://github.com/mob-sakai)",
+	"dependencies": {
+	}
+}
