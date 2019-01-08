@@ -107,11 +107,7 @@ echo -e ">> OK"
 if [ "$UNITY_PACKAGE_MANAGER" == "true" ]; then
   echo -e "\n>> Split for upm..."
   git subtree split --prefix="$UNITY_PACKAGE_SRC" --branch upm
-  git checkout upm -f
-  [ git show-branch origin/upm ] && git reset --soft origin/upm || git reset --soft master
-  git commit -m $RELEASE_VERSION
-  git tag $RELEASE_VERSION
-  git push origin upm --tags
+  git push origin upm
 fi
 
 
