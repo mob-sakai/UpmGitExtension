@@ -22,7 +22,7 @@ namespace Coffee.PackageManager
 #if UPM_GIT_EXT_PROJECT
 		const string ResourcesPath = "Assets/UpmGitExtension/Editor/Resources/";
 #else
-		const string ResourcesPath = "Packages/coffee.upm-git-extension/Editor/Resources/";
+		const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
 #endif
 		const string TemplatePath = ResourcesPath + "UpmGitExtension.uxml";
 		const string StylePath = ResourcesPath + "UpmGitExtension.uss";
