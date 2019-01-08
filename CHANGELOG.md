@@ -1,0 +1,1 @@
+Assets/UpmGitExtension/CHANGELOG.md

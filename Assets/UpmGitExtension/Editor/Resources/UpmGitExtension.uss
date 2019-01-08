@@ -1,0 +1,27 @@
+#detailActions.display-none {
+  min-width: 0;
+  min-height: 0;
+}
+
+#detailActions #hostingIcon {
+  background-image: resource("Images/GitHub-Mark-Light-32px");
+  width: 16;
+  height: 16;
+  margin-left: 0;
+  margin-right: 0;
+  border-left: 0;
+  border-right: 0;
+  slice-left: 0;
+  slice-right: 0;
+  slice-top: 0;
+  slice-bottom: 0;
+  cursor: link;
+}
+
+#detailActions #hostingIcon.github {
+  background-image: resource("Images/GitHub-Mark-32px");
+}
+
+#detailActions #hostingIcon.github.dark {
+  background-image: resource("Images/GitHub-Mark-Light-32px");
+}
