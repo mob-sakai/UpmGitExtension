@@ -78,6 +78,23 @@ namespace Coffee.PackageManager
 			Utils.SetElementDisplay (_gitDetailActoins, isGit);
 			Utils.SetElementDisplay (_originalDetailActions, !isGit);
 
+			if(isGit)
+			{
+				//Debug.Log ("hoge");
+				EditorApplication.delayCall += ()=>
+				{
+					Utils.SetElementDisplay (_detailControls.Q ("updateCombo"), true);
+					Utils.SetElementDisplay (_detailControls.Q ("remove"), true);
+					Utils.SetElementDisplay (_detailControls.Q ("update"), true);
+					_detailControls.Q ("", "popupField").SetEnabled (true);
+					_detailControls.Q ("remove").SetEnabled (true);
+					_detailControls.Q ("updateCombo").SetEnabled (true);
+					//_detailControls.Q ("update").SetEnabled (true);
+				}
+				;
+			}
+
+
 			Utils.SetElementClass (_hostingIcon, "github", true);
 			Utils.SetElementClass (_hostingIcon, "dark", EditorGUIUtility.isProSkin);
 		}
@@ -92,6 +109,7 @@ namespace Coffee.PackageManager
 		Button _viewDocumentation { get { return _gitDetailActoins.Q<Button> ("viewDocumentation"); } }
 		Button _viewChangelog { get { return _gitDetailActoins.Q<Button> ("viewChangelog"); } }
 		Button _viewLicense { get { return _gitDetailActoins.Q<Button> ("viewLicense"); } }
+		VisualElement _detailControls;
 		VisualElement _documentationContainer;
 		VisualElement _originalDetailActions;
 		VisualElement _gitDetailActoins;
@@ -123,6 +141,7 @@ namespace Coffee.PackageManager
 			_viewLicense.clickable.clicked += () => Application.OpenURL (Utils.GetFileURL (_packageInfo, "LICENSE.md"));
 
 			// Move element to documentationContainer
+			_detailControls = parent.parent.Q("detailsControls");
 			_documentationContainer = parent.parent.Q ("documentationContainer");
 			_originalDetailActions = _documentationContainer.Q ("detailActions");
 			_documentationContainer.Add (_gitDetailActoins);
