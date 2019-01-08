@@ -63,7 +63,7 @@ This project extends the UI of Unity Package Manager for package installed using
 ```js
 {
   "dependencies": {
-    "coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGithubExtension.git#0.1.0",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGithubExtension.git#0.1.0",
     ...
   },
 }
@@ -117,7 +117,7 @@ The default values are as follows:
 
 ShortVersionId is defined as follows:
 * `{PackageName}@{MajorVersion}.{MinorVersion}`
-* For example: `coffee.upm-git-extension@1.0`
+* For example: `com.coffee.upm-git-extension@0.1`
 
 
 #### How to add/update/remove a package from script?
@@ -130,7 +130,7 @@ https://docs.unity3d.com/ScriptReference/PackageManager.Client.html
 PackageId is defined as follows:
 * `{PackageName}@{MajorVersion}.{MinorVersion}.{PatchVersion}` (Unity official package)
 * `{PackageName}@{RepoURL}#{BranchOrTagOrRevision}`
-* For example: `com.unity.package-manager-ui@2.0.3`, `coffee.upm-git-extension@https://github.com/mob-sakai/UpmGitExtension.git#1.0.0`
+* For example: `com.unity.package-manager-ui@2.0.3`, `coffee.upm-git-extension@https://github.com/mob-sakai/UpmGitExtension.git#0.1.0`
 
 
 
