@@ -101,16 +101,21 @@ echo -e "\n>> (6/8) Commit release files..."
 git commit -m "update change log"
 echo -e ">> OK"
 
-#  7. Split to upm
+
+
+#  7. << Split for upm >>
 if [ "$UNITY_PACKAGE_MANAGER" == "true" ]; then
+  echo -e "\n>> Split for upm..."
   git subtree split --prefix="$UNITY_PACKAGE_SRC" --branch upm
   git checkout upm -f
   [ git show-branch origin/upm ] && git reset --soft origin/upm || git reset --soft master
   git commit -m $RELEASE_VERSION
-  # git tag $RELEASE_VERSION
-  # git push origin upm --tags
+  git tag $RELEASE_VERSION
+  git push origin upm --tags
 fi
-exit
+
+
+
 # 7. << Merge and push master and develop branch >>
 echo -e "\n>> (7/8) Merge and push..."
 git checkout master
@@ -120,15 +125,13 @@ git push origin master
 git checkout develop
 git merge --ff master
 git push origin develop
-
-
-
 echo -e ">> OK"
 
 
 
 # 8. << Upload unitypackage and release on Github >>
 echo -e "\n>> (8/8) Releasing..."
+[ "$UNITY_PACKAGE_MANAGER" == "true" ] && git checkout upm -f
 gh-release --assets $UNITY_PACKAGE_NAME --name $RELEASE_VERSION --tag_name $RELEASE_VERSION
 echo -e ">> OK"
 
