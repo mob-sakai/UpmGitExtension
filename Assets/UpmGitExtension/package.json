@@ -2,7 +2,7 @@
 	"name": "com.coffee.upm-git-extension",
 	"displayName": "UPM Git Extension",
 	"description": "",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"unity": "2018.3",
 	"license": "MIT",
 	"repository": {
