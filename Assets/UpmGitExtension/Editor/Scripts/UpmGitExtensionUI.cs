@@ -20,7 +20,7 @@ namespace Coffee.PackageManager
 		// Constant or Static Members.
 		//################################
 #if UPM_GIT_EXT_PROJECT
-		const string ResourcesPath = "Assets/UpmGithubExtension/Editor/Resources/";
+		const string ResourcesPath = "Assets/UpmGitExtension/Editor/Resources/";
 #else
 		const string ResourcesPath = "Packages/coffee.upm-git-extension/Editor/Resources/";
 #endif

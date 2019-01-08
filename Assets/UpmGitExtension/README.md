@@ -89,17 +89,22 @@ This project extends the UI of Unity Package Manager for package installed using
 The branching strategy when I develop a package for UPM is as follows.
 
 |Branch|Description|'Assets' directory|
-|-|-|-|-|
-|develop(default)|Development, Testing|Included|
+|-|-|-|
+|develop|Development, Testing|Included|
 |master|Publishing|Included|
-|upm|Subtree to publish for UPM.|Excluded|
+|upm(default)|Subtree to publish for UPM|Excluded|
 |{tags}|Tags to install using UPM|Excluded|
 
-Steps to publish a package.
-1. Develop package project on develop branch.
-2. Merge into master branch and publish as new version.
-3. Push subtree into ump branch.
-4. Tag on ump branch as new version.
+**Steps to release a package:**
+1. Update version in `package.json`.
+2. Develop package project on develop branch.
+3. Close all issues on GitHub for new version.
+4. Generate `CHANGELOG.md` using `github_changelog_generator` and commit it.
+5. Merge into master branch and publish as new version.
+6. Split subtree into ump branch.
+7. Squash and push.
+8. Tag on ump branch as new version.
+9. Release.
 
 
 #### About default document URL

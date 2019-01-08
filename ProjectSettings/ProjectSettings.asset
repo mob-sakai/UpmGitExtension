@@ -520,7 +520,8 @@ PlayerSettings:
   webGLCompressionFormat: 1
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    1: UPM_GIT_EXT_PROJECT
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}

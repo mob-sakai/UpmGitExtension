@@ -7,9 +7,9 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/mob-sakai/UpmGithubExtension.git"
+		"url": "git+https://github.com/mob-sakai/UpmGitExtension.git"
 	},
-	"src": "Assets/UpmGithubExtension",
+	"src": "Assets/UpmGitExtension",
 	"author": "mob-sakai <sakai861104@gmail.com> (https://github.com/mob-sakai)",
 	"dependencies": {
 	}
