@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.3.0) (2019-01-10)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.2.0...0.3.0)
+
+**Implemented enhancements:**
+
+- Update package button [\#9](https://github.com/mob-sakai/UpmGitExtension/issues/9)
+
 ## [0.2.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.2.0) (2019-01-08)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.1.2...0.2.0)
