@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "coffee.git-package-test": "https://github.com/mob-sakai/GitPackageTest.git#0.1.0",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/GitPackageTest.git#0.3.0",
     "com.unity.ads": "2.3.1",
     "com.unity.analytics": "3.2.2",
     "com.unity.collab-proxy": "1.2.15",
@@ -38,5 +38,11 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "lock": {
+    "com.coffee.upm-git-extension": {
+      "hash": "4386b3c3c27b1daaeed0292fc8dfcf62c7b1b427",
+      "revision": "0.3.0"
+    }
   }
 }

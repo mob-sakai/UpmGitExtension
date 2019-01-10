@@ -7,6 +7,8 @@ using UnityEngine.TestTools;
 using Utils = Coffee.PackageManager.UpmGitExtensionUtils;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UnityEditor.PackageManager;
+using System.IO;
+using System;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
@@ -18,25 +20,39 @@ namespace Coffee.PackageManager.Tests
 {
 	public class UtilsTests
 	{
-		const string packageName = "coffee.upm-git-extension";
+		const string packageName = "com.coffee.upm-git-extension";
 		const string userRepo = "mob-sakai/GitPackageTest";
 		const string repoURL = "https://github.com/" + userRepo;
-		const string revisionHash = "64d5c678fee9a68ffaaa3298f318d67e238131b4";
+		const string revisionHash = "4386b3c3c27b1daaeed0292fc8dfcf62c7b1b427";
 		const string fileName = "README.md";
 		const string fileURL = repoURL + "/blob/" + revisionHash + "/" + fileName;
 
 		[TestCase ("", ExpectedResult = "")]
 		[TestCase (packageName + "@https://github.com/" + userRepo + ".git", ExpectedResult = repoURL)]
-		[TestCase (packageName + "@https://github.com/" + userRepo + ".git#0.1.0", ExpectedResult = repoURL)]
+		[TestCase (packageName + "@https://github.com/" + userRepo + ".git#0.3.0", ExpectedResult = repoURL)]
 		[TestCase (packageName + "@ssh://git@github.com/" + userRepo + ".git", ExpectedResult = repoURL)]
-		[TestCase (packageName + "@ssh://git@github.com/" + userRepo + ".git#0.1.0", ExpectedResult = repoURL)]
+		[TestCase (packageName + "@ssh://git@github.com/" + userRepo + ".git#0.3.0", ExpectedResult = repoURL)]
 		[TestCase (packageName + "@git@github.com:" + userRepo + ".git", ExpectedResult = repoURL)]
-		[TestCase (packageName + "@git@github.com:" + userRepo + ".git#0.1.0", ExpectedResult = repoURL)]
+		[TestCase (packageName + "@git@github.com:" + userRepo + ".git#0.3.0", ExpectedResult = repoURL)]
 		[TestCase (packageName + "@git:git@github.com:" + userRepo + ".git", ExpectedResult = repoURL)]
-		[TestCase (packageName + "@git:git@github.com:" + userRepo + ".git#0.1.0", ExpectedResult = repoURL)]
+		[TestCase (packageName + "@git:git@github.com:" + userRepo + ".git#0.3.0", ExpectedResult = repoURL)]
 		public string GetRepoURLTest (string packageId)
 		{
 			return Utils.GetRepoURL (packageId);
+		}
+
+		[TestCase ("", ExpectedResult = "")]
+		[TestCase (packageName + "@https://github.com/" + userRepo + ".git", ExpectedResult = userRepo)]
+		[TestCase (packageName + "@https://github.com/" + userRepo + ".git#0.3.0", ExpectedResult = userRepo)]
+		[TestCase (packageName + "@ssh://git@github.com/" + userRepo + ".git", ExpectedResult = userRepo)]
+		[TestCase (packageName + "@ssh://git@github.com/" + userRepo + ".git#0.3.0", ExpectedResult = userRepo)]
+		[TestCase (packageName + "@git@github.com:" + userRepo + ".git", ExpectedResult = userRepo)]
+		[TestCase (packageName + "@git@github.com:" + userRepo + ".git#0.3.0", ExpectedResult = userRepo)]
+		[TestCase (packageName + "@git:git@github.com:" + userRepo + ".git", ExpectedResult = userRepo)]
+		[TestCase (packageName + "@git:git@github.com:" + userRepo + ".git#0.3.0", ExpectedResult = userRepo)]
+		public string GetRepoIdTest (string packageId)
+		{
+			return Utils.GetRepoId (packageId);
 		}
 
 		[TestCase ("", ExpectedResult = true)]
@@ -73,6 +89,34 @@ namespace Coffee.PackageManager.Tests
 			return Utils.HasElementClass (_element, "test");
 		}
 
+
+		[TestCase (LogType.Log, "Success", "https://api.github.com/repos/"+ userRepo + "/tags", ExpectedResult = null)]
+		[TestCase (LogType.Error, "HTTP/1.1 404 Not Found", "https://api.github.com/repos/"+ userRepo + "/tags2", ExpectedResult = null)]
+		[TestCase (LogType.Error, "Cannot resolve destination host", "https://api.githuberror.com/repos/"+ userRepo + "/tags", ExpectedResult =null)]
+		[UnityTest]
+		[Order(0)]
+		public IEnumerator RequestTest(LogType logType, string message, string url)
+		{
+			var path = Utils.GetRequestCachePath (url);
+			Debug.Log (path);
+			if(File.Exists(path))
+				File.Delete (path);
+
+			LogAssert.Expect (logType, message);
+			yield return Utils.Request(url, x=>Debug.Log("Success"));
+		}
+
+		[TestCase (LogType.Log, "Success", "https://api.github.com/repos/"+ userRepo + "/tags", ExpectedResult = null)]
+		[UnityTest]
+		[Order (1)]
+		public IEnumerator RequestCacheTest (LogType logType, string message, string url)
+		{
+			Assert.IsNotNull (Utils.GetRequestCache (url));
+
+			LogAssert.Expect (logType, message);
+			Utils.Request (url, x => Debug.Log ("Success"));
+			yield break;
+		}
 	}
 
 
@@ -81,12 +125,12 @@ namespace Coffee.PackageManager.Tests
 	public class PackageInfoUtilsTests
 	{
 		const string repoURL = "https://github.com/mob-sakai/GitPackageTest";
-		const string revisionHash = "64d5c678fee9a68ffaaa3298f318d67e238131b4";
+		const string revisionHash = "4386b3c3c27b1daaeed0292fc8dfcf62c7b1b427";
 		const string fileName = "README.md";
 		const string fileURL = repoURL + "/blob/" + revisionHash + "/" + fileName;
 
 		static PackageInfo pi;
-		[TestCase ("coffee.git-package-test", ExpectedResult = null)]
+		[TestCase ("com.coffee.upm-git-extension", ExpectedResult = null)]
 		[UnityTest ()]
 		[Order (-1)]
 		public IEnumerator GetPackageInfo (string packageName)

@@ -3,19 +3,20 @@ UPM Git Extension
 
 Git extension for Unity Package Manager (UPM)
 
-![](https://user-images.githubusercontent.com/12690315/50732386-8dfa6800-11bd-11e9-81ba-0aff931212a1.png)
+![](https://user-images.githubusercontent.com/12690315/50967879-c8953500-151c-11e9-91c8-37330fcb351d.png)
 
 [![](https://img.shields.io/github/release/mob-sakai/UpmGitExtension.svg?label=latest%20version)](https://github.com/mob-sakai/UpmGitExtension/releases)
 [![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/releases)
 ![](https://img.shields.io/badge/unity-2017%2B-green.svg)
 [![](https://img.shields.io/github/license/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/blob/master/LICENSE.txt)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
+[![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)
 
 << [Description](#Description) | [WebGL Demo](#demo) | [Download](https://github.com/mob-sakai/UpmGitExtension/releases) | [Usage](#usage) | [Development Note](#development-note) >>
 
 ### What's new? [See changelog ![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg?label=last%20updated)](https://github.com/mob-sakai/UpmGitExtension/blob/develop/CHANGELOG.md)
 ### Do you want to receive notifications for new releases? [Watch this repo ![](https://img.shields.io/github/watchers/mob-sakai/UpmGitExtension.svg?style=social&label=Watch)](https://github.com/mob-sakai/UpmGitExtension/subscription)
-### Support me on Patreon [![become_a_patron](https://user-images.githubusercontent.com/12690315/50731629-3b18b480-11ad-11e9-8fad-4b13f27969c1.png)](https://www.patreon.com/join/2343451?)
+### Support me on Patreon! [![become_a_patron](https://user-images.githubusercontent.com/12690315/50731629-3b18b480-11ad-11e9-8fad-4b13f27969c1.png)](https://www.patreon.com/join/2343451?)
 
 
 
@@ -37,19 +38,19 @@ This project extends the UI of Unity Package Manager for package installed using
 #### Features
 
 * Show link to repo URL
-* Override link to document URL
+* Override link to the document URL
   * Readme
   * Changelog
   * License
 * Support GitHub
-* Remove package button
+* Remove the package
+* Update the package with a specific tag/branch
 
 
 #### Future plans
 
 * Support BitBucket
 * Add package button
-* Update package button
 * Display license
 * Override the document URL with package.json
 
@@ -71,7 +72,6 @@ This project extends the UI of Unity Package Manager for package installed using
 3. Back in Unity, the package will be downloaded and imported.
 4. To open the package manager window, select `Window > Package Manager` from the main menu in Unity.
 5. The UI will be overridden when you select a package installed using git, such as UPM Git Extension.  
-![](https://user-images.githubusercontent.com/12690315/50732475-850a9600-11bf-11e9-97fd-b2e5520e4f84.png)
 6. Enjoy!
 
 

@@ -4,6 +4,8 @@ using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using Utils = Coffee.PackageManager.UpmGitExtensionUtils;
+using System.Linq;
+using System.Collections.Generic;
 
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -51,6 +53,8 @@ namespace Coffee.PackageManager
 		/// <param name="packageInfo">The package information</param>
 		public void OnPackageAddedOrUpdated (PackageInfo packageInfo)
 		{
+			if(_detailControls != null)
+				_detailControls.SetEnabled(true);
 		}
 
 		/// <summary>
@@ -59,6 +63,8 @@ namespace Coffee.PackageManager
 		/// <param name="packageInfo">The package information</param>
 		public void OnPackageRemoved (PackageInfo packageInfo)
 		{
+			if (_detailControls != null)
+				_detailControls.SetEnabled (true);
 		}
 
 		/// <summary>
@@ -77,23 +83,24 @@ namespace Coffee.PackageManager
 
 			Utils.SetElementDisplay (_gitDetailActoins, isGit);
 			Utils.SetElementDisplay (_originalDetailActions, !isGit);
+			Utils.SetElementDisplay (_detailControls.Q ("", "popupField"), !isGit);
+			Utils.SetElementDisplay (_updateButton, isGit);
+			Utils.SetElementDisplay (_versionPopup, isGit);
 
 			if(isGit)
 			{
-				//Debug.Log ("hoge");
+				Utils.RequestTags (_packageInfo.packageId, _tags);
+				Utils.RequestBranches (_packageInfo.packageId, _branches);
+
+				SetVersion (_packageInfo.version);
 				EditorApplication.delayCall += ()=>
 				{
 					Utils.SetElementDisplay (_detailControls.Q ("updateCombo"), true);
 					Utils.SetElementDisplay (_detailControls.Q ("remove"), true);
-					Utils.SetElementDisplay (_detailControls.Q ("update"), true);
-					_detailControls.Q ("", "popupField").SetEnabled (true);
 					_detailControls.Q ("remove").SetEnabled (true);
-					_detailControls.Q ("updateCombo").SetEnabled (true);
-					//_detailControls.Q ("update").SetEnabled (true);
 				}
 				;
 			}
-
 
 			Utils.SetElementClass (_hostingIcon, "github", true);
 			Utils.SetElementClass (_hostingIcon, "dark", EditorGUIUtility.isProSkin);
@@ -113,6 +120,10 @@ namespace Coffee.PackageManager
 		VisualElement _documentationContainer;
 		VisualElement _originalDetailActions;
 		VisualElement _gitDetailActoins;
+		Button _versionPopup;
+		Button _updateButton;
+		List<string> _tags = new List<string> ();
+		List<string> _branches = new List<string> ();
 
 		/// <summary>
 		/// Initializes UI.
@@ -145,7 +156,62 @@ namespace Coffee.PackageManager
 			_documentationContainer = parent.parent.Q ("documentationContainer");
 			_originalDetailActions = _documentationContainer.Q ("detailActions");
 			_documentationContainer.Add (_gitDetailActoins);
+
+			_updateButton = new Button (AddOrUpdatePackage) { name = "update", text = "Up to date" };
+			_updateButton.AddToClassList ("action");
+			_versionPopup = new Button (PopupVersions) { text = "hoge", style = { marginLeft = -4, marginRight = -3, marginTop = -3, marginBottom = -3, }, };
+			_versionPopup.AddToClassList ("popup");
+			_versionPopup.AddToClassList ("popupField");
+			_versionPopup.AddToClassList ("versions");
+
+			_detailControls.Q ("updateCombo").Insert (1,_updateButton);
+			_detailControls.Q ("updateDropdownContainer").Add(_versionPopup);
+
 			_initialized = true;
+		}
+
+		public static string GetVersionText(string version, string current = null)
+		{
+			return (current == null || current != version) ? version : version + " - current";
+		}
+
+		void PopupVersions()
+		{
+			var menu = new GenericMenu ();
+			var current = _packageInfo.version;
+
+			menu.AddItem (new GUIContent (current + " - current"), _versionPopup.text == current, SetVersion, current);
+
+			foreach (var t in _tags.OrderByDescending(x=>x))
+			{
+				string tag = t;
+				GUIContent text = new GUIContent ("All Tags/" + (current == tag ? tag + " - current" : tag));
+				menu.AddItem (text, _versionPopup.text == tag, SetVersion, tag);
+			}
+
+			menu.AddItem (new GUIContent ("All Branches/(default)"), false, SetVersion, "(default)");
+			foreach (var t in _branches.OrderBy (x => x))
+			{
+				string tag = t;
+				GUIContent text = new GUIContent ("All Branches/" + (current == tag ? tag + " - current" : tag));
+				menu.AddItem (text, _versionPopup.text == tag, SetVersion, tag);
+			}
+			menu.DropDown (new Rect (_versionPopup.LocalToWorld (new Vector2 (0, 10)), Vector2.zero));
+		}
+
+		void SetVersion(object version)
+		{
+			string ver = version as string;
+			_versionPopup.text = ver;
+			_updateButton.SetEnabled (_packageInfo.version != ver);
+			_updateButton.SetEnabled(true);
+		}
+
+		void AddOrUpdatePackage()
+		{
+			var target = _versionPopup.text != "(default)" ? _versionPopup.text : "";
+			var id = Utils.GetSpecificPackageId (_packageInfo.packageId, target);
+			Client.Add (id);
 		}
 	}
 }
