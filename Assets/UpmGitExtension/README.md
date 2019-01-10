@@ -143,7 +143,8 @@ PackageId is defined as follows:
 
 ## Author
 
-[mob-sakai](https://github.com/mob-sakai)  
+[mob-sakai](https://github.com/mob-sakai)
+[![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)  
 [![become_a_patron](https://user-images.githubusercontent.com/12690315/50731615-ce9db580-11ac-11e9-964f-e0423533dc69.png)](https://www.patreon.com/join/2343451?)
 
 
