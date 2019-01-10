@@ -64,15 +64,15 @@ This project extends the UI of Unity Package Manager for package installed using
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.2.0",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
     ...
   },
 }
 ```
 3. Back in Unity, the package will be downloaded and imported.
 4. To open the package manager window, select `Window > Package Manager` from the main menu in Unity.
-5. The UI will be overridden when you select a package installed using git, such as UPM Git Extension.  
-6. Enjoy!
+5. The UI will be overridden when you select a package installed using git, such as UPM Git Extension.
+7. Enjoy!
 
 
 ##### Requirement
