@@ -119,9 +119,6 @@ namespace Coffee.PackageManager.Tests
 		}
 	}
 
-
-
-#if UPM_GIT_EXT_PROJECT
 	public class PackageInfoUtilsTests
 	{
 		const string repoURL = "https://github.com/mob-sakai/GitPackageTest";
@@ -167,5 +164,4 @@ namespace Coffee.PackageManager.Tests
 			return Utils.GetFileURL (isPackageInfoExist ? pi : null, fileName);
 		}
 	}
-#endif
 }
