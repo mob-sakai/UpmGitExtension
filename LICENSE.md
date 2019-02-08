@@ -1,1 +1,0 @@
-Assets/UpmGitExtension/LICENSE.md
