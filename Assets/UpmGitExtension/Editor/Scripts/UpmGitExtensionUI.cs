@@ -138,8 +138,8 @@ namespace Coffee.PackageManager
 				return;
 
 #if UNITY_2019_1_OR_NEWER
-			gitDetailActoins = asset.CloneTree().Q("detailActions");
-            gitDetailActoins.styleSheets.Add(EditorGUIUtility.Load(StylePath) as StyleSheet);
+			_gitDetailActoins = asset.CloneTree().Q("detailActions");
+            _gitDetailActoins.styleSheets.Add(EditorGUIUtility.Load(StylePath) as StyleSheet);
 #else
 			_gitDetailActoins = asset.CloneTree (null).Q ("detailActions");
 			_gitDetailActoins.AddStyleSheetPath (StylePath);
@@ -152,20 +152,35 @@ namespace Coffee.PackageManager
 			_viewLicense.clickable.clicked += () => Application.OpenURL (Utils.GetFileURL (_packageInfo, "LICENSE.md"));
 
 			// Move element to documentationContainer
-			_detailControls = parent.parent.Q("detailsControls");
+			_detailControls = parent.parent.Q ("detailsControls") ?? parent.parent.parent.parent.Q ("packageToolBar");
 			_documentationContainer = parent.parent.Q ("documentationContainer");
 			_originalDetailActions = _documentationContainer.Q ("detailActions");
 			_documentationContainer.Add (_gitDetailActoins);
 
 			_updateButton = new Button (AddOrUpdatePackage) { name = "update", text = "Up to date" };
 			_updateButton.AddToClassList ("action");
-			_versionPopup = new Button (PopupVersions) { text = "hoge", style = { marginLeft = -4, marginRight = -3, marginTop = -3, marginBottom = -3, }, };
+			_versionPopup = new Button (PopupVersions);
 			_versionPopup.AddToClassList ("popup");
 			_versionPopup.AddToClassList ("popupField");
 			_versionPopup.AddToClassList ("versions");
 
-			_detailControls.Q ("updateCombo").Insert (1,_updateButton);
-			_detailControls.Q ("updateDropdownContainer").Add(_versionPopup);
+			if (_detailControls.name == "packageToolBar")
+			{
+				_hostingIcon.style.borderLeftWidth = 0;
+				_hostingIcon.style.borderRightWidth = 0;
+				_versionPopup.style.marginLeft = -10;
+				_detailControls.Q ("rightItems").Insert (1, _updateButton);
+				_detailControls.Q ("rightItems").Insert (2, _versionPopup);
+			}
+			else
+			{
+				_versionPopup.style.marginLeft = -4;
+				_versionPopup.style.marginRight = -3;
+				_versionPopup.style.marginTop = -3;
+				_versionPopup.style.marginBottom = -3;
+				_detailControls.Q ("updateCombo").Insert (1, _updateButton);
+				_detailControls.Q ("updateDropdownContainer").Add (_versionPopup);
+			}
 
 			_initialized = true;
 		}
