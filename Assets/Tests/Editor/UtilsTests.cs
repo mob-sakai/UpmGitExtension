@@ -98,7 +98,6 @@ namespace Coffee.PackageManager.Tests
 		public IEnumerator RequestTest(LogType logType, string message, string url)
 		{
 			var path = Utils.GetRequestCachePath (url);
-			Debug.Log (path);
 			if(File.Exists(path))
 				File.Delete (path);
 
