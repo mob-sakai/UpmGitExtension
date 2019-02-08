@@ -31,10 +31,8 @@ echo -e ">> OK"
 
 # 2. << Update version in package.json >>
 echo -e "\n>> (2/8) Update version... package.json"
-[ -L package.json ] && PKG_JSON_PATH=`readlink package.json` || PKG_JSON_PATH=package.json
 git checkout -B release develop
-sed -i -e "s/\"version\": \(.*\)/\"version\": \"${RELEASE_VERSION}\",/g" "${PKG_JSON_PATH}"
-rm "${PKG_JSON_PATH}-e"
+sed -i '' -e "s/\"version\": \(.*\)/\"version\": \"${RELEASE_VERSION}\",/g" package.json
 echo -e ">> OK"
 
 
@@ -77,7 +75,7 @@ CHANGELOG_GENERATOR_ARG="--future-release ${RELEASE_VERSION} ${CHANGELOG_GENERAT
 echo -e "\n>> (4/8) Generate change log... ${CHANGELOG_GENERATOR_ARG}"
 github_changelog_generator ${CHANGELOG_GENERATOR_ARG}
 
-[ -L CHANGELOG.md ] && git diff -- `readlink CHANGELOG.md` || git diff -- CHANGELOG.md
+git diff -- CHANGELOG.md
 read -p "[? Is the change log correct? (y/N):" yn
 case "$yn" in [yY]*) ;; *) exit ;; esac
 echo -e ">> OK"
@@ -87,6 +85,7 @@ echo -e ">> OK"
 # 5. << Export unitypackage >>
 echo -e "\n>> (5/8) Export unitypackage..."
 set +e
+cp -f package.json CHANGELOG.md README.md $UNITY_PACKAGE_SRC
 "$UNITY_EDITOR" $UNITY_ARGS -exportpackage $UNITY_PACKAGE_SRC $UNITY_PACKAGE_NAME
 [ $? != 0 ] && echo -e "\n>> Error : \n`cat $UNITY_LOG | grep -E ': error CS|Fatal Error'`" && exit
 set -e
@@ -96,9 +95,8 @@ echo -e ">> OK"
 
 # 6. << Commit release files >>
 echo -e "\n>> (6/8) Commit release files..."
-[ -L CHANGELOG.md ] && git add -- "`readlink CHANGELOG.md`" || git add -- CHANGELOG.md
-[ -L package.json ] && git add -- "`readlink package.json`" || git add -- package.json
-git commit -m "update change log"
+git add -u
+git commit -m "update documents for $RELEASE_VERSION"
 echo -e ">> OK"
 
 
