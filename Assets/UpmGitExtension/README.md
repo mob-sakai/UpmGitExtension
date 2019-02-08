@@ -3,18 +3,18 @@ UPM Git Extension
 
 Git extension for Unity Package Manager (UPM)
 
-![](https://user-images.githubusercontent.com/12690315/50967879-c8953500-151c-11e9-91c8-37330fcb351d.png)
+![](https://user-images.githubusercontent.com/12690315/52475554-2d58b380-2bdf-11e9-9cdf-b91129af7547.png)
 
 [![](https://img.shields.io/github/release/mob-sakai/UpmGitExtension.svg?label=latest%20version)](https://github.com/mob-sakai/UpmGitExtension/releases)
 [![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/releases)
 ![](https://img.shields.io/badge/unity-2017%2B-green.svg)
-[![](https://img.shields.io/github/license/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/blob/master/LICENSE.txt)
+[![](https://img.shields.io/github/license/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/blob/upm/LICENSE.txt)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
 [![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)
 
 << [Description](#Description) | [WebGL Demo](#demo) | [Download](https://github.com/mob-sakai/UpmGitExtension/releases) | [Usage](#usage) | [Development Note](#development-note) >>
 
-### What's new? [See changelog ![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg?label=last%20updated)](https://github.com/mob-sakai/UpmGitExtension/blob/develop/CHANGELOG.md)
+### What's new? [See changelog ![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg?label=last%20updated)](https://github.com/mob-sakai/UpmGitExtension/blob/upm/CHANGELOG.md)
 ### Do you want to receive notifications for new releases? [Watch this repo ![](https://img.shields.io/github/watchers/mob-sakai/UpmGitExtension.svg?style=social&label=Watch)](https://github.com/mob-sakai/UpmGitExtension/subscription)
 ### Support me on Patreon! [![become_a_patron](https://user-images.githubusercontent.com/12690315/50731629-3b18b480-11ad-11e9-8fad-4b13f27969c1.png)](https://www.patreon.com/join/2343451?)
 
@@ -45,6 +45,7 @@ This project extends the UI of Unity Package Manager for package installed using
 * Support GitHub
 * Remove the package
 * Update the package with a specific tag/branch
+* Support Unity 2019.1+
 
 
 #### Future plans
@@ -77,7 +78,7 @@ This project extends the UI of Unity Package Manager for package installed using
 
 ##### Requirement
 
-* Unity 2018.3+
+* Unity 2018.3+ *(including 2019.1+)*
 
 
 
@@ -155,4 +156,4 @@ PackageId is defined as follows:
 * Releases : https://github.com/mob-sakai/UpmGitExtension/releases
 * Issue tracker : https://github.com/mob-sakai/UpmGitExtension/issues
 * Current project : https://github.com/mob-sakai/UpmGitExtension/projects/1
-* Change log : https://github.com/mob-sakai/UpmGitExtension/blob/master/CHANGELOG.md
+* Change log : https://github.com/mob-sakai/UpmGitExtension/blob/upm/CHANGELOG.md
