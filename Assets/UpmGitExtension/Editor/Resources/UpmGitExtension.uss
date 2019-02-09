@@ -4,7 +4,6 @@
 }
 
 #detailActions #hostingIcon {
-  background-image: resource("Images/GitHub-Mark-Light-32px");
   width: 16;
   height: 16;
   margin-left: 0;
@@ -24,4 +23,12 @@
 
 #detailActions #hostingIcon.github.dark {
   background-image: resource("Images/GitHub-Mark-Light-32px");
+}
+
+#detailActions #hostingIcon.bitbucket {
+  background-image: resource("Images/Bitbucket-Mark-32px");
+}
+
+#detailActions #hostingIcon.bitbucket.dark {
+  background-image: resource("Images/Bitbucket-Mark-Light-32px");
 }

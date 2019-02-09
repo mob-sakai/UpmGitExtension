@@ -102,7 +102,19 @@ namespace Coffee.PackageManager
 				;
 			}
 
-			Utils.SetElementClass (_hostingIcon, "github", true);
+			if (_packageInfo.packageId.Contains ("github.com"))
+			{
+				Utils.SetElementClass (_hostingIcon, "github", true);
+				Utils.SetElementClass (_hostingIcon, "bitbucket", false);
+				_hostingIcon.tooltip = "View on GitHub";
+			}
+			else if (_packageInfo.packageId.Contains ("bitbucket.org"))
+			{
+				Utils.SetElementClass (_hostingIcon, "github", false);
+				Utils.SetElementClass (_hostingIcon, "bitbucket", true);
+				_hostingIcon.tooltip = "View on Bitbucket";
+			}
+
 			Utils.SetElementClass (_hostingIcon, "dark", EditorGUIUtility.isProSkin);
 		}
 
