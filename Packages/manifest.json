@@ -1,6 +1,9 @@
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/GitPackageTest.git#0.3.0",
+    "com.coffee.softmask-for-ugui": "https://github.com/mob-sakai/SoftMaskForUGUI.git#0.5.0",
+    "com.coffee.upm-git-extension-test-bitbucket": "https://bitbucket.org/mob-sakai/GitPackageTest.git#0.4.0",
+    "com.coffee.upm-git-extension-test-github": "https://github.com/mob-sakai/GitPackageTest.git#0.4.0",
+    "com.coffee.upm-git-extension-test-gitlab": "https://gitlab.com/mob-sakai/GitPackageTest.git#0.4.0",
     "com.unity.ads": "2.3.1",
     "com.unity.analytics": "3.2.2",
     "com.unity.collab-proxy": "1.2.15",
@@ -40,9 +43,21 @@
     "com.unity.modules.xr": "1.0.0"
   },
   "lock": {
-    "com.coffee.upm-git-extension": {
-      "hash": "4386b3c3c27b1daaeed0292fc8dfcf62c7b1b427",
-      "revision": "0.3.0"
+    "com.coffee.softmask-for-ugui": {
+      "hash": "e954e6d3b247034a2551aaea9b94359eabd9750b",
+      "revision": "0.5.0"
+    },
+    "com.coffee.upm-git-extension-test-github": {
+      "hash": "fdcd7a6d0ff19c4a717cfb3153ba1f4bf1004d47",
+      "revision": "0.4.0"
+    },
+    "com.coffee.upm-git-extension-test-gitlab": {
+      "hash": "bd7bd7aeab432583dfbe899b85f6a4eee774a682",
+      "revision": "0.4.0"
+    },
+    "com.coffee.upm-git-extension-test-bitbucket": {
+      "hash": "d0f59ba80f24de526e9963ecad44b057feb38ad8",
+      "revision": "0.4.0"
     }
   }
 }
