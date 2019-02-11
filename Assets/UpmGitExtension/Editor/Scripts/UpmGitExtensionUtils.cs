@@ -125,7 +125,7 @@ namespace Coffee.PackageManager
 
 			string repoURL = GetRepoURL (packageId);
 			string hash = GetRevisionHash (resolvedPath);
-			string blob = "blob";
+			string blob = UpmGitSettings.GetHostData(packageId).Blob;
 
 			return string.Format ("{0}/{1}/{2}/{3}", repoURL, blob, hash, filePath);
 		}
@@ -177,7 +177,7 @@ namespace Coffee.PackageManager
 						result.Add (m.Groups[2].Value);
 					}
 				};
-				launchProcess.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty (e.Data)) s_sbError.AppendLine (e.Data); };
+				launchProcess.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty (e.Data) && !e.Data.StartsWith("warning")) s_sbError.AppendLine (e.Data); };
 				launchProcess.Exited += (sender, e) =>
 				{
 					exited = true;

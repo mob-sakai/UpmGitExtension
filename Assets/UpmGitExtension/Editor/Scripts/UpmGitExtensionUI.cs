@@ -107,22 +107,11 @@ namespace Coffee.PackageManager
 					_detailControls.Q ("remove").SetEnabled (true);
 				}
 				;
-			}
+				_currentHostData = UpmGitSettings.GetHostData (_packageInfo.packageId);
 
-			if (_packageInfo.packageId.Contains ("github.com"))
-			{
-				Utils.SetElementClass (_hostingIcon, "github", true);
-				Utils.SetElementClass (_hostingIcon, "bitbucket", false);
-				_hostingIcon.tooltip = "View on GitHub";
+				_hostingIcon.tooltip = "View on " + _currentHostData.Name;
+				_hostingIcon.style.backgroundImage = EditorGUIUtility.isProSkin ? _currentHostData.LogoLight : _currentHostData.LogoDark;
 			}
-			else if (_packageInfo.packageId.Contains ("bitbucket.org"))
-			{
-				Utils.SetElementClass (_hostingIcon, "github", false);
-				Utils.SetElementClass (_hostingIcon, "bitbucket", true);
-				_hostingIcon.tooltip = "View on Bitbucket";
-			}
-
-			Utils.SetElementClass (_hostingIcon, "dark", EditorGUIUtility.isProSkin);
 		}
 
 
@@ -146,6 +135,7 @@ namespace Coffee.PackageManager
 		List<string> _tags = new List<string> ();
 		List<string> _branches = new List<string> ();
 		List<string> _refs = new List<string> ();
+		HostData _currentHostData = null;
 
 		/// <summary>
 		/// Initializes UI.
