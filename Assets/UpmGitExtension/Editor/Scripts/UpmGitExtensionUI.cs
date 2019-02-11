@@ -5,6 +5,7 @@ using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using Utils = Coffee.PackageManager.UpmGitExtensionUtils;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 #if UNITY_2019_1_OR_NEWER
@@ -89,10 +90,16 @@ namespace Coffee.PackageManager
 
 			if(isGit)
 			{
-				Utils.RequestTags (_packageInfo.packageId, _tags);
-				Utils.RequestBranches (_packageInfo.packageId, _branches);
+				_updateButton.text = "Update to";
+				_versionPopup.SetEnabled (false);
+				_updateButton.SetEnabled (false);
+				Utils.GetRefs (_packageInfo.packageId, _refs, () =>
+				{
+					_updateButton.SetEnabled (_currentRefName != _selectedRefName);
+					_versionPopup.SetEnabled (true);
+				});
 
-				SetVersion (_packageInfo.version);
+				SetVersion (_currentRefName);
 				EditorApplication.delayCall += ()=>
 				{
 					Utils.SetElementDisplay (_detailControls.Q ("updateCombo"), true);
@@ -128,6 +135,8 @@ namespace Coffee.PackageManager
 		Button _viewDocumentation { get { return _gitDetailActoins.Q<Button> ("viewDocumentation"); } }
 		Button _viewChangelog { get { return _gitDetailActoins.Q<Button> ("viewChangelog"); } }
 		Button _viewLicense { get { return _gitDetailActoins.Q<Button> ("viewLicense"); } }
+		string _currentRefName { get { return Utils.GetRefName (_packageInfo.packageId); } }
+		string _selectedRefName { get { return _versionPopup.text != "(default)" ? _versionPopup.text : ""; } }
 		VisualElement _detailControls;
 		VisualElement _documentationContainer;
 		VisualElement _originalDetailActions;
@@ -136,6 +145,7 @@ namespace Coffee.PackageManager
 		Button _updateButton;
 		List<string> _tags = new List<string> ();
 		List<string> _branches = new List<string> ();
+		List<string> _refs = new List<string> ();
 
 		/// <summary>
 		/// Initializes UI.
@@ -197,32 +207,32 @@ namespace Coffee.PackageManager
 			_initialized = true;
 		}
 
-		public static string GetVersionText(string version, string current = null)
-		{
-			return (current == null || current != version) ? version : version + " - current";
-		}
-
 		void PopupVersions()
 		{
 			var menu = new GenericMenu ();
-			var current = _packageInfo.version;
+			var currentRefName = _currentRefName;
 
-			menu.AddItem (new GUIContent (current + " - current"), _versionPopup.text == current, SetVersion, current);
+			menu.AddItem (new GUIContent (currentRefName + " - current"), _selectedRefName == currentRefName, SetVersion, currentRefName);
 
-			foreach (var t in _tags.OrderByDescending(x=>x))
+			// x.y(.z-sufix) only 
+			foreach (var t in _refs.Where(x=>Regex.IsMatch(x, "^\\d+\\.\\d+.*$")).OrderByDescending (x => x))
 			{
-				string tag = t;
-				GUIContent text = new GUIContent ("All Tags/" + (current == tag ? tag + " - current" : tag));
-				menu.AddItem (text, _versionPopup.text == tag, SetVersion, tag);
+				string target = t;
+				bool isCurrent = currentRefName == target;
+				GUIContent text = new GUIContent ("All Versions/" + (isCurrent ? target + " - current" : target));
+				menu.AddItem (text, isCurrent, SetVersion, target);
 			}
 
-			menu.AddItem (new GUIContent ("All Branches/(default)"), false, SetVersion, "(default)");
-			foreach (var t in _branches.OrderBy (x => x))
+			// other 
+			menu.AddItem (new GUIContent ("All Versions/Other/(default)"), _selectedRefName == "", SetVersion, "(default)");
+			foreach (var t in _refs.Where (x => !Regex.IsMatch (x, "^\\d+\\.\\d+.*$")).OrderByDescending (x => x))
 			{
-				string tag = t;
-				GUIContent text = new GUIContent ("All Branches/" + (current == tag ? tag + " - current" : tag));
-				menu.AddItem (text, _versionPopup.text == tag, SetVersion, tag);
+				string target = t;
+				bool isCurrent = currentRefName == target;
+				GUIContent text = new GUIContent ("All Versions/Other/" + (isCurrent ? target + " - current" : target));
+				menu.AddItem (text, isCurrent, SetVersion, target);
 			}
+
 			menu.DropDown (new Rect (_versionPopup.LocalToWorld (new Vector2 (0, 10)), Vector2.zero));
 		}
 
@@ -230,8 +240,7 @@ namespace Coffee.PackageManager
 		{
 			string ver = version as string;
 			_versionPopup.text = ver;
-			_updateButton.SetEnabled (_packageInfo.version != ver);
-			_updateButton.SetEnabled(true);
+			_updateButton.SetEnabled (_currentRefName != _selectedRefName);
 		}
 
 		void AddOrUpdatePackage()
@@ -239,6 +248,10 @@ namespace Coffee.PackageManager
 			var target = _versionPopup.text != "(default)" ? _versionPopup.text : "";
 			var id = Utils.GetSpecificPackageId (_packageInfo.packageId, target);
 			Client.Add (id);
+
+			_versionPopup.SetEnabled (false);
+			_updateButton.SetEnabled (false);
+			_updateButton.text = "Updating to";
 		}
 	}
 }

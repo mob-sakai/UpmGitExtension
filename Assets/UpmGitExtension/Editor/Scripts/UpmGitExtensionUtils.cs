@@ -12,11 +12,14 @@ using System.IO;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Coffee.PackageManager
 {
 	internal static class UpmGitExtensionUtils
 	{
+		static readonly StringBuilder s_sbError = new StringBuilder ();
+
 		const string kDisplayNone = "display-none";
 		public static void SetElementDisplay (VisualElement element, bool value)
 		{
@@ -68,6 +71,16 @@ namespace Coffee.PackageManager
 				repoUrl = Regex.Replace (repoUrl, "\\.git$", "");
 
 				return repoUrl;
+			}
+			return "";
+		}
+
+		public static string GetRefName (string packageId)
+		{
+			Match m = Regex.Match (packageId, "^[^@]+@[^#]+#(.+)$");
+			if (m.Success)
+			{
+				return m.Groups [1].Value;
 			}
 			return "";
 		}
@@ -210,6 +223,61 @@ namespace Coffee.PackageManager
 				www.Dispose ();
 			};
 			return op;
+		}
+
+		public static WaitUntil GetRefs (string packageId, List<string> result, Action onSuccess)
+		{
+			result.Clear ();
+			s_sbError.Length = 0;
+			string repoUrl = GetRepoURL (packageId);
+			var startInfo = new System.Diagnostics.ProcessStartInfo
+			{
+				Arguments = "ls-remote --refs -q " + repoUrl,
+				CreateNoWindow = true,
+				FileName = "git",
+				RedirectStandardError = true,
+				RedirectStandardOutput = true,
+				UseShellExecute = false,
+			};
+
+			bool exited = false;
+			var launchProcess = System.Diagnostics.Process.Start (startInfo);
+			if (launchProcess == null || launchProcess.HasExited == true || launchProcess.Id == 0)
+			{
+				Debug.LogError ("No 'git' executable was found. Please install Git on your system and restart Unity");
+				return null;
+			}
+			else
+			{
+				//Add process callback.
+				launchProcess.OutputDataReceived += (sender, e) =>
+				{
+					var m = Regex.Match (e.Data, "refs/(tags|heads)/(.*)$");
+					if(m.Success)
+					{
+						result.Add (m.Groups[2].Value);
+					}
+				};
+				launchProcess.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty (e.Data)) s_sbError.AppendLine (e.Data); };
+				launchProcess.Exited += (sender, e) =>
+				{
+					exited = true;
+					bool success = 0 == s_sbError.Length;
+					if (!success)
+					{
+						Debug.LogErrorFormat ("Error: {0} => {1}\n\n{2}", packageId, repoUrl, s_sbError);
+					}
+					else
+					{
+						onSuccess ();
+					}
+				};
+
+				launchProcess.BeginOutputReadLine ();
+				launchProcess.BeginErrorReadLine ();
+				launchProcess.EnableRaisingEvents = true;
+			}
+			return new WaitUntil (() => exited);
 		}
 	}
 }
