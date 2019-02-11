@@ -54,8 +54,8 @@ namespace Coffee.PackageManager
 		/// <param name="packageInfo">The package information</param>
 		public void OnPackageAddedOrUpdated (PackageInfo packageInfo)
 		{
-			if(_detailControls != null)
-				_detailControls.SetEnabled(true);
+			if (_detailControls != null)
+				_detailControls.SetEnabled (true);
 		}
 
 		/// <summary>
@@ -88,7 +88,7 @@ namespace Coffee.PackageManager
 			Utils.SetElementDisplay (_updateButton, isGit);
 			Utils.SetElementDisplay (_versionPopup, isGit);
 
-			if(isGit)
+			if (isGit)
 			{
 				_updateButton.text = "Update to";
 				_versionPopup.SetEnabled (false);
@@ -100,7 +100,7 @@ namespace Coffee.PackageManager
 				});
 
 				SetVersion (_currentRefName);
-				EditorApplication.delayCall += ()=>
+				EditorApplication.delayCall += () =>
 				{
 					Utils.SetElementDisplay (_detailControls.Q ("updateCombo"), true);
 					Utils.SetElementDisplay (_detailControls.Q ("remove"), true);
@@ -207,7 +207,7 @@ namespace Coffee.PackageManager
 			_initialized = true;
 		}
 
-		void PopupVersions()
+		void PopupVersions ()
 		{
 			var menu = new GenericMenu ();
 			var currentRefName = _currentRefName;
@@ -215,7 +215,7 @@ namespace Coffee.PackageManager
 			menu.AddItem (new GUIContent (currentRefName + " - current"), _selectedRefName == currentRefName, SetVersion, currentRefName);
 
 			// x.y(.z-sufix) only 
-			foreach (var t in _refs.Where(x=>Regex.IsMatch(x, "^\\d+\\.\\d+.*$")).OrderByDescending (x => x))
+			foreach (var t in _refs.Where (x => Regex.IsMatch (x, "^\\d+\\.\\d+.*$")).OrderByDescending (x => x))
 			{
 				string target = t;
 				bool isCurrent = currentRefName == target;
@@ -236,14 +236,14 @@ namespace Coffee.PackageManager
 			menu.DropDown (new Rect (_versionPopup.LocalToWorld (new Vector2 (0, 10)), Vector2.zero));
 		}
 
-		void SetVersion(object version)
+		void SetVersion (object version)
 		{
 			string ver = version as string;
 			_versionPopup.text = ver;
 			_updateButton.SetEnabled (_currentRefName != _selectedRefName);
 		}
 
-		void AddOrUpdatePackage()
+		void AddOrUpdatePackage ()
 		{
 			var target = _versionPopup.text != "(default)" ? _versionPopup.text : "";
 			var id = Utils.GetSpecificPackageId (_packageInfo.packageId, target);
