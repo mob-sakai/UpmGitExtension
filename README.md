@@ -84,6 +84,20 @@ This project extends the UI of Unity Package Manager for package installed using
 <br><br><br><br>
 ## Development Note
 
+#### For Unity 2019.1+
+
+For Unity 2019.1+, use UpmGitExtension 0.5.0 or higher.
+Find the manifest.json file in the Packages folder of your project and edit it to look like this:
+```js
+{
+  "dependencies": {
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.5.0",
+    ...
+  },
+}
+```
+
+
 #### Develop a package for UPM
 
 The branching strategy when I develop a package for UPM is as follows.
@@ -102,9 +116,8 @@ The branching strategy when I develop a package for UPM is as follows.
 4. Generate `CHANGELOG.md` using `github_changelog_generator` and commit it.
 5. Merge into master branch and publish as new version.
 6. Split subtree into ump branch.
-7. Squash and push.
-8. Tag on ump branch as new version.
-9. Release.
+7. Tag on ump branch as new version.
+8. Release.
 
 
 #### About default document URL
