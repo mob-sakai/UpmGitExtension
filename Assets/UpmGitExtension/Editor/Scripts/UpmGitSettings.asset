@@ -23,3 +23,8 @@ MonoBehaviour:
     Blob: src
     LogoDark: {fileID: 2800000, guid: 881a419a86f124aaab2df7b248411134, type: 3}
     LogoLight: {fileID: 2800000, guid: 881a419a86f124aaab2df7b248411134, type: 3}
+  - Name: GitLab
+    Domain: gitlab.com
+    Blob: blob
+    LogoDark: {fileID: 2800000, guid: 740e5e8844144484d87006fe78fee6c0, type: 3}
+    LogoLight: {fileID: 2800000, guid: 740e5e8844144484d87006fe78fee6c0, type: 3}
