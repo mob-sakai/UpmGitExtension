@@ -2,7 +2,7 @@
 	"name": "com.coffee.upm-git-extension",
 	"displayName": "UPM Git Extension",
 	"description": "This plugin extends the UI of Unity Package Manager for the packages installed with git.\n\n - Support GitHub and Bitbucket\n - Add link to the repogitory\n - link to the online documents\n - Update the package with a specific tag/branch\n - Remove the package",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"unity": "2018.3",
 	"license": "MIT",
 	"repository": {
