@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.1](https://github.com/mob-sakai/UpmGitExtension/tree/0.6.1) (2019-02-12)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.6.0...0.6.1)
+
+**Implemented enhancements:**
+
+- Update readme [\#18](https://github.com/mob-sakai/UpmGitExtension/issues/18)
+
 ## [0.6.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.6.0) (2019-02-12)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.5.0...0.6.0)

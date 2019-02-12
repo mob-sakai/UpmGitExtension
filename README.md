@@ -3,7 +3,7 @@ UPM Git Extension
 
 Git extension for Unity Package Manager (UPM)
 
-![](https://user-images.githubusercontent.com/12690315/52516811-6d1daa80-2c74-11e9-9cb5-edf6846032c2.png)
+![](https://user-images.githubusercontent.com/12690315/52618974-b7589300-2ee3-11e9-89e8-c3015dd22857.png)
 
 [![](https://img.shields.io/github/release/mob-sakai/UpmGitExtension.svg?label=latest%20version)](https://github.com/mob-sakai/UpmGitExtension/releases)
 [![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/releases)
@@ -42,7 +42,7 @@ This project extends the UI of Unity Package Manager for package installed using
   * Readme
   * Changelog
   * License
-* Support GitHub and Bitbucket
+* Support GitHub, Bitbucket and GitLab
 * Remove the package
 * Update the package with a specific tag/branch
 * Support Unity 2019.1+
