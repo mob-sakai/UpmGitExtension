@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.6.0) (2019-02-12)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.5.0...0.6.0)
+
+**Implemented enhancements:**
+
+- Use system git instead of WebRequest to get branch/tag names [\#17](https://github.com/mob-sakai/UpmGitExtension/issues/17)
+- Support GitLab.com [\#14](https://github.com/mob-sakai/UpmGitExtension/issues/14)
+
+**Fixed bugs:**
+
+- Bitbucket document links are dead [\#16](https://github.com/mob-sakai/UpmGitExtension/issues/16)
+
 ## [0.5.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.5.0) (2019-02-09)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.4.0...0.5.0)

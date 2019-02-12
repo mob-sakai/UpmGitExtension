@@ -1,14 +1,10 @@
 ﻿using System.Linq;
 using System.Collections;
-using System.Collections.Generic;
 using NUnit.Framework;
-using UnityEngine;
 using UnityEngine.TestTools;
 using Utils = Coffee.PackageManager.UpmGitExtensionUtils;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UnityEditor.PackageManager;
-using System.IO;
-using System;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
@@ -87,34 +83,6 @@ namespace Coffee.PackageManager.Tests
 			}
 
 			return Utils.HasElementClass (_element, "test");
-		}
-
-
-		[TestCase (LogType.Log, "Success", "https://api.github.com/repos/"+ userRepo + "/tags", ExpectedResult = null)]
-		[TestCase (LogType.Error, "HTTP/1.1 404 Not Found", "https://api.github.com/repos/"+ userRepo + "/tags2", ExpectedResult = null)]
-		[TestCase (LogType.Error, "Cannot resolve destination host", "https://api.githuberror.com/repos/"+ userRepo + "/tags", ExpectedResult =null)]
-		[UnityTest]
-		[Order(0)]
-		public IEnumerator RequestTest(LogType logType, string message, string url)
-		{
-			var path = Utils.GetRequestCachePath (url);
-			if(File.Exists(path))
-				File.Delete (path);
-
-			LogAssert.Expect (logType, message);
-			yield return Utils.Request(url, x=>Debug.Log("Success"));
-		}
-
-		[TestCase (LogType.Log, "Success", "https://api.github.com/repos/"+ userRepo + "/tags", ExpectedResult = null)]
-		[UnityTest]
-		[Order (1)]
-		public IEnumerator RequestCacheTest (LogType logType, string message, string url)
-		{
-			Assert.IsNotNull (Utils.GetRequestCache (url));
-
-			LogAssert.Expect (logType, message);
-			Utils.Request (url, x => Debug.Log ("Success"));
-			yield break;
 		}
 	}
 
