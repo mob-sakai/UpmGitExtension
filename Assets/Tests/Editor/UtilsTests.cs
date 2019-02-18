@@ -2,7 +2,6 @@
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
-using Utils = Coffee.PackageManager.UpmGitExtensionUtils;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UnityEditor.PackageManager;
 #if UNITY_2019_1_OR_NEWER
@@ -34,7 +33,7 @@ namespace Coffee.PackageManager.Tests
 		[TestCase (packageName + "@git:git@github.com:" + userRepo + ".git#0.3.0", ExpectedResult = repoURL)]
 		public string GetRepoURLTest (string packageId)
 		{
-			return Utils.GetRepoURL (packageId);
+			return PackageUtils.GetRepoHttpUrl (packageId);
 		}
 
 		[TestCase ("", ExpectedResult = "")]
@@ -48,7 +47,7 @@ namespace Coffee.PackageManager.Tests
 		[TestCase (packageName + "@git:git@github.com:" + userRepo + ".git#0.3.0", ExpectedResult = userRepo)]
 		public string GetRepoIdTest (string packageId)
 		{
-			return Utils.GetRepoId (packageId);
+			return PackageUtils.GetRepoId (packageId);
 		}
 
 		[TestCase ("", ExpectedResult = true)]
@@ -62,10 +61,10 @@ namespace Coffee.PackageManager.Tests
 			if (0 < operations.Length)
 			{
 				foreach (bool flag in operations.Split (',').Select (System.Convert.ToBoolean))
-					Utils.SetElementDisplay (_element, flag);
+					UIUtils.SetElementDisplay (_element, flag);
 			}
 
-			return Utils.IsElementDisplay (_element);
+			return UIUtils.IsElementDisplay (_element);
 		}
 
 		[TestCase ("", ExpectedResult = false)]
@@ -79,10 +78,10 @@ namespace Coffee.PackageManager.Tests
 			if (0 < operations.Length)
 			{
 				foreach (bool flag in operations.Split (',').Select (System.Convert.ToBoolean))
-					Utils.SetElementClass (_element, "test", flag);
+					UIUtils.SetElementClass (_element, "test", flag);
 			}
 
-			return Utils.HasElementClass (_element, "test");
+			return UIUtils.HasElementClass (_element, "test");
 		}
 	}
 
@@ -114,21 +113,21 @@ namespace Coffee.PackageManager.Tests
 		[TestCase (true, ExpectedResult = repoURL)]
 		public string GetRepoURLTest (bool isPackageInfoExist)
 		{
-			return Utils.GetRepoURL (isPackageInfoExist ? pi : null);
+			return PackageUtils.GetRepoHttpUrl (isPackageInfoExist ? pi : null);
 		}
 
 		[TestCase (false, ExpectedResult = "")]
 		[TestCase (true, ExpectedResult = revisionHash)]
 		public string GetRevisionHashTest (bool isPackageInfoExist)
 		{
-			return Utils.GetRevisionHash (isPackageInfoExist ? pi : null);
+			return PackageUtils.GetRevisionHash (isPackageInfoExist ? pi : null);
 		}
 
 		[TestCase (false, "README.md", ExpectedResult = "")]
 		[TestCase (true, "README.md", ExpectedResult = fileURL)]
 		public string GetFileURLTest (bool isPackageInfoExist, string fileName)
 		{
-			return Utils.GetFileURL (isPackageInfoExist ? pi : null, fileName);
+			return PackageUtils.GetFileURL (isPackageInfoExist ? pi : null, fileName);
 		}
 	}
 }

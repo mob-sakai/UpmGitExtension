@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
 using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
-using Utils = Coffee.PackageManager.UpmGitExtensionUtils;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System;
+using System.Reflection;
 
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -82,18 +84,20 @@ namespace Coffee.PackageManager
 
 			var isGit = packageInfo.source == PackageSource.Git;
 
-			Utils.SetElementDisplay (_gitDetailActoins, isGit);
-			Utils.SetElementDisplay (_originalDetailActions, !isGit);
-			Utils.SetElementDisplay (_detailControls.Q ("", "popupField"), !isGit);
-			Utils.SetElementDisplay (_updateButton, isGit);
-			Utils.SetElementDisplay (_versionPopup, isGit);
+			UIUtils.SetElementDisplay (_gitDetailActoins, isGit);
+			UIUtils.SetElementDisplay (_originalDetailActions, !isGit);
+			UIUtils.SetElementDisplay (_detailControls.Q ("", "popupField"), !isGit);
+			UIUtils.SetElementDisplay (_updateButton, isGit);
+			UIUtils.SetElementDisplay (_versionPopup, isGit);
+			UIUtils.SetElementDisplay (_originalAddButton, false);
+			UIUtils.SetElementDisplay (_addButton, true);
 
 			if (isGit)
 			{
 				_updateButton.text = "Update to";
 				_versionPopup.SetEnabled (false);
 				_updateButton.SetEnabled (false);
-				Utils.GetRefs (_packageInfo.packageId, _refs, () =>
+				GitUtils.GetRefs (PackageUtils.GetRepoHttpUrl (_packageInfo.packageId), _refs, () =>
 				{
 					_updateButton.SetEnabled (_currentRefName != _selectedRefName);
 					_versionPopup.SetEnabled (true);
@@ -102,12 +106,12 @@ namespace Coffee.PackageManager
 				SetVersion (_currentRefName);
 				EditorApplication.delayCall += () =>
 				{
-					Utils.SetElementDisplay (_detailControls.Q ("updateCombo"), true);
-					Utils.SetElementDisplay (_detailControls.Q ("remove"), true);
+					UIUtils.SetElementDisplay (_detailControls.Q ("updateCombo"), true);
+					UIUtils.SetElementDisplay (_detailControls.Q ("remove"), true);
 					_detailControls.Q ("remove").SetEnabled (true);
 				}
 				;
-				_currentHostData = UpmGitSettings.GetHostData (_packageInfo.packageId);
+				_currentHostData = Settings.GetHostData (_packageInfo.packageId);
 
 				_hostingIcon.tooltip = "View on " + _currentHostData.Name;
 				_hostingIcon.style.backgroundImage = EditorGUIUtility.isProSkin ? _currentHostData.LogoLight : _currentHostData.LogoDark;
@@ -124,18 +128,22 @@ namespace Coffee.PackageManager
 		Button _viewDocumentation { get { return _gitDetailActoins.Q<Button> ("viewDocumentation"); } }
 		Button _viewChangelog { get { return _gitDetailActoins.Q<Button> ("viewChangelog"); } }
 		Button _viewLicense { get { return _gitDetailActoins.Q<Button> ("viewLicense"); } }
-		string _currentRefName { get { return Utils.GetRefName (_packageInfo.packageId); } }
+		string _currentRefName { get { return PackageUtils.GetRefName (_packageInfo.packageId); } }
 		string _selectedRefName { get { return _versionPopup.text != "(default)" ? _versionPopup.text : ""; } }
 		VisualElement _detailControls;
 		VisualElement _documentationContainer;
 		VisualElement _originalDetailActions;
 		VisualElement _gitDetailActoins;
+		VisualElement _originalAddButton;
+		VisualElement _addButton;
 		Button _versionPopup;
 		Button _updateButton;
 		List<string> _tags = new List<string> ();
 		List<string> _branches = new List<string> ();
 		List<string> _refs = new List<string> ();
 		HostData _currentHostData = null;
+
+
 
 		/// <summary>
 		/// Initializes UI.
@@ -151,17 +159,17 @@ namespace Coffee.PackageManager
 
 #if UNITY_2019_1_OR_NEWER
 			_gitDetailActoins = asset.CloneTree().Q("detailActions");
-            _gitDetailActoins.styleSheets.Add(EditorGUIUtility.Load(StylePath) as StyleSheet);
+            _gitDetailActoins.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet> (StylePath));
 #else
 			_gitDetailActoins = asset.CloneTree (null).Q ("detailActions");
 			_gitDetailActoins.AddStyleSheetPath (StylePath);
 #endif
 
 			// Add callbacks
-			_hostingIcon.clickable.clicked += () => Application.OpenURL (Utils.GetRepoURL (_packageInfo));
-			_viewDocumentation.clickable.clicked += () => Application.OpenURL (Utils.GetFileURL (_packageInfo, "README.md"));
-			_viewChangelog.clickable.clicked += () => Application.OpenURL (Utils.GetFileURL (_packageInfo, "CHANGELOG.md"));
-			_viewLicense.clickable.clicked += () => Application.OpenURL (Utils.GetFileURL (_packageInfo, "LICENSE.md"));
+			_hostingIcon.clickable.clicked += () => Application.OpenURL (PackageUtils.GetRepoHttpUrl (_packageInfo));
+			_viewDocumentation.clickable.clicked += () => Application.OpenURL (PackageUtils.GetFileURL (_packageInfo, "README.md"));
+			_viewChangelog.clickable.clicked += () => Application.OpenURL (PackageUtils.GetFileURL (_packageInfo, "CHANGELOG.md"));
+			_viewLicense.clickable.clicked += () => Application.OpenURL (PackageUtils.GetFileURL (_packageInfo, "LICENSE.md"));
 
 			// Move element to documentationContainer
 			_detailControls = parent.parent.Q ("detailsControls") ?? parent.parent.parent.parent.Q ("packageToolBar");
@@ -193,6 +201,13 @@ namespace Coffee.PackageManager
 				_detailControls.Q ("updateCombo").Insert (1, _updateButton);
 				_detailControls.Q ("updateDropdownContainer").Add (_versionPopup);
 			}
+
+			// Add package button
+			_originalAddButton = UIUtils.GetRoot (_gitDetailActoins).Q ("statusBarContainer").Q ("moreAddOptionsButton");
+			_addButton = new Button (AddPackage) { name = "moreAddOptionsButton", text = "+" };
+
+			UIUtils.GetRoot (_gitDetailActoins).Q ("statusBarContainer").Add (_addButton);
+
 
 			_initialized = true;
 		}
@@ -236,12 +251,39 @@ namespace Coffee.PackageManager
 		void AddOrUpdatePackage ()
 		{
 			var target = _versionPopup.text != "(default)" ? _versionPopup.text : "";
-			var id = Utils.GetSpecificPackageId (_packageInfo.packageId, target);
-			Client.Add (id);
+			var id = PackageUtils.GetSpecificPackageId (_packageInfo.packageId, target);
+			PackageUtils.AddPackage (id);
 
 			_versionPopup.SetEnabled (false);
 			_updateButton.SetEnabled (false);
 			_updateButton.text = "Updating to";
 		}
+
+
+		void AddPackage ()
+		{
+			var typePackage = Type.GetType ("UnityEditor.PackageManager.UI.Package, Unity.PackageManagerUI.Editor");
+			var piAddRemoveOperationInProgress = typePackage.GetProperty ("AddRemoveOperationInProgress", BindingFlags.Static | BindingFlags.Public);
+			var miAddFromLocalDisk = typePackage.GetMethod ("AddFromLocalDisk", BindingFlags.Static | BindingFlags.NonPublic);
+			var addPackageFromDiskItem = new GUIContent ("Add package from disk...");
+			var menu = new GenericMenu ();
+
+			var menuPosition = _addButton.LocalToWorld (new Vector2 (_addButton.layout.width, 0));
+			var menuRect = new Rect (menuPosition + new Vector2(0, -15), Vector2.zero);
+
+			menu.AddItem (new GUIContent ("Add package from disk..."), false, delegate
+			{
+				var path = EditorUtility.OpenFilePanelWithFilters ("Select package on disk", "", new [] { "package.json file", "json" });
+				if (!string.IsNullOrEmpty (path) && !(bool)piAddRemoveOperationInProgress.GetValue (null))
+					miAddFromLocalDisk.Invoke (null, new object [] { path });
+			});
+			menu.AddItem (new GUIContent ("Add package from URL..."), false, delegate
+			{
+				EditorWindow.GetWindow<UpmGitAddWindow> (true);
+			});
+
+			menu.DropDown (menuRect);
+		}
+
 	}
 }
