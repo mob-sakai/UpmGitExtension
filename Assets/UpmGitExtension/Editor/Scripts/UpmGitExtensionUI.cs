@@ -203,11 +203,13 @@ namespace Coffee.PackageManager
 			}
 
 			// Add package button
-			_originalAddButton = UIUtils.GetRoot (_gitDetailActoins).Q ("statusBarContainer").Q ("moreAddOptionsButton");
+			var _root = UIUtils.GetRoot (_gitDetailActoins);
+			_originalAddButton = _root.Q ("toolbarAddButton") ?? _root.Q ("moreAddOptionsButton");
 			_addButton = new Button (AddPackage) { name = "moreAddOptionsButton", text = "+" };
-
-			UIUtils.GetRoot (_gitDetailActoins).Q ("statusBarContainer").Add (_addButton);
-
+			_addButton.AddToClassList ("toolbarButton");
+			_addButton.AddToClassList ("space");
+			_addButton.AddToClassList ("pulldown");
+			_originalAddButton.parent.Insert (_originalAddButton.parent.IndexOf(_originalAddButton) + 1, _addButton);
 
 			_initialized = true;
 		}
