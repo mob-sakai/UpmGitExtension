@@ -3,7 +3,7 @@ UPM Git Extension
 
 Git extension for Unity Package Manager (UPM)
 
-![](https://user-images.githubusercontent.com/12690315/52618974-b7589300-2ee3-11e9-89e8-c3015dd22857.png)
+![](https://user-images.githubusercontent.com/12690315/52934439-cb940880-3399-11e9-8cc7-a0b70e3e64d8.png)
 
 [![](https://img.shields.io/github/release/mob-sakai/UpmGitExtension.svg?label=latest%20version)](https://github.com/mob-sakai/UpmGitExtension/releases)
 [![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/releases)
@@ -37,47 +37,71 @@ This project extends the UI of Unity Package Manager for package installed using
 
 #### Features
 
-* Show link to repo URL
+* Show link to repository URL
 * Override link to the document URL
   * Readme
   * Changelog
   * License
 * Support GitHub, Bitbucket and GitLab
-* Remove the package
-* Update the package with a specific tag/branch
+* Add package from url
+* Remove package
+* Update package with a specific tag/branch
 * Support Unity 2019.1+
 
 
 #### Future plans
 
-* Add package button
+* View offline documents for private repository
 * Display license
 * Override the document URL with package.json
 
 
 
 <br><br><br><br>
-## Usage
+## Install
 
-1. Find the manifest.json file in the Packages folder of your project.
-2. Edit it to look like this:
+Find `Packages/manifest.json` in your project and edit it to look like this:
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.7.0",
     ...
   },
 }
 ```
-3. Back in Unity, the package will be downloaded and imported.
-4. To open the package manager window, select `Window > Package Manager` from the main menu in Unity.
-5. The UI will be overridden when you select a package installed using git, such as UPM Git Extension.
-7. Enjoy!
+For Unity 2019.1+, use UpmGitExtension 0.5.0 or higher.
 
 
 ##### Requirement
 
 * Unity 2018.3+ *(including 2019.1+)*
+
+
+
+<br><br><br><br>
+## Usage
+
+#### Add package from url
+
+![](https://user-images.githubusercontent.com/12690315/52932712-0dba4b80-3394-11e9-8cb7-f141fcb24cb6.png)
+
+1. Click `+` button and select `Add package from url` to open window
+2. Input repository url and select a tag or branch
+3. Wait a few seconds for validation
+4. Click `Add` button to add package
+
+
+#### Update package with a specific tag/branch
+
+![](https://user-images.githubusercontent.com/12690315/52932818-638ef380-3394-11e9-973f-8e2e1dc72342.png)
+
+1. Click version popup and select a tag/branch in repository
+2. Click `Update To` button
+
+
+#### Remove package
+
+1. Click `Remove` button
 
 
 
@@ -102,9 +126,8 @@ The branching strategy when I develop a package for UPM is as follows.
 4. Generate `CHANGELOG.md` using `github_changelog_generator` and commit it.
 5. Merge into master branch and publish as new version.
 6. Split subtree into ump branch.
-7. Squash and push.
-8. Tag on ump branch as new version.
-9. Release.
+7. Tag on ump branch as new version.
+8. Release.
 
 
 #### About default document URL
