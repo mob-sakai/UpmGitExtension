@@ -14,6 +14,7 @@ using System.Linq;
 using UnityEditor.PackageManager;
 using UnityEditor;
 using UnityEditor.PackageManager.Requests;
+using Markdig;
 
 namespace Coffee.PackageManager
 {
@@ -245,6 +246,28 @@ namespace Coffee.PackageManager
 			return string.Format ("{0}/{1}/{2}/{3}", repoURL, blob, hash, filePath);
 		}
 
+		public static string GetFilePath (PackageInfo packageInfo, string filePattern)
+		{
+			return packageInfo != null
+				? GetFilePath (packageInfo.resolvedPath, filePattern)
+				: "";
+		}
+
+		public static string GetFilePath (string resolvedPath, string filePattern)
+		{
+			if (string.IsNullOrEmpty (resolvedPath) || string.IsNullOrEmpty (filePattern))
+				return "";
+
+			foreach(var path in Directory.EnumerateFiles (resolvedPath, filePattern))
+			{
+				if(!path.EndsWith(".meta"))
+				{
+					return path;
+				}
+			}
+			return "";
+		}
+
 		public static string GetSpecificPackageId (string packageId, string tag)
 		{
 			if (string.IsNullOrEmpty (packageId))
@@ -290,6 +313,33 @@ namespace Coffee.PackageManager
 				_request = null;
 				return;
 			}
+		}
+	}
+
+	internal static class MarkdownUtils
+	{
+		const string k_CssFileName = "github-markdown";
+
+		static readonly MarkdownPipeline s_Pipeline = new MarkdownPipelineBuilder ().UseAdvancedExtensions ().Build ();
+		static readonly string s_TempDir = Path.Combine (Directory.GetCurrentDirectory (), "Temp");
+
+		public static void OpenInBrowser (string path)
+		{
+			string cssPath = Path.Combine (s_TempDir, k_CssFileName + ".css");
+			if (!File.Exists (cssPath))
+			{
+				File.Copy (AssetDatabase.GUIDToAssetPath (AssetDatabase.FindAssets (k_CssFileName) [0]), cssPath);
+			}
+
+			var htmlPath = Path.Combine (s_TempDir, Path.GetFileNameWithoutExtension (path) + ".html");
+			using (StreamReader sr = new StreamReader (path))
+			using (StreamWriter sw = new StreamWriter (htmlPath))
+			{
+				sw.WriteLine ("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + k_CssFileName + ".css\">");
+				sw.Write (Markdown.ToHtml (sr.ReadToEnd (), s_Pipeline));
+			}
+
+			Application.OpenURL ("file://" + htmlPath);
 		}
 	}
 }
