@@ -50,7 +50,7 @@ namespace Coffee.PackageManager
 				if (success)
 				{
 					foreach (Match m in Regex.Matches (output, "refs/(tags|heads)/(.*)$", RegexOptions.Multiline))
-						result.Add (m.Groups [2].Value);
+						result.Add (m.Groups [2].Value.Trim());
 				}
 				callback ();
 			});
