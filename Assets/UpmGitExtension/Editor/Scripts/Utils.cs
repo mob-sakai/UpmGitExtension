@@ -59,8 +59,7 @@ namespace Coffee.PackageManager
 		public static WaitWhile GetPackageJson (string repoUrl, string branch, Action<string> callback)
 		{
 			const string kPath = "Temp/UpmGit";
-			if (Directory.Exists (kPath))
-				Directory.Delete (kPath, true);
+			FileUtil.DeleteFileOrDirectory (kPath);
 
 			string args = string.Format ("clone --depth=1 --branch {0} --single-branch {1} {2}", branch, repoUrl, kPath);
 			return ExecuteGitCommand (args, (_, __) => callback (PackageJsonHelper.GetPackageName (kPath)));
