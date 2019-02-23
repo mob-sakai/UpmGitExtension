@@ -14,6 +14,7 @@ using System.Linq;
 using UnityEditor.PackageManager;
 using UnityEditor;
 using UnityEditor.PackageManager.Requests;
+using Markdig;
 
 namespace Coffee.PackageManager
 {
@@ -49,7 +50,7 @@ namespace Coffee.PackageManager
 				if (success)
 				{
 					foreach (Match m in Regex.Matches (output, "refs/(tags|heads)/(.*)$", RegexOptions.Multiline))
-						result.Add (m.Groups [2].Value);
+						result.Add (m.Groups [2].Value.Trim());
 				}
 				callback ();
 			});
@@ -58,8 +59,7 @@ namespace Coffee.PackageManager
 		public static WaitWhile GetPackageJson (string repoUrl, string branch, Action<string> callback)
 		{
 			const string kPath = "Temp/UpmGit";
-			if (Directory.Exists (kPath))
-				Directory.Delete (kPath, true);
+			FileUtil.DeleteFileOrDirectory (kPath);
 
 			string args = string.Format ("clone --depth=1 --branch {0} --single-branch {1} {2}", branch, repoUrl, kPath);
 			return ExecuteGitCommand (args, (_, __) => callback (PackageJsonHelper.GetPackageName (kPath)));
@@ -245,6 +245,28 @@ namespace Coffee.PackageManager
 			return string.Format ("{0}/{1}/{2}/{3}", repoURL, blob, hash, filePath);
 		}
 
+		public static string GetFilePath (PackageInfo packageInfo, string filePattern)
+		{
+			return packageInfo != null
+				? GetFilePath (packageInfo.resolvedPath, filePattern)
+				: "";
+		}
+
+		public static string GetFilePath (string resolvedPath, string filePattern)
+		{
+			if (string.IsNullOrEmpty (resolvedPath) || string.IsNullOrEmpty (filePattern))
+				return "";
+
+			foreach(var path in Directory.EnumerateFiles (resolvedPath, filePattern))
+			{
+				if(!path.EndsWith(".meta"))
+				{
+					return path;
+				}
+			}
+			return "";
+		}
+
 		public static string GetSpecificPackageId (string packageId, string tag)
 		{
 			if (string.IsNullOrEmpty (packageId))
@@ -290,6 +312,33 @@ namespace Coffee.PackageManager
 				_request = null;
 				return;
 			}
+		}
+	}
+
+	internal static class MarkdownUtils
+	{
+		const string k_CssFileName = "github-markdown";
+
+		static readonly MarkdownPipeline s_Pipeline = new MarkdownPipelineBuilder ().UseAdvancedExtensions ().Build ();
+		static readonly string s_TempDir = Path.Combine (Directory.GetCurrentDirectory (), "Temp");
+
+		public static void OpenInBrowser (string path)
+		{
+			string cssPath = Path.Combine (s_TempDir, k_CssFileName + ".css");
+			if (!File.Exists (cssPath))
+			{
+				File.Copy (AssetDatabase.GUIDToAssetPath (AssetDatabase.FindAssets (k_CssFileName) [0]), cssPath);
+			}
+
+			var htmlPath = Path.Combine (s_TempDir, Path.GetFileNameWithoutExtension (path) + ".html");
+			using (StreamReader sr = new StreamReader (path))
+			using (StreamWriter sw = new StreamWriter (htmlPath))
+			{
+				sw.WriteLine ("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + k_CssFileName + ".css\">");
+				sw.Write (Markdown.ToHtml (sr.ReadToEnd (), s_Pipeline));
+			}
+
+			Application.OpenURL ("file://" + htmlPath);
 		}
 	}
 }

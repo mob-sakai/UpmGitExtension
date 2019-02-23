@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.0) (2019-02-23)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.7.0...0.8.0)
+
+**Implemented enhancements:**
+
+- Focus to url text field when Add Package Window opened [\#24](https://github.com/mob-sakai/UpmGitExtension/issues/24)
+- View offline documents [\#20](https://github.com/mob-sakai/UpmGitExtension/issues/20)
+
+**Fixed bugs:**
+
+- Unable to add more than one package from url on Windows [\#23](https://github.com/mob-sakai/UpmGitExtension/issues/23)
+- Unable to add package from url on Windows [\#22](https://github.com/mob-sakai/UpmGitExtension/issues/22)
+
 ## [0.7.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.7.0) (2019-02-19)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.6.1...0.7.0)
