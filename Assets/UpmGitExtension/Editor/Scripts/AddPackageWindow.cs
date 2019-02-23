@@ -14,6 +14,7 @@ namespace Coffee.PackageManager
 {
 	public class UpmGitAddWindow : EditorWindow
 	{
+		bool _focused;
 		string _url = "";
 		string _repoUrl = "";
 		string _version = "(default)";
@@ -68,7 +69,15 @@ namespace Coffee.PackageManager
 				using (var ccs = new EditorGUI.ChangeCheckScope ())
 				using (new EditorGUILayout.HorizontalScope ())
 				{
+					GUI.SetNextControlName ("Repogitory URL");
 					_url = EditorGUILayout.TextField ("Repogitory URL", _url);
+
+					if (!_focused)
+					{
+						EditorGUI.FocusTextInControl ("Repogitory URL");
+						_focused = true;
+					}
+
 					if (ccs.changed)
 					{
 						_repoUrl = PackageUtils.GetRepoUrl (_url);
