@@ -38,7 +38,7 @@ namespace Coffee.PackageManager
 			var menu = new GenericMenu ();
 			var currentRefName = _version;
 
-			void callback (object x) => onVersionChanged (x as string);
+			GenericMenu.MenuFunction2 callback = (x) => onVersionChanged(x as string);
 
 			// x.y(.z-sufix) only 
 			foreach (var t in _refs.Where (x => Regex.IsMatch (x, "^\\d+\\.\\d+.*$")).OrderByDescending (x => x))

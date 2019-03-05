@@ -47,6 +47,7 @@ This project extends the UI of Unity Package Manager for package installed using
 * Remove package
 * Update package with a specific tag/branch
 * Support Unity 2019.1+
+* Support .Net 3.5 & 4.x
 
 
 #### Future plans
@@ -64,7 +65,7 @@ Find `Packages/manifest.json` in your project and edit it to look like this:
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.7.0",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.8.1",
     ...
   },
 }
@@ -128,6 +129,8 @@ The branching strategy when I develop a package for UPM is as follows.
 6. Split subtree into ump branch.
 7. Tag on ump branch as new version.
 8. Release.
+
+For details, see https://www.patreon.com/posts/25070968.
 
 
 #### About default document URL

@@ -276,7 +276,7 @@ namespace Coffee.PackageManager
 			menu.AddItem (new GUIContent ("Add package from disk..."), false, delegate
 			{
 				var path = EditorUtility.OpenFilePanelWithFilters ("Select package on disk", "", new [] { "package.json file", "json" });
-				if (!string.IsNullOrEmpty (path) && !(bool)piAddRemoveOperationInProgress.GetValue (null))
+				if (!string.IsNullOrEmpty (path) && !(bool)piAddRemoveOperationInProgress.GetValue (null, new object[0]))
 					miAddFromLocalDisk.Invoke (null, new object [] { path });
 			});
 			menu.AddItem (new GUIContent ("Add package from URL..."), false, delegate
