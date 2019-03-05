@@ -129,6 +129,8 @@ The branching strategy when I develop a package for UPM is as follows.
 7. Tag on ump branch as new version.
 8. Release.
 
+For details, see https://www.patreon.com/posts/25070968.
+
 
 #### About default document URL
 
