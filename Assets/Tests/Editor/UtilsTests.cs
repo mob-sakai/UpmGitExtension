@@ -4,6 +4,7 @@ using NUnit.Framework;
 using UnityEngine.TestTools;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UnityEditor.PackageManager;
+using System;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
@@ -87,13 +88,8 @@ namespace Coffee.PackageManager.Tests
 
 	public class PackageInfoUtilsTests
 	{
-		const string repoURL = "https://github.com/mob-sakai/GitPackageTest";
-		const string revisionHash = "4386b3c3c27b1daaeed0292fc8dfcf62c7b1b427";
-		const string fileName = "README.md";
-		const string fileURL = repoURL + "/blob/" + revisionHash + "/" + fileName;
-
 		static PackageInfo pi;
-		[TestCase ("com.coffee.upm-git-extension", ExpectedResult = null)]
+		[TestCase ("com.coffee.upm-git-extension-test-github", ExpectedResult = null)]
 		[UnityTest ()]
 		[Order (-1)]
 		public IEnumerator GetPackageInfo (string packageName)
@@ -110,24 +106,28 @@ namespace Coffee.PackageManager.Tests
 		}
 
 		[TestCase (false, ExpectedResult = "")]
-		[TestCase (true, ExpectedResult = repoURL)]
+		[TestCase (true, ExpectedResult = "https://github.com/mob-sakai/GitPackageTest")]
 		public string GetRepoURLTest (bool isPackageInfoExist)
 		{
 			return PackageUtils.GetRepoHttpUrl (isPackageInfoExist ? pi : null);
 		}
 
 		[TestCase (false, ExpectedResult = "")]
-		[TestCase (true, ExpectedResult = revisionHash)]
+		[TestCase (true, ExpectedResult = "fdcd7a6d0ff19c4a717cfb3153ba1f4bf1004d47")]
 		public string GetRevisionHashTest (bool isPackageInfoExist)
 		{
 			return PackageUtils.GetRevisionHash (isPackageInfoExist ? pi : null);
 		}
 
-		[TestCase (false, "README.md", ExpectedResult = "")]
-		[TestCase (true, "README.md", ExpectedResult = fileURL)]
-		public string GetFileURLTest (bool isPackageInfoExist, string fileName)
+		[TestCase (false, "README.*", ExpectedResult = "")]
+		[TestCase (true, "README.*", ExpectedResult = "Library/PackageCache/com.coffee.upm-git-extension-test-github@fdcd7a6d0ff19c4a717cfb3153ba1f4bf1004d47/README.md")]
+		public string GetFileURLTest (bool isPackageInfoExist, string pattern)
 		{
-			return PackageUtils.GetFileURL (isPackageInfoExist ? pi : null, fileName);
+			var path = PackageUtils.GetFilePath (isPackageInfoExist ? pi : null, pattern);
+			if (path.Length == 0)
+				return "";
+
+			return new Uri (Environment.CurrentDirectory + "/").MakeRelativeUri (new Uri (path)).ToString ();
 		}
 	}
 }
