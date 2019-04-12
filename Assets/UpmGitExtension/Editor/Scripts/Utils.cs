@@ -257,7 +257,7 @@ namespace Coffee.PackageManager
 			if (string.IsNullOrEmpty (resolvedPath) || string.IsNullOrEmpty (filePattern))
 				return "";
 
-			foreach(var path in Directory.EnumerateFiles (resolvedPath, filePattern))
+			foreach(var path in Directory.GetFiles (resolvedPath, filePattern))
 			{
 				if(!path.EndsWith(".meta"))
 				{
