@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.1](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.1) (2019-04-12)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.8.0...0.8.1)
+
+**Fixed bugs:**
+
+- Support .Net 3.5 scripting runtime version [\#30](https://github.com/mob-sakai/UpmGitExtension/issues/30)
+- Unit Tests don't pass [\#27](https://github.com/mob-sakai/UpmGitExtension/issues/27)
+
 ## [0.8.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.0) (2019-02-23)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.7.0...0.8.0)
