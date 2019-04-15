@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.2](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.2) (2019-04-16)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.8.1...0.8.2)
+
+**Fixed bugs:**
+
+- An error occurs when installing 0.7.0+ [\#31](https://github.com/mob-sakai/UpmGitExtension/issues/31)
+
 ## [0.8.1](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.1) (2019-04-12)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.8.0...0.8.1)
