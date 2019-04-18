@@ -1,6 +1,14 @@
 # Changelog
 
-## [0.8.2](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.2) (2019-04-16)
+## [0.8.3](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.3) (2019-05-12)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.8.2...0.8.3)
+
+**Fixed bugs:**
+
+- Error on 'git ls-remote' for private repos accessed via SSH [\#34](https://github.com/mob-sakai/UpmGitExtension/issues/34)
+
+## [0.8.2](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.2) (2019-04-15)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.8.1...0.8.2)
 
