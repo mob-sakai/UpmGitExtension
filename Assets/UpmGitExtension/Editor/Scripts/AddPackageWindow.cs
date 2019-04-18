@@ -69,12 +69,12 @@ namespace Coffee.PackageManager
 				using (var ccs = new EditorGUI.ChangeCheckScope ())
 				using (new EditorGUILayout.HorizontalScope ())
 				{
-					GUI.SetNextControlName ("Repogitory URL");
-					_url = EditorGUILayout.TextField ("Repogitory URL", _url);
+					GUI.SetNextControlName ("Repository URL");
+					_url = EditorGUILayout.TextField ("Repository URL", _url);
 
 					if (!_focused)
 					{
-						EditorGUI.FocusTextInControl ("Repogitory URL");
+						EditorGUI.FocusTextInControl ("Repository URL");
 						_focused = true;
 					}
 
