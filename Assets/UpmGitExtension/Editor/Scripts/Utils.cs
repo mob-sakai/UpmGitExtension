@@ -186,6 +186,16 @@ namespace Coffee.PackageManager
 			return "";
 		}
 
+		public static string GetRepoUrlForCommand (string packageId)
+		{
+			Match m = Regex.Match (packageId, "^[^@]+@([^#]+)(#.+)?$");
+			if (m.Success)
+			{
+				return m.Groups [1].Value;
+			}
+			return "";
+		}
+
 		public static string GetRefName (string packageId)
 		{
 			Match m = Regex.Match (packageId, "^[^@]+@[^#]+#(.+)$");

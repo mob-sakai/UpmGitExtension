@@ -97,7 +97,7 @@ namespace Coffee.PackageManager
 				_updateButton.text = "Update to";
 				_versionPopup.SetEnabled (false);
 				_updateButton.SetEnabled (false);
-				GitUtils.GetRefs (PackageUtils.GetRepoHttpUrl (_packageInfo.packageId), _refs, () =>
+				GitUtils.GetRefs (PackageUtils.GetRepoUrlForCommand (_packageInfo.packageId), _refs, () =>
 				{
 					_updateButton.SetEnabled (_currentRefName != _selectedRefName);
 					_versionPopup.SetEnabled (true);
