@@ -4,19 +4,18 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 using System.Text.RegularExpressions;
-using UnityEditor.PackageManager;
-using UnityEngine.Networking;
 using UnityEngine;
 using System;
-using System.IO;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
 namespace Coffee.PackageManager
 {
 	internal static class UpmGitExtensionUtils
 	{
+		static readonly StringBuilder s_sbError = new StringBuilder ();
+
 		const string kDisplayNone = "display-none";
 		public static void SetElementDisplay (VisualElement element, bool value)
 		{
@@ -72,14 +71,9 @@ namespace Coffee.PackageManager
 			return "";
 		}
 
-		public static string GetRepoId (PackageInfo packageInfo)
+		public static string GetRefName (string packageId)
 		{
-			return GetRepoId (packageInfo != null ? packageInfo.packageId : "");
-		}
-
-		public static string GetRepoId (string packageId)
-		{
-			Match m = Regex.Match (GetRepoURL(packageId), "/([^/]+/[^/]+)$");
+			Match m = Regex.Match (packageId, "^[^@]+@[^#]+#(.+)$");
 			if (m.Success)
 			{
 				return m.Groups [1].Value;
@@ -87,38 +81,19 @@ namespace Coffee.PackageManager
 			return "";
 		}
 
-		public static string GetApiRequestUrl (string packageId, string methodPath)
+		public static string GetRepoId (PackageInfo packageInfo)
 		{
-			var repoId = GetRepoId (packageId);
-			if (packageId.Contains("github.com"))
+			return GetRepoId (packageInfo != null ? packageInfo.packageId : "");
+		}
+
+		public static string GetRepoId (string packageId)
+		{
+			Match m = Regex.Match (GetRepoURL (packageId), "/([^/]+/[^/]+)$");
+			if (m.Success)
 			{
-				return "https://api.github.com/repos/" + repoId + "/" + methodPath;
-			}
-			else if (packageId.Contains ("bitbucket.org"))
-			{
-				return "https://api.bitbucket.org/2.0/repositories/" + repoId + "/refs/" + methodPath;
+				return m.Groups [1].Value;
 			}
 			return "";
-		}
-
-		public static AsyncOperation RequestTags (string packageId, List<string> result)
-		{
-			return Request (GetApiRequestUrl (packageId, "tags"), x => FillRefNamesFromResponse (x, result));
-		}
-
-		public static AsyncOperation RequestBranches (string packageId, List<string> result)
-		{
-			return Request (GetApiRequestUrl (packageId, "branches"), x => FillRefNamesFromResponse (x, result));
-		}
-
-		public static void FillRefNamesFromResponse(string res, List<string> result)
-		{
-			result.Clear ();
-			result.AddRange (
-				Regex.Matches (res, "\\{\\s*\"name\": \"([^\"]+)\",")
-					.Cast<Match> ()
-					.Select (x => x.Groups [1].Value)
-			);
 		}
 
 		public static string GetRevisionHash (PackageInfo packageInfo)
@@ -150,7 +125,7 @@ namespace Coffee.PackageManager
 
 			string repoURL = GetRepoURL (packageId);
 			string hash = GetRevisionHash (resolvedPath);
-			string blob = "blob";
+			string blob = UpmGitSettings.GetHostData(packageId).Blob;
 
 			return string.Format ("{0}/{1}/{2}/{3}", repoURL, blob, hash, filePath);
 		}
@@ -169,47 +144,59 @@ namespace Coffee.PackageManager
 			return "";
 		}
 
-		public static string GetRequestCache (string url)
+		public static WaitUntil GetRefs (string packageId, List<string> result, Action onSuccess)
 		{
-			var path = GetRequestCachePath (url);
-			return File.Exists (path) && ((DateTime.UtcNow - File.GetLastWriteTimeUtc (path)).TotalSeconds < 300)
-				? File.ReadAllText (path)
-				: null;
-		}
-
-		public static string GetRequestCachePath (string url)
-		{
-			return "Temp/RequestCache_" + url.GetHashCode ();
-		}
-
-		public static AsyncOperation Request (string url, Action<string> onSuccess)
-		{
-			if (string.IsNullOrEmpty (url))
-				return null;
-
-			var cache = GetRequestCache (url);
-			if (!string.IsNullOrEmpty (cache))
+			result.Clear ();
+			s_sbError.Length = 0;
+			string repoUrl = GetRepoURL (packageId);
+			var startInfo = new System.Diagnostics.ProcessStartInfo
 			{
-				onSuccess (cache);
+				Arguments = "ls-remote --refs -q " + repoUrl,
+				CreateNoWindow = true,
+				FileName = "git",
+				RedirectStandardError = true,
+				RedirectStandardOutput = true,
+				UseShellExecute = false,
+			};
+
+			bool exited = false;
+			var launchProcess = System.Diagnostics.Process.Start (startInfo);
+			if (launchProcess == null || launchProcess.HasExited == true || launchProcess.Id == 0)
+			{
+				Debug.LogError ("No 'git' executable was found. Please install Git on your system and restart Unity");
 				return null;
 			}
-
-			var www = UnityWebRequest.Get (url);
-			var op = www.SendWebRequest ();
-			op.completed += _ =>
+			else
 			{
-				if (www.isHttpError || www.isHttpError || !string.IsNullOrEmpty(www.error))
+				//Add process callback.
+				launchProcess.OutputDataReceived += (sender, e) =>
 				{
-					Debug.LogError (www.error);
-					www.Dispose ();
-					return;
-				}
-				var path = GetRequestCachePath (url);
-				File.WriteAllText (path, www.downloadHandler.text);
-				onSuccess (www.downloadHandler.text);
-				www.Dispose ();
-			};
-			return op;
+					var m = Regex.Match (e.Data, "refs/(tags|heads)/(.*)$");
+					if(m.Success)
+					{
+						result.Add (m.Groups[2].Value);
+					}
+				};
+				launchProcess.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty (e.Data) && !e.Data.StartsWith("warning")) s_sbError.AppendLine (e.Data); };
+				launchProcess.Exited += (sender, e) =>
+				{
+					exited = true;
+					bool success = 0 == s_sbError.Length;
+					if (!success)
+					{
+						Debug.LogErrorFormat ("Error: {0} => {1}\n\n{2}", packageId, repoUrl, s_sbError);
+					}
+					else
+					{
+						onSuccess ();
+					}
+				};
+
+				launchProcess.BeginOutputReadLine ();
+				launchProcess.BeginErrorReadLine ();
+				launchProcess.EnableRaisingEvents = true;
+			}
+			return new WaitUntil (() => exited);
 		}
 	}
 }
