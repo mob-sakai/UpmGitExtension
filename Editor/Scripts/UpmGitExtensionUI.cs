@@ -68,7 +68,7 @@ namespace Coffee.PackageManager
 		public void OnPackageSelectionChange (PackageInfo packageInfo)
 		{
 			InitializeUI ();
-			if (packageInfo == null || _packageInfo == packageInfo)
+			if (!_initialized || packageInfo == null || _packageInfo == packageInfo)
 				return;
 
 			_packageInfo = packageInfo;
@@ -104,9 +104,10 @@ namespace Coffee.PackageManager
 			if (_initialized)
 				return;
 
-			_initialized = true;
-
 			var asset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset> (TemplatePath);
+			if (!asset)
+				return;
+
 #if UNITY_2019_1_OR_NEWER
 			gitDetailActoins = asset.CloneTree().Q("detailActions");
             gitDetailActoins.styleSheets.Add(EditorGUIUtility.Load(StylePath) as StyleSheet);
@@ -125,6 +126,7 @@ namespace Coffee.PackageManager
 			_documentationContainer = parent.parent.Q ("documentationContainer");
 			_originalDetailActions = _documentationContainer.Q ("detailActions");
 			_documentationContainer.Add (_gitDetailActoins);
+			_initialized = true;
 		}
 	}
 }
