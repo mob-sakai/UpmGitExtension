@@ -7,21 +7,20 @@ using UnityEditor;
 
 namespace Coffee.PackageManager
 {
-	[CreateAssetMenu]
-	public class UpmGitSettings : ScriptableObject
+	public class Settings : ScriptableObject
 	{
-		static readonly HostData s_EmptyHostData = new HostData ();
-		static UpmGitSettings s_Instance = null;
-		static UpmGitSettings Instance
+		static HostData s_EmptyHostData;
+		static Settings s_Instance = null;
+		static Settings Instance
 		{
 			get
 			{
 				if (s_Instance == null)
 				{
-					s_Instance = AssetDatabase.FindAssets ("t:" + typeof (UpmGitSettings).Name)
+					s_Instance = AssetDatabase.FindAssets ("t:" + typeof (Settings).Name)
 						.Select (x => AssetDatabase.GUIDToAssetPath (x))
 						.OrderBy (x => x)
-						.Select(x=>AssetDatabase.LoadAssetAtPath<UpmGitSettings> (x))
+						.Select(x=>AssetDatabase.LoadAssetAtPath<Settings> (x))
 						.FirstOrDefault ();
 				}
 				return s_Instance;
@@ -32,14 +31,19 @@ namespace Coffee.PackageManager
 
 		public static HostData GetHostData (string packageId)
 		{
-			return Instance.m_HostData.FirstOrDefault (x=> packageId.Contains(x.Domain)) ?? s_EmptyHostData;
+			return Instance.m_HostData.FirstOrDefault (x => packageId.Contains (x.Domain))
+				?? new HostData ()
+				{
+					LogoDark = EditorGUIUtility.FindTexture ("buildsettings.web.small"),
+					LogoLight = EditorGUIUtility.FindTexture ("d_buildsettings.web.small"),
+				};
 		}
 	}
 
 	[System.Serializable]
 	public class HostData
 	{
-		public string Name = "undefined";
+		public string Name = "web";
 		public string Domain = "undefined";
 		public string Blob = "blob";
 		public Texture2D LogoDark = null;
