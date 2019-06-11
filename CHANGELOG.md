@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.5.0) (2019-02-09)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.4.0...0.5.0)
+
+**Implemented enhancements:**
+
+- Support Bitbucket.org [\#7](https://github.com/mob-sakai/UpmGitExtension/issues/7)
+
 ## [0.4.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.4.0) (2019-02-08)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.3.1...0.4.0)

@@ -63,7 +63,6 @@ namespace Coffee.PackageManager
 			{
 				var repoUrl = m.Groups [1].Value;
 				repoUrl = Regex.Replace (repoUrl, "(git:)?git@([^:]+):", "https://$2/");
-				//repoUrl = repoUrl.Replace ("github.com:", "https://github.com/");
 				repoUrl = repoUrl.Replace ("ssh://", "https://");
 				repoUrl = repoUrl.Replace ("git@", "");
 				repoUrl = Regex.Replace (repoUrl, "\\.git$", "");
@@ -95,6 +94,10 @@ namespace Coffee.PackageManager
 			{
 				return "https://api.github.com/repos/" + repoId + "/" + methodPath;
 			}
+			else if (packageId.Contains ("bitbucket.org"))
+			{
+				return "https://api.bitbucket.org/2.0/repositories/" + repoId + "/refs/" + methodPath;
+			}
 			return "";
 		}
 
@@ -112,7 +115,7 @@ namespace Coffee.PackageManager
 		{
 			result.Clear ();
 			result.AddRange (
-				Regex.Matches (res, "\\s*\"name\": \"(.+)\",")
+				Regex.Matches (res, "\\{\\s*\"name\": \"([^\"]+)\",")
 					.Cast<Match> ()
 					.Select (x => x.Groups [1].Value)
 			);
