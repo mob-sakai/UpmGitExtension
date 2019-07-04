@@ -19,7 +19,7 @@ namespace Coffee.PackageManager
 		public GitButton (System.Action action) : base (action)
 		{
 #if UNITY_2019_1_OR_NEWER
-			styleSheets.Add (AssetDatabase.Load<StyleSheet>(StylePath));
+			styleSheets.Add (UnityEditor.AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
 #else
 			AddStyleSheetPath (StylePath);
 #endif

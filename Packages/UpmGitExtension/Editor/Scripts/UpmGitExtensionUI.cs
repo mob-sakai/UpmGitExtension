@@ -96,6 +96,7 @@ namespace Coffee.PackageManager
 		static readonly string assemblyName = ", " + typeof(IPackageManagerExtension).Assembly.GetName().Name;
 		static readonly string nameSpace = typeof(IPackageManagerExtension).Namespace + ".";
 		static readonly Type tPackageWindow = Type.GetType(nameSpace + "PackageManagerWindow" + assemblyName);
+		static readonly Type tPackageCollection = Type.GetType(nameSpace + "PackageCollection" + assemblyName);
 		static readonly Type tUpmBaseOperation = Type.GetType(nameSpace + "UpmBaseOperation" + assemblyName);
 		static readonly Regex regVersionValid = new Regex(@"^\d+", RegexOptions.Compiled);
 		static readonly Regex regInstallVersion = new Regex(@"#.*$", RegexOptions.Compiled);
