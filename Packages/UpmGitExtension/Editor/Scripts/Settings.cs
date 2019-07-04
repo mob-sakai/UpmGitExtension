@@ -51,6 +51,7 @@ namespace Coffee.PackageManager
 		public string Name = "web";
 		public string Domain = "undefined";
 		public string Blob = "blob";
+		public string Raw = "https://rawcdn.githack.com/{0}/{1}/{2}";
 		public Texture2D LogoDark;
 		public Texture2D LogoLight;
 		public Texture2D Logo { get { return EditorGUIUtility.isProSkin ? LogoLight : LogoDark; } }
