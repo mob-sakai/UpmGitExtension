@@ -1,0 +1,64 @@
+.maximized {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+
+.installPackageWindow {
+  opacity: 0.9;
+  align-items: center;
+  justify-content: center;
+}
+
+.installPackageWindow.dark {
+  background-color: #333;
+}
+
+.installPackageWindow.right {
+  background-color: #aaa;
+}
+
+.installPackageWindow .horizontal {
+  flex-direction: row;
+  position: relative;
+  width: 550px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+
+.installPackageWindow .fixed {
+  width: 100px;
+}
+
+.installPackageWindow .expandable {
+  flex: 1 0 0;
+}
+
+.installPackageWindow .button {
+  width: 100px;
+}
+
+.installPackageWindow .h-spaced {
+  margin-left: 4px;
+}
+
+.installPackageWindow .v-spaced {
+  margin-top: 4px;
+}
+
+.installPackageWindow .error {
+  width: 22px;
+  height: 22px;
+  background-image: resource("console.erroricon")
+}
+
+.installPackageWindow .git-image {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+  background-image: resource("giticon")
+}
