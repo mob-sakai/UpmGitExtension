@@ -30,42 +30,230 @@ namespace Coffee.PackageManager
 				? JsonUtility.FromJson<PackageJsonHelper> (File.ReadAllText (jsonPath)).name
 				: "";
 		}
+
+		public static string GetPackageNameFromJson (string json)
+		{
+			var packageJson = JsonUtility.FromJson<PackageJsonHelper> (json);
+			return packageJson != null ? packageJson.name : "";
+		}
+	}
+
+	internal class EditorKvs : ScriptableSingleton<EditorKvs>, ISerializationCallbackReceiver
+	{
+		const long kLifeTime = 60 * 5 * TimeSpan.TicksPerSecond;
+
+		Dictionary<string, int> m_IndexMap = new Dictionary<string, int> ();
+
+		[SerializeField]
+		List<string> m_Keys = new List<string> ();
+
+		[SerializeField]
+		List<string> m_Values = new List<string> ();
+
+		[SerializeField]
+		List<long> m_Expires = new List<long> ();
+
+		int GetIndex (string key)
+		{
+			int index;
+			if (m_IndexMap.TryGetValue (key, out index))
+				return index;
+
+			index = m_Keys.Count;
+			m_Keys.Add (key);
+			m_Values.Add ("");
+			m_Expires.Add (0);
+			m_IndexMap.Add (key, index);
+			return index;
+		}
+
+		internal static string Get (string key)
+		{
+			string result;
+			TryGet (key, out result);
+			return result;
+		}
+
+		internal static T Get<T> (string key, Func<string, T> converter)
+		{
+			T result;
+			TryGet (key, out result, converter);
+			return result;
+		}
+
+		internal static bool TryGet (string key, out string result)
+		{
+			var inst = instance;
+			int index = inst.GetIndex (key);
+			bool isAvalable = DateTime.UtcNow.Ticks < inst.m_Expires [index];
+			result = isAvalable ? inst.m_Values [index] : "";
+			Debug.LogFormat ($">>>> cache hit? {0}: key = {1}, result = {2}", isAvalable, key, result);
+			return isAvalable;
+		}
+
+		internal static bool TryGet<T> (string key, out T result, Func<string, T> converter)
+		{
+			string value;
+			bool isAvalable = TryGet (key, out value);
+			try
+			{
+				result = isAvalable ? converter (value) : default (T);
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+				isAvalable = false;
+				result = default (T);
+			}
+			return isAvalable;
+		}
+
+		internal static void Set (string key, string value)
+		{
+			var inst = instance;
+			int index = inst.GetIndex (key);
+			inst.m_Values [index] = value;
+			inst.m_Expires [index] = DateTime.UtcNow.Ticks + kLifeTime;
+			Debug.LogFormat ($">>>> cache: key = {0}, result = {1}", key, value);
+		}
+
+		internal static void Set<T> (string key, T value, Func<T, string> converter)
+		{
+			Set (key, converter (value));
+		}
+
+		public void OnBeforeSerialize ()
+		{
+		}
+
+		public void OnAfterDeserialize ()
+		{
+			m_IndexMap = m_Keys
+				.Select ((k, i) => new { k, i })
+				.ToDictionary (x => x.k, x => x.i);
+		}
+
+		[MenuItem ("Test/Clear")]
+		static void Clear ()
+		{
+			var inst = instance;
+			inst.m_Keys.Clear ();
+			inst.m_Values.Clear ();
+			inst.m_Expires.Clear ();
+			inst.OnAfterDeserialize ();
+		}
 	}
 
 	internal static class GitUtils
 	{
 		static readonly StringBuilder s_sbError = new StringBuilder ();
 		static readonly StringBuilder s_sbOutput = new StringBuilder ();
+		static readonly Regex s_regRefs = new Regex ("refs/(tags|heads)/(.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
+
 
 		public static bool IsGitRunning { get; private set; }
 
 		public delegate void GitCommandCallback (bool success, string output);
 
-		public static WaitWhile GetRefs (string repoUrl, List<string> result, Action callback)
+		public static void GetRefs (string repoUrl, Action<IEnumerable<string>> callback)
 		{
-			result.Clear ();
+			// If it is cached.
+			string cacheKey = "<GetRefs>" + repoUrl;
+			IEnumerable<string> result;
+			if (EditorKvs.TryGet (cacheKey, out result, x => x.Split (',')))
+			{
+				callback (result);
+				return;
+			}
+
 			string args = string.Format ("ls-remote --refs -q {0}", repoUrl);
-			return ExecuteGitCommand (args, (success, output) =>
+			ExecuteGitCommand (args, (success, output) =>
 			{
 				if (success)
 				{
-					foreach (Match m in Regex.Matches (output, "refs/(tags|heads)/(.*)$", RegexOptions.Multiline))
-						result.Add (m.Groups [2].Value.Trim());
+					result = s_regRefs.Matches (output)
+								.OfType<Match> ()
+								.Select (x => x.Groups [2].Value.Trim ())
+								.ToArray ();
+					if(result.Any())
+					{
+						EditorKvs.Set (cacheKey, result, x => string.Join (",", x));
+					}
 				}
-				callback ();
+				else
+				{
+					result = new string [0];
+				}
+				callback (result);
 			});
 		}
 
-		public static WaitWhile GetPackageJson (string repoUrl, string branch, Action<string> callback)
+		public static void GetPackageJson (string repoUrl, string branch, Action<string> callback)
 		{
-			const string kPath = "Temp/UpmGit";
-			FileUtil.DeleteFileOrDirectory (kPath);
+			// package.json is cached.
+			string cacheKey = "<GetPackageJson>" + repoUrl + "/" + branch;
+			string result;
+			if (EditorKvs.TryGet (cacheKey, out result))
+			{
+				callback (PackageJsonHelper.GetPackageNameFromJson (result));
+				return;
+			}
 
-			string args = string.Format ("clone --depth=1 --branch {0} --single-branch {1} {2}", branch, repoUrl, kPath);
-			return ExecuteGitCommand (args, (_, __) => callback (PackageJsonHelper.GetPackageName (kPath)));
+			// Download raw package.json from host.
+			using (var wc = new System.Net.WebClient ())
+			{
+				string userAndRepoName = PackageUtils.GetUserAndRepo (repoUrl);
+				var host = Settings.GetHostData (repoUrl);
+				Uri uri = new Uri (string.Format (host.Raw, userAndRepoName, branch, "package.json"));
+
+				wc.DownloadStringCompleted += (s, e) =>
+				{
+					IsGitRunning = false;
+
+					// Download is completed successfully.
+					if (e.Error == null)
+					{
+						try
+						{
+							// Check meta file.
+							wc.DownloadData (new Uri (string.Format (host.Raw, userAndRepoName, branch, "package.json.meta")));
+							if (!string.IsNullOrEmpty (e.Result))
+							{
+								EditorKvs.Set (cacheKey, e.Result);
+							}
+							callback (PackageJsonHelper.GetPackageNameFromJson (e.Result));
+							return;
+						}
+						// Maybe, package.json.meta is not found.
+						catch (Exception ex)
+						{
+							Debug.LogException(ex);
+							callback ("");
+						}
+					}
+
+					// Download is failed: Clone the repo to get package.json.
+					string clonePath = Path.GetTempFileName ();
+					FileUtil.DeleteFileOrDirectory (clonePath);
+					string args = string.Format ("clone --depth=1 --branch {0} --single-branch {1} {2}", branch, repoUrl, clonePath);
+					ExecuteGitCommand (args, (_, __) =>
+					{
+						// Get package.json from cloned repo.
+						string filePath = Path.Combine (clonePath, "package.json");
+						string json = File.Exists (filePath) && File.Exists (filePath + ".meta") ? File.ReadAllText (filePath) : "";
+						if (!string.IsNullOrEmpty (json))
+						{
+							EditorKvs.Set (cacheKey, json);
+						}
+						callback (PackageJsonHelper.GetPackageNameFromJson (json));
+					});
+				};
+				IsGitRunning = true;
+				wc.DownloadStringAsync (uri);
+			}
 		}
 
-		static WaitWhile ExecuteGitCommand (string args, GitCommandCallback callback)
+		static void ExecuteGitCommand (string args, GitCommandCallback callback)
 		{
 			var startInfo = new System.Diagnostics.ProcessStartInfo
 			{
@@ -74,9 +262,10 @@ namespace Coffee.PackageManager
 				FileName = "git",
 				RedirectStandardError = true,
 				RedirectStandardOutput = true,
-				UseShellExecute = false,
+				UseShellExecute = false
 			};
 
+			Debug.LogFormat ("[GitUtils]: Start git command: args = {0}", args);
 			var launchProcess = System.Diagnostics.Process.Start (startInfo);
 			if (launchProcess == null || launchProcess.HasExited == true || launchProcess.Id == 0)
 			{
@@ -106,7 +295,6 @@ namespace Coffee.PackageManager
 				launchProcess.BeginErrorReadLine ();
 				launchProcess.EnableRaisingEvents = true;
 			}
-			return new WaitWhile (() => IsGitRunning);
 		}
 	}
 
@@ -158,11 +346,28 @@ namespace Coffee.PackageManager
 
 	internal static class PackageUtils
 	{
+		static readonly Regex s_regUserAndRepo = new Regex ("[^/:]+/[^/]+$", RegexOptions.Compiled);
+
+		/// <summary>
+		/// Gets user name and repo name from git url.
+		/// </summary>
+		/// <param name="url">URL.</param>
+		public static string GetUserAndRepo (string url)
+		{
+			Match m = s_regUserAndRepo.Match (url);
+			if (m.Success)
+			{
+				var ret = m.Value;
+				return ret.EndsWith (".git", StringComparison.Ordinal) ? ret.Substring (0, ret.Length - 4) : ret;
+			}
+			return "";
+		}
+
 		public static string GetRepoUrl (string url)
 		{
 			Match m = Regex.Match (url, "(git@[^:]+):(.*)");
 			string ret = m.Success ? string.Format ("ssh://{0}/{1}", m.Groups [1].Value, m.Groups [2].Value) : url;
-			return ret.EndsWith (".git") ? ret : ret + ".git";
+			return ret.EndsWith (".git", StringComparison.Ordinal) ? ret : ret + ".git";
 		}
 
 		public static string GetRepoHttpUrl (PackageInfo packageInfo)
@@ -267,9 +472,9 @@ namespace Coffee.PackageManager
 			if (string.IsNullOrEmpty (resolvedPath) || string.IsNullOrEmpty (filePattern))
 				return "";
 
-			foreach(var path in Directory.GetFiles (resolvedPath, filePattern))
+			foreach (var path in Directory.GetFiles (resolvedPath, filePattern))
 			{
-				if(!path.EndsWith(".meta"))
+				if (!path.EndsWith (".meta", StringComparison.Ordinal))
 				{
 					return path;
 				}
@@ -315,7 +520,7 @@ namespace Coffee.PackageManager
 				
 				EditorApplication.update -= UpdatePackageRequest;
 				EditorUtility.ClearProgressBar ();
-				if(_callback != null)
+				if (_callback != null)
 				{
 					_callback (_request);
 				}
