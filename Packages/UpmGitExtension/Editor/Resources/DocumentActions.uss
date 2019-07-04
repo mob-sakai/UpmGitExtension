@@ -1,0 +1,26 @@
+/* #detailActions.display-none {
+  min-width: 0px;
+  min-height: 0px;
+} */
+
+#detailActions #hostButton {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  margin-right: 4px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  border-top-width: 0px;
+  border-bottom-width: 0px;
+  background-image: none;
+  cursor: link;
+}
+
+#detailActions #logo {
+  width: 16px;
+  height: 16px;
+}
