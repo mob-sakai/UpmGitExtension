@@ -10,7 +10,7 @@ namespace Coffee.PackageManager
 	public class Settings : ScriptableObject
 	{
 		static HostData s_EmptyHostData;
-		static Settings s_Instance = null;
+		static Settings s_Instance;
 		static Settings Instance
 		{
 			get
@@ -25,10 +25,10 @@ namespace Coffee.PackageManager
 				}
 				if (s_EmptyHostData == null)
 				{
-					s_EmptyHostData = new HostData ()
+					s_EmptyHostData = new HostData
 					{
 						LogoDark = EditorGUIUtility.FindTexture ("buildsettings.web.small"),
-						LogoLight = EditorGUIUtility.FindTexture ("d_buildsettings.web.small"),
+						LogoLight = EditorGUIUtility.FindTexture ("d_buildsettings.web.small")
 					};
 				}
 				return s_Instance;
@@ -51,7 +51,8 @@ namespace Coffee.PackageManager
 		public string Name = "web";
 		public string Domain = "undefined";
 		public string Blob = "blob";
-		public Texture2D LogoDark = null;
-		public Texture2D LogoLight = null;
+		public Texture2D LogoDark;
+		public Texture2D LogoLight;
+		public Texture2D Logo { get { return EditorGUIUtility.isProSkin ? LogoLight : LogoDark; } }
 	}
 }
