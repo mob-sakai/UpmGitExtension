@@ -104,7 +104,9 @@ echo -e ">> OK"
 #  7. << Split for upm >>
 if [ "$UNITY_PACKAGE_MANAGER" == "true" ]; then
   echo -e "\n>> Split for upm..."
-  git subtree split --prefix="$UNITY_PACKAGE_SRC" --branch upm
+  git fetch
+  git show-ref --quiet refs/remotes/origin/upm && git branch -f upm origin/upm
+  git-snapshot --prefix="$UNITY_PACKAGE_SRC" --message="$RELEASE_VERSION" --branch=upm
   git push origin upm
 fi
 
