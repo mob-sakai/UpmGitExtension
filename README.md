@@ -1,9 +1,9 @@
 UPM Git Extension
 ===
 
-Git extension for Unity Package Manager (UPM)
+This package extends the UI of Unity Package Manager (UPM) for the packages installed from git repository.
 
-![](https://user-images.githubusercontent.com/12690315/52934439-cb940880-3399-11e9-8cc7-a0b70e3e64d8.png)
+![](https://user-images.githubusercontent.com/12690315/60764681-20c28380-a0c9-11e9-9c3c-75e3d4e0279e.png)
 
 [![](https://img.shields.io/github/release/mob-sakai/UpmGitExtension.svg?label=latest%20version)](https://github.com/mob-sakai/UpmGitExtension/releases)
 [![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/releases)
@@ -16,7 +16,8 @@ Git extension for Unity Package Manager (UPM)
 
 ### What's new? [See changelog ![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg?label=last%20updated)](https://github.com/mob-sakai/UpmGitExtension/blob/upm/CHANGELOG.md)
 ### Do you want to receive notifications for new releases? [Watch this repo ![](https://img.shields.io/github/watchers/mob-sakai/UpmGitExtension.svg?style=social&label=Watch)](https://github.com/mob-sakai/UpmGitExtension/subscription)
-### Support me on Patreon! [![become_a_patron](https://user-images.githubusercontent.com/12690315/50731629-3b18b480-11ad-11e9-8fad-4b13f27969c1.png)](https://www.patreon.com/join/2343451?)
+### Support me on Patreon!  
+[![become_a_patron](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/join/2343451?)
 
 
 
@@ -35,27 +36,28 @@ But, I'm not quite satisfied with the feature. :(
 This project extends the UI of Unity Package Manager for package installed using git!
 
 
-#### Features
+### Features
 
-* Show link to repository URL
-* Override link to the document URL
+* Link to git repository URL
+* Link to markdown converted offline documents
   * Readme
   * Changelog
   * License
-* Support GitHub, Bitbucket and GitLab
-* Add package from url
-* Remove package
+* Support GitHub, GitLab, Bitbucket, etc.
+* Install package from git repository URL with UI
 * Update package with a specific tag/branch
+* Remove package
 * Support Unity 2018.3 or later
-* Support .Net 3.5 and 4.x
-* View offline documents
+* Support .Net 3.5 and 4.x both
 
 
-#### Future plans
+### Future plans
 
 * Display license
+* Version fetch for Unity 2019.x
+* Check Unity version before install
 * Override the document URL with package.json
-
+* [Support git dependency in the package](https://github.com/mob-sakai/GitDependencyResolverForUnity)
 
 
 <br><br><br><br>
@@ -73,51 +75,68 @@ Find `Packages/manifest.json` in your project and edit it to look like this:
 * For Unity 2019.1 or later, use UpmGitExtension 0.5.0 or later.
 
 
-##### Requirement
+### Requirement
 
 * Unity 2018.3 or later
-* git
+* Git (executable on command-line)
 
 
 
 <br><br><br><br>
 ## Usage
 
-#### Add package from url
+### Install a package from git repository
 
-![](https://user-images.githubusercontent.com/12690315/52932712-0dba4b80-3394-11e9-8cb7-f141fcb24cb6.png)
 
-1. Click `+` button and select `Add package from url` to open window
-2. Input repository url and select a tag or branch
+1. Click ![giticon](https://user-images.githubusercontent.com/12690315/60764763-7fd4c800-a0ca-11e9-957b-ca68e3ca6123.png) button in package manager UI to open `Install Package Window`  
+![](https://user-images.githubusercontent.com/12690315/60766233-dbf71680-a0e1-11e9-8303-fbd790e9e35b.png)  
+![](https://user-images.githubusercontent.com/12690315/60764768-91b66b00-a0ca-11e9-9ccd-9fef88c77d5e.png)
+1. Input a git repository url and click `Find Versions` button  
+![](https://user-images.githubusercontent.com/12690315/60766258-4314cb00-a0e2-11e9-91f8-3aad514450bc.png)
+2. Select a tag or branch and click `Find Package` button  
+![](https://user-images.githubusercontent.com/12690315/60766257-4314cb00-a0e2-11e9-8b2e-23efc50ded72.png)
 3. Wait a few seconds for validation
-4. Click `Add` button to add package
+4. Click `Add Package` button to install the package  
+![](https://user-images.githubusercontent.com/12690315/60766259-4314cb00-a0e2-11e9-9b89-0bc0d4f71517.png)
 
 
-#### Update package with a specific tag/branch
+### Update package with a specific tag or branch as version
 
-![](https://user-images.githubusercontent.com/12690315/52932818-638ef380-3394-11e9-973f-8e2e1dc72342.png)
+You can update the package in your project, _just like official packages._
 
-1. Click version popup and select a tag/branch in repository
+#### For Unity 2019.1 or later
+
+1. Select the version of the package
+2. Click `Update To ***` button  
+![](https://user-images.githubusercontent.com/12690315/60766318-fc73a080-a0e2-11e9-9020-23dfc05939a0.png)
+
+#### For Unity 2018.3
+
+1. Click version popup and select a tag or branch in repository  
+![](https://user-images.githubusercontent.com/12690315/60766391-1cf02a80-a0e4-11e9-8c3f-d420b7e84b46.png)
 2. Click `Update To` button
 
 
-#### Remove package
+### Remove package
 
-1. Click `Remove` button
+You can update the package from your project, just like official packages.
+
+1. Click `Remove` button  
+![](https://user-images.githubusercontent.com/12690315/60766319-fd0c3700-a0e2-11e9-9154-b88161496a3e.png)
 
 
 
 <br><br><br><br>
 ## Development Note
 
-#### Develop a package for UPM
+### Develop a package for UPM
 
 The branching strategy when I develop a package for UPM is as follows.
 
 |Branch|Description|'Assets' directory|
 |-|-|-|
-|develop|Development, Testing|Included|
-|master|Publishing|Included|
+|develop|Develop, Test|Included|
+|master|Publish with legacy way (.unitypackage)|Included|
 |upm(default)|Subtree to publish for UPM|Excluded|
 |{tags}|Tags to install using UPM|Excluded|
 
@@ -134,32 +153,6 @@ The branching strategy when I develop a package for UPM is as follows.
 For details, see https://www.patreon.com/posts/25070968.
 
 
-#### About default document URL
-
-The document URL in UnityPackageManager 2.0.3 is hard-coded.  
-The default values are as follows:
-* View document: `http://docs.unity3d.com/Packages/{ShortVersionId}/index.html` or official manual page (only for built in package)
-* View changelog: `http://docs.unity3d.com/Packages/{ShortVersionId}/changelog/CHANGELOG.html`
-* View licenses: `http://docs.unity3d.com/Packages/{ShortVersionId}/license/index.html` or `https://unity3d.com/legal/licenses/Unity_Companion_License`
-
-ShortVersionId is defined as follows:
-* `{PackageName}@{MajorVersion}.{MinorVersion}`
-* For example: `com.coffee.upm-git-extension@0.1`
-
-
-#### How to add/update/remove a package from script?
-
-Use `UnityEditor.PackageManager.Client` class.  
-https://docs.unity3d.com/ScriptReference/PackageManager.Client.html
-* Add/Update: `Client.Add({PackageId})`
-* Remove: `Client.Remove({PackageName})`
-
-PackageId is defined as follows:
-* `{PackageName}@{MajorVersion}.{MinorVersion}.{PatchVersion}` (Unity official package)
-* `{PackageName}@{RepoURL}#{BranchOrTagOrRevision}`
-* For example: `com.unity.package-manager-ui@2.0.3`, `coffee.upm-git-extension@https://github.com/mob-sakai/UpmGitExtension.git#1.1.1`
-
-
 
 <br><br><br><br>
 ## License
@@ -172,7 +165,7 @@ PackageId is defined as follows:
 
 [mob-sakai](https://github.com/mob-sakai)
 [![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)  
-[![become_a_patron](https://user-images.githubusercontent.com/12690315/50731615-ce9db580-11ac-11e9-964f-e0423533dc69.png)](https://www.patreon.com/join/2343451?)
+[![become_a_patron](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/join/2343451?)
 
 
 
