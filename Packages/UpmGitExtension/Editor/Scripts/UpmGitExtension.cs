@@ -203,7 +203,7 @@ namespace Coffee.PackageManager
 		
 		void UpdateGitPackages(Queue<Expose> packagesToUpdate, Dictionary<string, IEnumerable<string>> results = null)
 		{
-			Debug.LogFormat ("[UpdateGitPackages]: {0}", packagesToUpdate.Count);
+			Debug.LogFormat ("[UpdateGitPackages] {0} package(s) left", packagesToUpdate.Count);
 			phase = Phase.UpdatePackages;
 			bool isRunning = 0 < packagesToUpdate.Count;
 			PlaySpinner(isRunning);
@@ -226,7 +226,8 @@ namespace Coffee.PackageManager
 					try
 					{
 						Debug.LogFormat ("[UpdateGitPackages] Overwrite {0}", pair.Key);
-						UpdatePackageInfoVersions(exPackages[pair.Key], pair.Value);
+						if (exPackages.Call("ContainsKey", pair.Key).As<bool>())
+							UpdatePackageInfoVersions(exPackages[pair.Key], pair.Value);
 					}
 					catch (Exception e)
 					{
@@ -255,14 +256,14 @@ namespace Coffee.PackageManager
 			// Already get versions.
 			if(packageId == null || results.ContainsKey(packageName))
 			{
-				Debug.LogFormat ("[UpdateGitPackages]: Skip: {0}", packageName);
+				Debug.LogFormat ("[UpdateGitPackages] Skip: {0}", packageName);
 				UpdateGitPackages(packagesToUpdate, results);
 				return;
 			}
 			
 			// Get all branch/tag names in repo.
 			var url = PackageUtils.GetRepoUrlForCommand(packageId);
-			Debug.LogFormat ("[UpdateGitPackages]: GetRefs: {0}", packageName);
+			Debug.LogFormat ("[UpdateGitPackages] GetRefs: {0}", packageName);
 			GitUtils.GetRefs(url, refNames =>
 			{
 				results[packageName] = refNames;
@@ -320,7 +321,7 @@ namespace Coffee.PackageManager
 			if (exPackageWindow == null)
 				return;
 
-			Debug.LogFormat ("[UpdateGitPackages]: Reloading package collection...");
+			Debug.LogFormat ("[UpdateGitPackages] Reloading package collection...");
 			exPackageWindow["Collection"].Call("UpdatePackageCollection", false);
 		}
 
@@ -328,7 +329,7 @@ namespace Coffee.PackageManager
 
 		void OnPackageListLoaded()
 		{
-			Debug.LogFormat ("[UpdateGitPackages]: OnPackageListLoaded {0}, {1}", phase, Time.frameCount);
+			Debug.LogFormat ("[UpdateGitPackages] OnPackageListLoaded {0}, {1}", phase, Time.frameCount);
 			if (phase == Phase.ReloadPackageCollection)
 			{
 				phase = Phase.Idle;
@@ -351,7 +352,7 @@ namespace Coffee.PackageManager
 
 				if (!started)
 				{
-					Debug.LogFormat ("[UpdateGitPackages]: Start task to update git package.");
+					Debug.LogFormat ("[UpdateGitPackages] Start task to update git package.");
 					UpdateGitPackages(gitPackages, null);
 				}
 			}

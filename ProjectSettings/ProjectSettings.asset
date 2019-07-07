@@ -521,7 +521,7 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   scriptingDefineSymbols:
-    1: UPM_GIT_EXT_PROJECT
+    1: UPM_GIT_EXT_DEBUG
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}

@@ -55,6 +55,7 @@ namespace Coffee.PackageManager
 			int index = inst.GetIndex (key);
 			bool isAvalable = DateTime.UtcNow.Ticks < inst.m_Expires [index];
 			result = isAvalable ? inst.m_Values [index] : "";
+			Debug.LogFormat (">>>> Cache hit? {0}, key = {1}, result = {2}", isAvalable, key, result);
 			return isAvalable;
 		}
 
@@ -81,6 +82,7 @@ namespace Coffee.PackageManager
 			int index = inst.GetIndex (key);
 			inst.m_Values [index] = value;
 			inst.m_Expires [index] = DateTime.UtcNow.Ticks + kLifeTime;
+			Debug.LogFormat (">>>> Cache key = {0}, result = {1}", key, value);
 		}
 
 		internal static void Set<T> (string key, T value, Func<T, string> converter)
