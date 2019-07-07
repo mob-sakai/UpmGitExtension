@@ -17,14 +17,14 @@ using UnityEngine.Experimental.UIElements;
 namespace Coffee.PackageManager
 {
 	[InitializeOnLoad]
-	internal class UpmGitExtensionUI : VisualElement, IPackageManagerExtension
+	internal class UpmGitExtension : VisualElement, IPackageManagerExtension
 	{
 		//################################
 		// Constant or Static Members.
 		//################################
-		static UpmGitExtensionUI ()
+		static UpmGitExtension ()
 		{
-			PackageManagerExtensions.RegisterExtension (new UpmGitExtensionUI ());
+			PackageManagerExtensions.RegisterExtension (new UpmGitExtension ());
 		}
 
 		//################################
