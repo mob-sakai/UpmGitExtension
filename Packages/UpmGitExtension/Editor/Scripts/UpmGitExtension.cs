@@ -63,7 +63,7 @@ namespace Coffee.PackageManager
 		public void OnPackageSelectionChange (PackageInfo packageInfo)
 		{
 			InitializeUI ();
-			if (packageInfo == null)
+			if (phase == Phase.Initialize || packageInfo == null)
 				return;
 
 			// Update document actions.
@@ -136,6 +136,9 @@ namespace Coffee.PackageManager
 		void InitializeUI ()
 		{
 			if (phase != Phase.Initialize)
+				return;
+
+			if (!DocumentActions.IsResourceReady() || !InstallPackageWindow.IsResourceReady() || !GitButton.IsResourceReady())
 				return;
 
 			root = UIUtils.GetRoot(this).Q("container");

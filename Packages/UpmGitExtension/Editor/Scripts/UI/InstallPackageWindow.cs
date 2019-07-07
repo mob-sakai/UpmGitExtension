@@ -21,6 +21,11 @@ namespace Coffee.PackageManager
 		const string TemplatePath = ResourcesPath + "InstallPackageWindow.uxml";
 		const string StylePath = ResourcesPath + "InstallPackageWindow.uss";
 
+		public static bool IsResourceReady()
+		{
+			return EditorGUIUtility.Load(TemplatePath) && EditorGUIUtility.Load(StylePath);
+		}
+
 		//################################
 		// Public Members.
 		//################################

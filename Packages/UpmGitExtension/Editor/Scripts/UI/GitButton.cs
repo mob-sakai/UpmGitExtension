@@ -1,4 +1,5 @@
-﻿#if UNITY_2019_1_OR_NEWER
+﻿using UnityEditor;
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 #else
@@ -15,6 +16,11 @@ namespace Coffee.PackageManager
 		//################################
 		const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
 		const string StylePath = ResourcesPath + "GitButton.uss";
+
+		public static bool IsResourceReady()
+		{
+			return EditorGUIUtility.Load(StylePath);
+		}
 
 		public GitButton (System.Action action) : base (action)
 		{

@@ -22,6 +22,11 @@ namespace Coffee.PackageManager
 		const string TemplatePath = ResourcesPath + "DocumentActions.uxml";
 		const string StylePath = ResourcesPath + "DocumentActions.uss";
 
+		public static bool IsResourceReady()
+		{
+			return EditorGUIUtility.Load(TemplatePath) && EditorGUIUtility.Load(StylePath);
+		}
+
 		public DocumentActions (VisualElement detailActions)
 		{
 			originDetailActions = detailActions;
