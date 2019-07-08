@@ -1,5 +1,4 @@
 ﻿.git-button {
-  flex-glow: 0;
   align-items: center;
   justify-content: center;
   height: 19px;
