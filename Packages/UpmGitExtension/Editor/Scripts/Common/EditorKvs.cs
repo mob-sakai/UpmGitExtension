@@ -90,6 +90,9 @@ namespace Coffee.PackageManager
 			Set (key, converter (value));
 		}
 
+#if UPM_GIT_EXT_DEBUG
+		[MenuItem("EditorKvs/Clear")]
+#endif
 		internal static void Clear ()
 		{
 			var inst = instance;
