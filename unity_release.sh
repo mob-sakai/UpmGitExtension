@@ -37,38 +37,6 @@ echo -e ">> OK"
 
 
 
-# 3. << Check unity editor is exist and no compile error >>
-UNITY_VER=`sed -e "s/m_EditorVersion: \(.*\)/\1/g" ProjectSettings/ProjectVersion.txt`
-UNITY_EDITOR="/Applications/Unity/Hub/Editor/${UNITY_VER}/Unity.app/Contents/MacOS/Unity"
-UNITY_LOG="unity.log"
-UNITY_ARGS="-quit -batchmode -projectPath `pwd` -logFile $UNITY_LOG"
-UNITY_PACKAGE_SRC=`node -pe 'require("./package.json").src'`
-UNITY_PACKAGE_NAME="${PACKAGE_NAME}_${RELEASE_VERSION}.unitypackage"
-echo -e "\n>> (3/8) Check exporting package is available..."
-echo -e "Version: $UNITY_VER ($UNITY_EDITOR)"
-echo -e "Package Source: $UNITY_PACKAGE_SRC"
-
-#   3-1. Is src directory exist?
-[ ! -d "$UNITY_PACKAGE_SRC" ] && echo -e "\n>> Error : $UNITY_PACKAGE_SRC is not exist." && exit
-
-#   3-2. Is runtime compile successfully?
-set +e
-if [ "$EDITOR_ONLY" != "true" ]; then
-  echo -e "\n>> compile for runtime..."
-  "$UNITY_EDITOR" $UNITY_ARGS -buildOSX64Player `pwd`/build.app
-  [ $? != 0 ] && echo -e "\n>> Error : \n`cat $UNITY_LOG | grep -E ': error CS|Fatal Error'`" && exit
-  echo -e ">> OK"
-fi
-
-#   3-3. Is exporting package successfully?
-echo -e "\n>> Pre export package..."
-"$UNITY_EDITOR" $UNITY_ARGS -exportpackage $UNITY_PACKAGE_SRC $UNITY_PACKAGE_NAME
-[ $? != 0 ] && echo -e "\n>> Error : \n`cat $UNITY_LOG | grep -E ': error CS|Fatal Error'`" && exit
-echo -e ">> OK"
-set -e
-
-
-
 # 4. << Generate change log >>
 CHANGELOG_GENERATOR_ARG=`grep -o -e ".*git\"$" package.json | sed -e "s/^.*\/\([^\/]*\)\/\([^\/]*\).git.*$/--user \1 --project \2/"`
 CHANGELOG_GENERATOR_ARG="--future-release ${RELEASE_VERSION} ${CHANGELOG_GENERATOR_ARG}"
@@ -78,17 +46,6 @@ github_changelog_generator ${CHANGELOG_GENERATOR_ARG}
 git diff -- CHANGELOG.md
 read -p "[? Is the change log correct? (y/N):" yn
 case "$yn" in [yY]*) ;; *) exit ;; esac
-echo -e ">> OK"
-
-
-
-# 5. << Export unitypackage >>
-echo -e "\n>> (5/8) Export unitypackage..."
-set +e
-cp -f package.json CHANGELOG.md README.md $UNITY_PACKAGE_SRC
-"$UNITY_EDITOR" $UNITY_ARGS -exportpackage $UNITY_PACKAGE_SRC $UNITY_PACKAGE_NAME
-[ $? != 0 ] && echo -e "\n>> Error : \n`cat $UNITY_LOG | grep -E ': error CS|Fatal Error'`" && exit
-set -e
 echo -e ">> OK"
 
 
@@ -128,7 +85,7 @@ echo -e ">> OK"
 # 8. << Upload unitypackage and release on Github >>
 echo -e "\n>> (8/8) Releasing..."
 [ "$UNITY_PACKAGE_MANAGER" == "true" ] && git checkout upm -f
-gh-release --assets $UNITY_PACKAGE_NAME --name $RELEASE_VERSION --tag_name $RELEASE_VERSION
+gh-release --name $RELEASE_VERSION --tag_name $RELEASE_VERSION
 echo -e ">> OK"
 
 
