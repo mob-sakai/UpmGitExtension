@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.9.0](https://github.com/mob-sakai/UpmGitExtension/tree/0.9.0) (2019-07-09)
+
+[Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.8.3...0.9.0)
+
+**Implemented enhancements:**
+
+- Use preferentially raw.githack.com to download package.json [\#39](https://github.com/mob-sakai/UpmGitExtension/issues/39)
+- Cache result of git command [\#38](https://github.com/mob-sakai/UpmGitExtension/issues/38)
+- On Unity 2019.1 or later, show all tags/branches as versions [\#37](https://github.com/mob-sakai/UpmGitExtension/issues/37)
+- Support Unity 2019.2 [\#36](https://github.com/mob-sakai/UpmGitExtension/issues/36)
+- Updatable indicator [\#26](https://github.com/mob-sakai/UpmGitExtension/issues/26)
+- Improve add package window [\#21](https://github.com/mob-sakai/UpmGitExtension/issues/21)
+
 ## [0.8.3](https://github.com/mob-sakai/UpmGitExtension/tree/0.8.3) (2019-05-12)
 
 [Full Changelog](https://github.com/mob-sakai/UpmGitExtension/compare/0.8.2...0.8.3)
