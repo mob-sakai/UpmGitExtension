@@ -1,0 +1,12 @@
+<UXML xmlns:ui="UnityEngine.Experimental.UIElements">
+    <ui:VisualElement name="detailActions" class="githubActions">
+      <ui:Button name="hostButton" >
+        <ui:VisualElement name="logo"/>
+      </ui:Button>
+      <ui:Button name="viewDocumentationButton" class="detailAction link" text="View documentation"/>
+      <ui:Label name="detailActionSeparator" class="detailActionSeparator" text="-"/>
+      <ui:Button name="viewChangelogButton" class="detailAction link" text="View changelog"/>
+      <ui:Label name="detailActionSeparator" class="detailActionSeparator" text="-"/>
+      <ui:Button name="viewLicenseButton" class="detailAction link" text="View license"/>
+    </ui:VisualElement>
+</UXML>

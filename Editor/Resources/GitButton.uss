@@ -1,0 +1,15 @@
+﻿.git-button {
+  align-items: center;
+  justify-content: center;
+  height: 19px;
+  padding-top: 3px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.git-button-image {
+  width: 14px;
+  height: 14px;
+  background-image: resource("giticon")
+}

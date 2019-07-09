@@ -1,0 +1,29 @@
+<UXML xmlns:ui="UnityEngine.Experimental.UIElements">
+  <!--<ui:VisualElement name="installPackageWindow" class="installPackageWindow maximize">-->
+    <ui:VisualElement name="titleContainer" class="horizontal">
+      <ui:VisualElement class="git-image" />
+      <ui:Label text="Install Package From Git Repository" />
+    </ui:VisualElement>
+    <ui:VisualElement name="urlContainer" class="horizontal">
+      <ui:Label text="Repository URL" class="fixed" />
+      <ui:TextField name="repoUrlText" class="expandable" />
+      <ui:Button name="findVersionsButton" text="Find Versions" class="button h-spaced" tooltip="Fetch all tags/branches from the repository as package versions." />
+      <ui:Label name="findVersionsError" class="error" tooltip="Versions not found. Make sure that the git repository url and access permissions are correct." />
+    </ui:VisualElement>
+    <ui:VisualElement name="versionContainer" class="horizontal">
+      <ui:Label text="Version" class="fixed" />
+      <ui:Button name="versionSelectButton" class="expandable unity-base-popup-field__input popupField" />
+      <ui:Button name="findPackageButton" text="Find Package" class="button h-spaced" tooltip="Verify the specified version of the package." />
+      <ui:Label name="findPackageError" class="error" tooltip="'package.json' and 'package.json.meta' are not found in root directory of the git repository." />
+    </ui:VisualElement>
+    <ui:VisualElement name="packageContainer" class="horizontal">
+      <ui:Label text="Package Name" class="fixed" />
+      <ui:Label name="packageNameLabel" class="expandable" />
+      <ui:Button name="installPackageButton" text="Install Package" class="button h-spaced" tooltip="Install the package to this project." />
+      <ui:Label name="installPackageError" class="error" />
+    </ui:VisualElement>
+    <ui:VisualElement name="controlContainer" class="horizontal v-spaced">
+      <ui:Button name="closeButton" text="Close" class="button" />
+    </ui:VisualElement>
+  <!--</ui:VisualElement>-->
+</UXML>
