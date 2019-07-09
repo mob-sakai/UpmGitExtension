@@ -217,7 +217,7 @@ namespace Coffee.PackageManager
 				findPackageError.visible = hasError;
 				if (!hasError)
 				{
-					packageNameLabel.text = packageName;
+					EditorApplication.delayCall += () => packageNameLabel.text = packageName;
 					SetPhase (Phase.InstallPackage);
 				}
 			});

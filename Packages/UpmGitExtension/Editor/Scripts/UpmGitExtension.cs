@@ -339,7 +339,6 @@ namespace Coffee.PackageManager
 			try
 			{
 				// Get repository refs as versions and update package infos.
-				bool started = 0 < gitPackages.Count;
 				foreach (Expose p in GetExposedPackages()["Values"])
 				{
 					// Is it git package?
@@ -350,7 +349,7 @@ namespace Coffee.PackageManager
 					}
 				}
 
-				if (!started)
+				if (phase == Phase.Idle || phase == Phase.Initialize)
 				{
 					Debug.LogFormat ("[UpdateGitPackages] Start task to update git package.");
 					UpdateGitPackages(gitPackages, null);
