@@ -11,6 +11,8 @@
 echo -e ">> Start Github Release:"
 PACKAGE_NAME=`node -pe 'require("./package.json").name'`
 echo -e ">> Package name: ${PACKAGE_NAME}"
+PACKAGE_SRC=`node -pe 'require("./package.json").src'`
+echo -e ">> Package src: ${PACKAGE_SRC}"
 CURRENT_VERSION=`grep -o -e "\"version\".*$" package.json | sed -e "s/\"version\": \"\(.*\)\".*$/\1/"`
 
 read -p "[? (1/8) Input release version (for current: ${CURRENT_VERSION}): " RELEASE_VERSION
@@ -52,6 +54,7 @@ echo -e ">> OK"
 
 # 6. << Commit release files >>
 echo -e "\n>> (6/8) Commit release files..."
+cp -f package.json CHANGELOG.md README.md $PACKAGE_SRC
 git add -u
 git commit -m "update documents for $RELEASE_VERSION"
 echo -e ">> OK"
@@ -63,7 +66,7 @@ if [ "$UNITY_PACKAGE_MANAGER" == "true" ]; then
   echo -e "\n>> Split for upm..."
   git fetch
   git show-ref --quiet refs/remotes/origin/upm && git branch -f upm origin/upm
-  git-snapshot --prefix="$UNITY_PACKAGE_SRC" --message="$RELEASE_VERSION" --branch=upm
+  git-snapshot --prefix="$PACKAGE_SRC" --message="$RELEASE_VERSION" --branch=upm
   git push origin upm
 fi
 
