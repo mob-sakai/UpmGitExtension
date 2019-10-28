@@ -197,6 +197,8 @@ namespace Coffee.PackageManager
 			};
 			Expose.FromObject(updateButton.clickable)["clicked"] = Expose.FromObject(actionUpdate);
 
+			Settings.onChangedShowAllVersions = ReloadPackageCollection;
+
 			phase = Phase.Idle;
 		}
 
@@ -274,6 +276,7 @@ namespace Coffee.PackageManager
 		void UpdatePackageInfoVersions(Expose exPackage, IEnumerable<string> versions)
 		{
 			Expose vers = Expose.FromObject(versions
+				.Where(x=>Settings.showAllVersions || regVersionValid.IsMatch (x) || x.Contains("upm"))
 				.Select(x => regVersionValid.IsMatch(x) ? x : "0.0.0-" + x)
 				.Distinct()
 				.OrderBy(x => x)
