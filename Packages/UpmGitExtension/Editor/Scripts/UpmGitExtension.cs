@@ -190,10 +190,27 @@ namespace Coffee.PackageManager
 					var packageId = exTargetPackage["Info"]["m_PackageId"].As<string>();
 					string packageIdPrefix = regInstallVersion.Replace(packageId, "");
 					string refName = exTargetPackage["Version"].ToString().Replace("0.0.0-", "");
-					exTargetPackage["_PackageId"] = Expose.FromObject(packageIdPrefix + "#" + refName);
-				}
+					packageId = packageIdPrefix + "#" + refName;
 
-				detailView.Call("UpdateClick");
+					var m = Regex.Match (packageId, "([^@]+)@(.*)");
+					if(m.Success)
+					{
+						var l = string.Format ("\"{0}\": \"{1}\",", m.Groups [1].Value, m.Groups [2].Value);
+						Debug.Log (l);
+						var manifest = MiniJSON.Json.Deserialize (System.IO.File.ReadAllText ("Packages/manifest.json")) as Dictionary<string,object>;
+						var dependencies = manifest ["dependencies"] as Dictionary<string, object>;
+
+						dependencies.Remove (m.Groups [1].Value);
+						dependencies.Add (m.Groups [1].Value, m.Groups [2].Value);
+
+						System.IO.File.WriteAllText ("Packages/manifest.json", MiniJSON.Json.Serialize (manifest));
+						UnityEditor.AssetDatabase.Refresh (ImportAssetOptions.ForceUpdate);
+					}
+				}
+				else
+				{
+					detailView.Call ("UpdateClick");
+				}
 			};
 			Expose.FromObject(updateButton.clickable)["clicked"] = Expose.FromObject(actionUpdate);
 
