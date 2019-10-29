@@ -25,5 +25,9 @@
     <ui:VisualElement name="controlContainer" class="horizontal v-spaced">
       <ui:Button name="closeButton" text="Close" class="button" />
     </ui:VisualElement>
+    <ui:VisualElement name="optionContainer" class="horizontal v-spaced">
+      <ui:Toggle name="showAllVersionsToggle" />
+      <ui:Label text="Show All Versions" />
+    </ui:VisualElement>
   <!--</ui:VisualElement>-->
 </UXML>

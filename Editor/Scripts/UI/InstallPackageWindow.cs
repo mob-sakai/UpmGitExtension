@@ -65,6 +65,8 @@ namespace Coffee.PackageManager
 
 			closeButton = root.Q<Button> ("closeButton");
 
+			showAllVersionsToggle = root.Q<Toggle> ("showAllVersionsToggle");
+
 			// Url container
 #if UNITY_2019_1_OR_NEWER
 			repoUrlText.RegisterValueChangedCallback ((evt) => onChange_RepoUrl (evt.newValue));
@@ -82,6 +84,10 @@ namespace Coffee.PackageManager
 			
 			// Controll container
 			closeButton.clickable.clicked += onClick_Close;
+
+			// Show all version
+			showAllVersionsToggle.value = Settings.showAllVersions;
+			showAllVersionsToggle.OnValueChanged((evt) => Settings.showAllVersions = evt.newValue);
 
 			SetPhase (Phase.InputRepoUrl);
 		}
@@ -107,6 +113,7 @@ namespace Coffee.PackageManager
 		readonly Button findVersionsButton;
 		readonly Button versionSelectButton;
 		readonly Button findPackageButton;
+		readonly Toggle showAllVersionsToggle;
 		readonly Label packageNameLabel;
 		readonly TextField repoUrlText;
 		IEnumerable<string> versions = new string [0];
@@ -199,9 +206,17 @@ namespace Coffee.PackageManager
 				menu.AddItem(new GUIContent(t), currentRefName == t, callback, t);
 
 			menu.AddDisabledItem(GUIContent.none);
-			
-			foreach (var t in orderdVers.Where(x => !regSemVer.IsMatch(x)))
-				menu.AddItem(new GUIContent(t), currentRefName == t, callback, t);
+
+			if(Settings.showAllVersions)
+			{
+				foreach (var t in orderdVers.Where (x => !regSemVer.IsMatch (x)))
+					menu.AddItem (new GUIContent (t), currentRefName == t, callback, t);
+			}
+			else
+			{
+				foreach (var t in orderdVers.Where (x => !regSemVer.IsMatch (x) && x.Contains("upm")))
+					menu.AddItem (new GUIContent (t), currentRefName == t, callback, t);
+			}
 
 			menu.DropDown(versionSelectButton.worldBound);
 		}

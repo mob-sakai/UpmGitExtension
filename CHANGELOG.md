@@ -1,3 +1,18 @@
+# 1.0.0 (2019-10-29)
+
+
+### Bug Fixes
+
+* An error occurs during initialization ([2a83d97](https://github.com/mob-sakai/UpmGitExtension/commit/2a83d9738a0f91ee9c0bb65ffbc70aa0e62db589))
+* Fix for private repo ([e921c23](https://github.com/mob-sakai/UpmGitExtension/commit/e921c233857947c472f9bd074ad7204c2e7ccb72))
+* Remove uss property ([b491102](https://github.com/mob-sakai/UpmGitExtension/commit/b491102f76e607dd888d21253695a6d69decec18))
+
+
+### Features
+
+* Support git dependency in the package [#35](https://github.com/mob-sakai/UpmGitExtension/issues/35) ([12d0dcc](https://github.com/mob-sakai/UpmGitExtension/commit/12d0dcc3b5746dc4bd62cfc2b4a9a17b270a2e69))
+* Tag filtering [#45](https://github.com/mob-sakai/UpmGitExtension/issues/45) ([221e04b](https://github.com/mob-sakai/UpmGitExtension/commit/221e04b67bae08f423788de5b8d217337bbc7672))
+
 # Changelog
 
 ## [0.9.1](https://github.com/mob-sakai/UpmGitExtension/tree/0.9.1) (2019-07-16)
