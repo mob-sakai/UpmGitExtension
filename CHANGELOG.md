@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.1...v1.0.2) (2019-10-29)
+
+
+### Bug Fixes
+
+* Replace version in package.json on release ([#56](https://github.com/mob-sakai/UpmGitExtension/issues/56)) ([9d3f5a4](https://github.com/mob-sakai/UpmGitExtension/commit/9d3f5a463da4b9692366da486d599b135867f65d))
+
 ## [1.0.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0...v1.0.1) (2019-10-29)
 
 

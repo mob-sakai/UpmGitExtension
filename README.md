@@ -68,7 +68,7 @@ Find `Packages/manifest.json` in your project and edit it to look like this:
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#1.0.1",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#1.0.2",
     ...
   },
 }
