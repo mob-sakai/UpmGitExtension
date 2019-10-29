@@ -49,6 +49,8 @@ This project extends the UI of Unity Package Manager for package installed using
 * Remove package
 * Support Unity 2018.3 or later
 * Support .Net 3.5 and 4.x both
+* Version fillterring
+* Support [GitDependencyResolverForUnity](https://github.com/mob-sakai/GitDependencyResolverForUnity) in Unity 2019.1 or later
 
 
 ### Future plans
@@ -67,12 +69,11 @@ Find `Packages/manifest.json` in your project and edit it to look like this:
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.9.1",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.10.0",
     ...
   },
 }
 ```
-* For Unity 2019.1 or later, use UpmGitExtension 0.5.0 or later.
 
 
 ### Requirement
