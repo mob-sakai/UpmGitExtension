@@ -1,16 +1,44 @@
 {
-	"name": "com.coffee.upm-git-extension",
-	"displayName": "UPM Git Extension",
-	"description": "This package extends the UI of Unity Package Manager (UPM) for the packages installed from git repository.\n\n - Support GitHub,  GitLab, Bitbucket, etc.\n - Link to the repogitory and offline documents\n - Install the package from git repository with UI\n - Update the package with a specific tag/branch\n - Remove the package",
-	"version": "0.9.1",
-	"unity": "2018.3",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/mob-sakai/UpmGitExtension.git"
-	},
-	"src": "Packages/UpmGitExtension",
-	"author": "mob-sakai <sakai861104@gmail.com> (https://github.com/mob-sakai)",
-	"dependencies": {
-	}
+  "name": "com.coffee.upm-git-extension",
+  "displayName": "UPM Git Extension",
+  "description": "This package extends the UI of Unity Package Manager (UPM) for the packages installed from git repository.\n\n - Support GitHub,  GitLab, Bitbucket, etc.\n - Link to the repogitory and offline documents\n - Install the package from git repository with UI\n - Update the package with a specific tag/branch\n - Remove the package",
+  "version": "0.9.1",
+  "unity": "2018.3",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mob-sakai/UpmGitExtension.git"
+  },
+  "author": "mob-sakai <sakai861104@gmail.com> (https://github.com/mob-sakai)",
+  "dependencies": {},
+  "devDependencies": {
+    "semantic-release-git-snapshot": "^1.2.0-beta.1",
+    "@semantic-release/changelog": "^3.0.4",
+    "@semantic-release/git": "^7.1.0-beta.7",
+    "semantic-release": "^16.0.0-beta.26"
+  },
+  "bugs": {
+    "url": "https://github.com/mob-sakai/UpmGitExtension/issues"
+  },
+  "homepage": "https://github.com/mob-sakai/UpmGitExtension#readme",
+  "scripts": {
+    "release": "cd Packages/$npm_package_name && semantic-release"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/git",
+      "@semantic-release/github",
+      [
+        "semantic-release-git-snapshot",
+        {
+          "prefix": ".",
+          "branch": "upm",
+          "tagFormat": "${version}"
+        }
+      ]
+    ]
+  }
 }

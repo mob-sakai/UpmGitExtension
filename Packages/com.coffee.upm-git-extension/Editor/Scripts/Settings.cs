@@ -43,6 +43,27 @@ namespace Coffee.PackageManager
 				? Instance.m_HostData.FirstOrDefault (x => packageId.Contains (x.Domain)) ?? s_EmptyHostData
 				: s_EmptyHostData;
 		}
+
+		public static System.Action onChangedShowAllVersions = () => { };
+
+		public static bool? _showAllVersions = null;
+		public static bool showAllVersions
+		{
+			get
+			{
+				_showAllVersions = _showAllVersions ?? EditorPrefs.GetBool ("com.coffee.upm-git-extension/showAllVersions", false);
+				return (bool)_showAllVersions;
+			}
+			set
+			{
+				if(_showAllVersions != value)
+				{
+					_showAllVersions = value;
+					EditorPrefs.SetBool ("com.coffee.upm-git-extension/showAllVersions", value);
+					onChangedShowAllVersions ();
+				}
+			}
+		}
 	}
 
 	[System.Serializable]
