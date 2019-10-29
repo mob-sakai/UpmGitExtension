@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0...v1.0.1) (2019-10-29)
+
+
+### Bug Fixes
+
+* Overwrite manifest.json on install package via install window ([9b7a76c](https://github.com/mob-sakai/UpmGitExtension/commit/9b7a76ca17f5f95e1f81a8afcb1a19fb1ccc73d1))
+* Support Unity 2019.1 or later ([#54](https://github.com/mob-sakai/UpmGitExtension/issues/54)) ([03d5a32](https://github.com/mob-sakai/UpmGitExtension/commit/03d5a325a8ae4492c1a4afdffc88af7b3b2a79aa))
+
 # 1.0.0 (2019-10-29)
 
 
