@@ -31,7 +31,7 @@
       "@semantic-release/changelog",
       "@semantic-release/git",
       "@semantic-release/github",
-	  "semantic-release-git-snapshot"
+      "semantic-release-git-snapshot"
     ]
   }
 }
