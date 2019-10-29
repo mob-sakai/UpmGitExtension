@@ -87,7 +87,11 @@ namespace Coffee.PackageManager
 
 			// Show all version
 			showAllVersionsToggle.value = Settings.showAllVersions;
+#if UNITY_2019_1_OR_NEWER
+			showAllVersionsToggle.RegisterValueChangedCallback((evt) => Settings.showAllVersions = evt.newValue);
+#else
 			showAllVersionsToggle.OnValueChanged((evt) => Settings.showAllVersions = evt.newValue);
+#endif
 
 			SetPhase (Phase.InputRepoUrl);
 		}
