@@ -423,10 +423,20 @@ namespace Coffee.PackageManager
 
 		public static void AddPackage (string packageId, Action<Request> callback = null)
 		{
-			_request = Client.Add (packageId);
-			_callback = callback;
-			EditorUtility.DisplayProgressBar ("Add Package", "Cloning " + packageId, 0.5f);
-			EditorApplication.update += UpdatePackageRequest;
+			var m = Regex.Match (packageId, "([^@]+)@(.*)");
+			if (m.Success)
+			{
+				var l = string.Format ("\"{0}\": \"{1}\",", m.Groups [1].Value, m.Groups [2].Value);
+				Debug.Log (l);
+				var manifest = MiniJSON.Json.Deserialize (System.IO.File.ReadAllText ("Packages/manifest.json")) as Dictionary<string, object>;
+				var dependencies = manifest ["dependencies"] as Dictionary<string, object>;
+
+				dependencies.Remove (m.Groups [1].Value);
+				dependencies.Add (m.Groups [1].Value, m.Groups [2].Value);
+
+				System.IO.File.WriteAllText ("Packages/manifest.json", MiniJSON.Json.Serialize (manifest));
+				UnityEditor.AssetDatabase.Refresh (ImportAssetOptions.ForceUpdate);
+			}
 		}
 
 		public static bool isBusy { get { return GitUtils.IsGitRunning || (_request != null && _request.Status == StatusCode.InProgress); } }
