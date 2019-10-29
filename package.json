@@ -10,13 +10,6 @@
     "url": "https://github.com/mob-sakai/UpmGitExtension.git"
   },
   "author": "mob-sakai <sakai861104@gmail.com> (https://github.com/mob-sakai)",
-  "dependencies": {},
-  "devDependencies": {
-    "semantic-release-git-snapshot": "^1.2.0-beta.1",
-    "@semantic-release/changelog": "^3.0.4",
-    "@semantic-release/git": "^7.1.0-beta.7",
-    "semantic-release": "^16.0.0-beta.26"
-  },
   "bugs": {
     "url": "https://github.com/mob-sakai/UpmGitExtension/issues"
   },
@@ -24,11 +17,24 @@
   "scripts": {
     "release": "cd Packages/$npm_package_name && semantic-release"
   },
+  "dependencies": {},
+  "devDependencies": {
+    "semantic-release-git-snapshot": "^1.2.0-beta.1",
+    "@semantic-release/changelog": "^3.0.4",
+    "@semantic-release/git": "^7.1.0-beta.7",
+    "semantic-release": "^16.0.0-beta.26"
+  },
   "release": {
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       "@semantic-release/changelog",
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ],
       "@semantic-release/git",
       "@semantic-release/github",
       [
