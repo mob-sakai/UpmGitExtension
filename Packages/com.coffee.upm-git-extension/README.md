@@ -16,9 +16,8 @@ This package extends the UI of Unity Package Manager (UPM) for the packages inst
 
 ### What's new? [See changelog ![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg?label=last%20updated)](https://github.com/mob-sakai/UpmGitExtension/blob/upm/CHANGELOG.md)
 ### Do you want to receive notifications for new releases? [Watch this repo ![](https://img.shields.io/github/watchers/mob-sakai/UpmGitExtension.svg?style=social&label=Watch)](https://github.com/mob-sakai/UpmGitExtension/subscription)
-### Support me on Patreon!  
-[![become_a_patron](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/join/2343451?)
-
+### Support me on GitHub!  
+[![become_a_sponsor_on_github](https://user-images.githubusercontent.com/12690315/66942881-03686280-f085-11e9-9586-fc0b6011029f.png)](https://github.com/users/mob-sakai/sponsorship)
 
 
 <br><br><br><br>
@@ -69,7 +68,7 @@ Find `Packages/manifest.json` in your project and edit it to look like this:
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#0.10.1",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#1.0.2",
     ...
   },
 }
@@ -166,7 +165,7 @@ For details, see https://www.patreon.com/posts/25070968.
 
 [mob-sakai](https://github.com/mob-sakai)
 [![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)  
-[![become_a_patron](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/join/2343451?)
+[![become_a_sponsor_on_github](https://user-images.githubusercontent.com/12690315/66942881-03686280-f085-11e9-9586-fc0b6011029f.png)](https://github.com/users/mob-sakai/sponsorship)
 
 
 
