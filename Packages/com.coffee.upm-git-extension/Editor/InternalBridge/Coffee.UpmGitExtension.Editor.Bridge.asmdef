@@ -13,7 +13,7 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [
-        "UPM_GIT_EXT_DEBUG"
+        "DEVELOP_BRIDGE_UGE"
     ],
     "versionDefines": []
 }

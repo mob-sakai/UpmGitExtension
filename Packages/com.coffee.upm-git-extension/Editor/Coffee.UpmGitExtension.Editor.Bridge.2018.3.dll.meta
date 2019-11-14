@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: 83e7ad198f11344acbfd2625eafc04dd
+guid: 1b1ec14f258c44a3aa73857da4f5b8de
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
   defineConstraints:
+  - '!DEVELOP_BRIDGE_UGE'
   - UNITY_2018_3_OR_NEWER
-  - !UNITY_2019_1_OR_NEWER
-  - '!UPM_GIT_EXT_DEBUG'
+  - '!UNITY_2019_1_OR_NEWER'
   isPreloaded: 0
   isOverridable: 1
   isExplicitlyReferenced: 1

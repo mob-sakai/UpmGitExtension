@@ -2,7 +2,8 @@
     "name": "Coffee.UpmGitExtension.Editor",
     "references": [
         "Unity.PackageManagerUI.Editor",
-        "Unity.PackageManagerCaptain.Editor"
+        "Unity.PackageManagerCaptain.Editor",
+        "Unity.InternalAPIEditorBridgeDev.001"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [
@@ -12,7 +13,10 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "bridge.2018.3.dll",
+        "Coffee.UpmGitExtension.Editor.Bridge.2018.3.dll",
+        "Coffee.UpmGitExtension.Editor.Bridge.2019.1.dll",
+        "Coffee.UpmGitExtension.Editor.Bridge.2019.2.dll",
+        "Coffee.UpmGitExtension.Editor.Bridge.2019.3.dll",
         "Markdig_UGE.dll"
     ],
     "autoReferenced": false,
