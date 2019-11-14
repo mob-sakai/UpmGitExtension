@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.UI.InternalBridge;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -156,7 +157,7 @@ namespace Coffee.PackageManager
 		{
 			SetPhase (Phase.FindVersions);
 			root.SetEnabled (false);
-			UnityEditor.PackageManager.UI.GitUtils.GetRefs ("", repoUrlText.value, refs =>
+			GitUtils.GetRefs ("", repoUrlText.value, refs =>
 			{
 				root.SetEnabled (true);
 				bool hasError = !refs.Any ();
@@ -208,7 +209,7 @@ namespace Coffee.PackageManager
 
 		void onClick_InstallPackage ()
 		{
-			UnityEditor.PackageManager.UI.PackageUtilsXXX.InstallPackage(packageNameLabel.text, PackageUtils.GetRepoUrl (repoUrlText.value), refName);
+			PackageUtils.InstallPackage(packageNameLabel.text, PackageUtils.GetRepoUrl (repoUrlText.value), refName);
 			root.SetEnabled (false);
 			onClick_Close ();
 		}

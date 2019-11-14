@@ -9,9 +9,87 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 
 namespace UnityEditor.PackageManager.UI.InternalBridge
 {
+	internal class Debug
+	{
+		[Conditional("UPM_GIT_EXT_DEBUG")]
+		public static void Log(object message)
+		{
+			UnityEngine.Debug.Log(message);
+		}
+		
+		[Conditional("UPM_GIT_EXT_DEBUG")]
+		public static void LogFormat(string format, params object[] args)
+		{
+			UnityEngine.Debug.LogFormat(format, args);
+		}
+		
+		public static void LogError(object message)
+		{
+			UnityEngine.Debug.LogError(message);
+		}
+		
+		public static void LogErrorFormat(string format, params object[] args)
+		{
+			UnityEngine.Debug.LogErrorFormat(format, args);
+		}
+		
+		public static void LogException(Exception e)
+		{
+			UnityEngine.Debug.LogException(e);
+		}
+	}
+
+
+	public static class UIUtils
+	{
+		const string kDisplayNone = "display-none";
+		public static void SetElementDisplay (VisualElement element, bool value)
+		{
+			if (element == null)
+				return;
+
+			SetElementClass (element, kDisplayNone, !value);
+			element.visible = value;
+		}
+
+		public static bool IsElementDisplay (VisualElement element)
+		{
+			return !HasElementClass (element, kDisplayNone);
+		}
+
+		public static void SetElementClass (VisualElement element, string className, bool value)
+		{
+			if (element == null)
+				return;
+
+			if (value)
+				element.AddToClassList (className);
+			else
+				element.RemoveFromClassList (className);
+		}
+
+		public static bool HasElementClass (VisualElement element, string className)
+		{
+			if (element == null)
+				return false;
+
+			return element.ClassListContains (className);
+		}
+
+		public static VisualElement GetRoot (VisualElement element)
+		{
+			while (element != null && element.parent != null)
+			{
+				element = element.parent;
+			}
+			return element;
+		}
+	}
+
     public static class GitUtils
     {
         static readonly Regex REG_REFS = new Regex("refs/(tags|remotes/origin)/([^/]+),(.+),(.+)$", RegexOptions.Compiled);

@@ -202,7 +202,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 var packageName = pInfo.Name;
                 pInfo.Origin = (PackageSource)99;
                 var json = JsonUtility.ToJson(pInfo);
-                var repoUrl = PackageUtils.GetRepoUrl(packageId);
+                var repoUrl = PackageUtils.GetRepoUrl(pInfo.PackageId);
 
 				// Get available branch/tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
 				GitUtils.GetRefs(pInfo.Name, repoUrl, refs =>

@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
+using UnityEditor.PackageManager.UI.InternalBridge;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -114,7 +115,7 @@ namespace Coffee.PackageManager
 
             root = UIUtils.GetRoot(this).Q("container");
 
-            var internalBridge = InternalBridge.Instance;
+            var internalBridge = Bridge.Instance;
             internalBridge.Setup(root.Q("packageSpinner"), root.Q("packageList"), root.Q("detailsGroup"));
 
 
@@ -175,8 +176,6 @@ namespace Coffee.PackageManager
 
             updateButton.OverwriteCallback(internalBridge.UpdateClick);
             removeButton.OverwriteCallback(internalBridge.RemoveClick);
-
         }
-
     }
 }
