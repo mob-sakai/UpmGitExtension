@@ -6,7 +6,7 @@ UNITY=$3
 
 # Get value from package.json
 get_from_package_json() {
-    echo `grep -o -e "\"$1\".*$" package.json | head -n 1 | cut -d ':' -f 2 | sed -e "s/[\",\t ]//g"`
+    echo `grep -o -e "\"$1\".*$" package.json | head -n 1 | cut -d ':' -f 2 | sed -e "s/[\", ]//g"`
 }
 
 # Create repo.
