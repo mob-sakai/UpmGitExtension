@@ -85,14 +85,6 @@ namespace Coffee.PackageManager
 			// Controll container
 			closeButton.clickable.clicked += onClick_Close;
 
-			// Show all version
-			showAllVersionsToggle.value = Settings.showAllVersions;
-#if UNITY_2019_1_OR_NEWER
-			showAllVersionsToggle.RegisterValueChangedCallback((evt) => Settings.showAllVersions = evt.newValue);
-#else
-			showAllVersionsToggle.OnValueChanged((evt) => Settings.showAllVersions = evt.newValue);
-#endif
-
 			SetPhase (Phase.InputRepoUrl);
 		}
 
@@ -117,7 +109,6 @@ namespace Coffee.PackageManager
 		readonly Button findVersionsButton;
 		readonly Button versionSelectButton;
 		readonly Button findPackageButton;
-		readonly Toggle showAllVersionsToggle;
 		readonly Label packageNameLabel;
 		readonly TextField repoUrlText;
 		IEnumerable<string> versions = new string [0];
