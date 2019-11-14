@@ -55,17 +55,13 @@ namespace Coffee.PackageManager
 
 			versionContainer = root.Q ("versionContainer");
 			versionSelectButton = root.Q<Button> ("versionSelectButton");
-			findPackageButton = root.Q<Button> ("findPackageButton");
-			findPackageError = root.Q ("findPackageError");
 
 			packageContainer = root.Q ("packageContainer");
 			packageNameLabel = root.Q<Label> ("packageNameLabel");
 			installPackageButton = root.Q<Button> ("installPackageButton");
-			installPackageError = root.Q ("installPackageError");
 
 			closeButton = root.Q<Button> ("closeButton");
 
-			showAllVersionsToggle = root.Q<Toggle> ("showAllVersionsToggle");
 
 			// Url container
 #if UNITY_2019_1_OR_NEWER
@@ -77,7 +73,6 @@ namespace Coffee.PackageManager
 
 			// Version container
 			versionSelectButton.clickable.clicked += onClick_SelectVersions;
-			findPackageButton.clickable.clicked += onClick_FindPackage;
 
 			// Package container
 			installPackageButton.clickable.clicked += onClick_InstallPackage;
@@ -102,16 +97,14 @@ namespace Coffee.PackageManager
 		readonly VisualElement versionContainer;
 		readonly VisualElement packageContainer;
 		readonly VisualElement findVersionsError;
-		readonly VisualElement findPackageError;
-		readonly VisualElement installPackageError;
 		readonly Button closeButton;
 		readonly Button installPackageButton;
 		readonly Button findVersionsButton;
 		readonly Button versionSelectButton;
-		readonly Button findPackageButton;
 		readonly Label packageNameLabel;
 		readonly TextField repoUrlText;
 		IEnumerable<string> versions = new string [0];
+		string refName = "";
 
 		enum Phase
 		{
@@ -137,12 +130,8 @@ namespace Coffee.PackageManager
 			if (canSelectVersion)
 			{
 				findVersionsError.visible = false;
-				findPackageError.visible = false;
-				installPackageError.visible = false;
 			}
 
-			bool canFindPackage = Phase.FindPackage <= phase;
-			findPackageButton.SetEnabled (canFindPackage);
 
 			bool canInstallPackage = Phase.InstallPackage <= phase;
 			packageContainer.SetEnabled (canInstallPackage);
@@ -150,8 +139,6 @@ namespace Coffee.PackageManager
 			if (canInstallPackage || phase == Phase.InputRepoUrl)
 			{
 				findVersionsError.visible = false;
-				findPackageError.visible = false;
-				installPackageError.visible = false;
 			}
 		}
 
@@ -169,7 +156,7 @@ namespace Coffee.PackageManager
 		{
 			SetPhase (Phase.FindVersions);
 			root.SetEnabled (false);
-			GitUtils.GetRefs (repoUrlText.value, refs =>
+			UnityEditor.PackageManager.UI.GitUtils.GetRefs ("", repoUrlText.value, refs =>
 			{
 				root.SetEnabled (true);
 				bool hasError = !refs.Any ();
@@ -191,26 +178,25 @@ namespace Coffee.PackageManager
 
 			GenericMenu.MenuFunction2 callback = (x) =>
 			{
-				versionSelectButton.text = x as string;
-				SetPhase (Phase.FindPackage);
+				var splited = x as string[];
+				versionSelectButton.text = splited[0];
+				packageNameLabel.text = splited[1];
+				refName = splited[2];
+				SetPhase (Phase.InstallPackage);
 			};
 
-			var orderdVers = versions.OrderByDescending(x => x).ToArray();
+			var orderdVers = versions
+				.OrderByDescending(x => x.Split(',')[1]).ToArray();
 
-			foreach (var t in orderdVers.Where(x => regSemVer.IsMatch(x)))
-				menu.AddItem(new GUIContent(t), currentRefName == t, callback, t);
-
-			menu.AddDisabledItem(GUIContent.none);
-
-			if(Settings.showAllVersions)
+			foreach (var t in orderdVers)
 			{
-				foreach (var t in orderdVers.Where (x => !regSemVer.IsMatch (x)))
-					menu.AddItem (new GUIContent (t), currentRefName == t, callback, t);
-			}
-			else
-			{
-				foreach (var t in orderdVers.Where (x => !regSemVer.IsMatch (x) && x.Contains("upm")))
-					menu.AddItem (new GUIContent (t), currentRefName == t, callback, t);
+				var splited = t.Split(',');
+				var refName = splited[0];
+				var version = splited[1];
+				var packageName = splited[2];
+				var text = version == refName ? version : version + " - " + refName;
+				var packageId = string.Format ("{0}@{1}#{2}", packageName, PackageUtils.GetRepoUrl (repoUrlText.value), refName);
+				menu.AddItem(new GUIContent(text), currentRefName == text, callback, new []{text, packageName, refName});
 			}
 
 			menu.DropDown(versionSelectButton.worldBound);
@@ -218,39 +204,13 @@ namespace Coffee.PackageManager
 
 		void onClick_FindPackage ()
 		{
-			root.SetEnabled (false);
-			SetPhase (Phase.FindPackage);
-			GitUtils.GetPackageJson (repoUrlText.value, versionSelectButton.text, packageName =>
-			{
-				root.SetEnabled (true);
-				bool hasError = string.IsNullOrEmpty (packageName);
-				findPackageError.visible = hasError;
-				if (!hasError)
-				{
-					EditorApplication.delayCall += () => packageNameLabel.text = packageName;
-					SetPhase (Phase.InstallPackage);
-				}
-			});
 		}
 
 		void onClick_InstallPackage ()
 		{
+			UnityEditor.PackageManager.UI.PackageUtilsXXX.InstallPackage(packageNameLabel.text, PackageUtils.GetRepoUrl (repoUrlText.value), refName);
 			root.SetEnabled (false);
-			var url = PackageUtils.GetRepoUrl (repoUrlText.value);
-			var _packageId = string.Format ("{0}@{1}#{2}", packageNameLabel.text, url, versionSelectButton.text);
-			PackageUtils.AddPackage (_packageId, req =>
-			{
-				root.SetEnabled (true);
-				if (req.Status == StatusCode.Success)
-				{
-					onClick_Close ();
-				}
-				else if (req.Status == StatusCode.Failure)
-				{
-					installPackageError.tooltip = req.Error.message;
-					installPackageError.visible = true;
-				}
-			});
+			onClick_Close ();
 		}
 	}
 }

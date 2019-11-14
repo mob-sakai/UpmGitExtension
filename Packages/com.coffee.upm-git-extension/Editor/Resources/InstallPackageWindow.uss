@@ -56,6 +56,11 @@
   background-image: resource("console.erroricon")
 }
 
+.installPackageWindow .error-hidden {
+  width: 22px;
+  height: 22px;
+}
+
 .installPackageWindow .git-image {
   width: 14px;
   height: 14px;
