@@ -6,48 +6,49 @@ using UnityEngine.Experimental.UIElements;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using System;
-using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Linq;
-using Conditional = System.Diagnostics.ConditionalAttribute;
-// using Semver;
 
-namespace UnityEditor.PackageManager.UI
+namespace UnityEditor.PackageManager.UI.InternalBridge
 {
     public static class GitUtils
     {
-        static readonly StringBuilder s_sbError = new StringBuilder();
-        static readonly StringBuilder s_sbOutput = new StringBuilder();
-        public delegate void CommandCallback(bool success, string output);
+        static readonly Regex REG_REFS = new Regex("refs/(tags|remotes/origin)/([^/]+),(.+),(.+)$", RegexOptions.Compiled);
+        const string GET_REFS_SCRIPT = "Packages/com.coffee.upm-git-extension/Editor/InternalAccessBridge/get-available-refs";
 
-        static readonly Regex s_regRefs = new Regex("refs/(tags|remotes/origin)/([^/]+),(.+),(.+)$", RegexOptions.Compiled);
-
-			
-        // repourlから
+        /// <summary>
+        /// Fetch the all branch/tag names where the package can be installed from the repository.
+        ///   - package.json and package.json.meta exist in root
+        ///   - Support current unity verison
+        ///   - Branch name is not nested
+        /// </summary>
+        /// <param name="packageName">Package name</param>
+        /// <param name="repoUrl">Repo url</param>
+        /// <param name="callback">Callback. The argument is "[tagOrBranchName],[version],[packageName]"</param>
         public static void GetRefs(string packageName, string repoUrl, Action<IEnumerable<string>> callback)
         {
-            // StringBuilder command = new StringBuilder ();
             var appDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var cacheRoot = new DirectoryInfo(Path.Combine(appDir, "UpmGitExtension"));
             var cacheDir = new DirectoryInfo(Path.Combine(cacheRoot.FullName, Uri.EscapeDataString(packageName + "@" + repoUrl)));
             var cacheFile = new FileInfo(Path.Combine(cacheDir.FullName, "versions"));
 
-            // Cached.
+            // Results are cached for 5 minutes.
             if (cacheFile.Exists && (DateTime.Now - cacheFile.LastWriteTime).TotalMinutes < 5)
             {
-                var versions =  File.ReadAllText(cacheFile.FullName)
-                    .Split('\n')
-                    .Select(r => s_regRefs.Match(r))
-                    .Where(m => m.Success && (packageName.Length == 0 || packageName == m.Groups[4].Value))
-                    .Select(m =>m.Groups[2].Value + "," + m.Groups[3].Value + "," + m.Groups[4].Value);
+                var versions = REG_REFS.Matches(File.ReadAllText(cacheFile.FullName))
+                    .Cast<Match>()
+                    .Where(m => packageName.Length == 0 || packageName == m.Groups[4].Value)
+                    .Select(m => string.Format("{0},{1},{2}", m.Groups[2], m.Groups[3], m.Groups[4]));
                 callback(versions);
             }
+            // Run script and cache result.
             else
             {
-                var script = "Packages/com.coffee.upm-git-extension/Editor/InternalAccessBridge/get-available-refs.sh";
-                var args = string.Format("{0} {1} {2}", repoUrl, cacheDir.FullName, UnityEngine.Application.unityVersion);
+                var script = Application.platform == RuntimePlatform.WindowsEditor
+                    ? GET_REFS_SCRIPT + ".bat"
+                    : GET_REFS_SCRIPT + ".sh";
+                var args = string.Format("{0} {1} {2}", repoUrl, cacheDir.FullName, Application.unityVersion);
                 ExecuteShell(script, args, (success) =>
                 {
                     if (success)
@@ -68,11 +69,10 @@ namespace UnityEditor.PackageManager.UI
                 UseShellExecute = true,
             };
 
-            Debug.LogFormat("[ExecuteShell] script {0}, args = {1}", script, args);
             var launchProcess = System.Diagnostics.Process.Start(startInfo);
             if (launchProcess == null || launchProcess.HasExited == true || launchProcess.Id == 0)
             {
-                Debug.LogErrorFormat("[ExecuteShell] failed: script = {0}, args = {1}");
+                Debug.LogErrorFormat("[ExecuteShell] failed: script = {0}, args = {1}", script, args);
                 callback(false);
             }
             else
@@ -83,7 +83,7 @@ namespace UnityEditor.PackageManager.UI
                     bool success = 0 == launchProcess.ExitCode;
                     if (!success)
                     {
-                        Debug.LogErrorFormat("Error: {0}\n\n{1}", args, s_sbError);
+                        Debug.LogErrorFormat("[ExecuteShell] failed: script = {0}, args = {1}", script, args);
                     }
                     callback(success);
                 };
@@ -94,61 +94,105 @@ namespace UnityEditor.PackageManager.UI
 
     }
 
-    public static class PackageUtilsXXX
+    public static class PackageUtils
     {
-        public static void InstallPackage(string packageName, string url, string refName)
+        static readonly Regex REG_PACKAGE_ID = new Regex("^([^@]+)@([^#]+)(#.+)?$", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Install or update package
+        /// </summary>
+        /// <param name="packageName">Package name</param>
+        /// <param name="repoUrl">Package url for install</param>
+        /// <param name="refName">Reference name for install (option)</param>
+        public static void InstallPackage(string packageName, string repoUrl, string refName)
         {
-            const string manifestPath = "Packages/manifest.json";
-            var manifest = MiniJSON.Json.Deserialize(System.IO.File.ReadAllText(manifestPath)) as Dictionary<string, object>;
-            var dependencies = manifest["dependencies"] as Dictionary<string, object>;
-
-            dependencies.Add(packageName, url + "#" + refName);
-
-            System.IO.File.WriteAllText(manifestPath, MiniJSON.Json.Serialize(manifest));
-            UnityEditor.EditorApplication.delayCall += () => UnityEditor.AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+            UpdateManifestJson(dependencies =>
+            {
+                // Remove from dependencies.
+                dependencies.Remove(packageName);
+                if (!string.IsNullOrEmpty(repoUrl))
+                {
+                    // Add to dependencies.
+                    if (!string.IsNullOrEmpty(refName))
+                        dependencies.Add(packageName, repoUrl + "#" + refName);
+                    else
+                        dependencies.Add(packageName, repoUrl);
+                }
+            });
         }
 
-        public static void RemovePackage(string packageName)
+        /// <summary>
+        /// Uninstall package
+        /// </summary>
+        /// <param name="packageName">Package name</param>
+        public static void UninstallPackage(string packageName)
         {
-            const string manifestPath = "Packages/manifest.json";
-            var manifest = MiniJSON.Json.Deserialize(System.IO.File.ReadAllText(manifestPath)) as Dictionary<string, object>;
-            var dependencies = manifest["dependencies"] as Dictionary<string, object>;
-
-            dependencies.Remove(packageName);
-
-            System.IO.File.WriteAllText(manifestPath, MiniJSON.Json.Serialize(manifest));
-            UnityEditor.EditorApplication.delayCall += () => UnityEditor.AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+            UpdateManifestJson(dependencies => dependencies.Remove(packageName));
         }
 
-        public static string GetFilePath(string resolvedPath, string filePattern)
+        /// <summary>
+        /// Update manifest.json
+        /// </summary>
+        /// <param name="actionForDependencies">Action for dependencies</param>
+        static void UpdateManifestJson(Action<Dictionary<string, object>> actionForDependencies)
         {
-            if (string.IsNullOrEmpty(resolvedPath) || string.IsNullOrEmpty(filePattern))
+            const string manifestPath = "Packages/manifest.json";
+            var manifest = MiniJSON.Json.Deserialize(File.ReadAllText(manifestPath)) as Dictionary<string, object>;
+            actionForDependencies(manifest["dependencies"] as Dictionary<string, object>);
+
+            // Save manifest.json.
+            File.WriteAllText(manifestPath, MiniJSON.Json.Serialize(manifest));
+            EditorApplication.delayCall += () => AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+        }
+
+        /// <summary>
+        /// Get a file path in package directory with pattern.
+        /// </summary>
+        /// <param name="dir">Directory path</param>
+        /// <param name="pattern">Pattern</param>
+        /// <returns>If the file exists, return the file path. Otherwise, return empty.</returns>
+        public static string GetFilePathWithPattern(string dir, string pattern)
+        {
+            if (string.IsNullOrEmpty(dir) || string.IsNullOrEmpty(pattern))
                 return "";
 
-            foreach (var path in Directory.GetFiles(resolvedPath, filePattern))
+            return Directory.GetFiles(dir, pattern)
+                .FirstOrDefault(path => !path.EndsWith(".meta", StringComparison.Ordinal))
+                ?? "";
+        }
+
+        /// <summary>
+        /// Get repo url for package from package id.
+        /// </summary>
+        /// <param name="packageId">Package id([packageName]@[repoUrl]#[ref])</param>
+        /// <param name="asHttps">Convert repo url to https url</param>
+        /// <returns>Repo url</returns>
+        public static string GetRepoUrl(string packageId, bool asHttps = false)
+        {
+            Match m = REG_PACKAGE_ID.Match(packageId);
+            if (m.Success)
             {
-                if (!path.EndsWith(".meta", StringComparison.Ordinal))
+                var repoUrl = m.Groups[2].Value;
+                if(asHttps)
                 {
-                    return path;
+                    repoUrl = Regex.Replace(repoUrl, "(git:)?git@([^:]+):", "https://$2/");
+                    repoUrl = repoUrl.Replace("ssh://", "https://");
+                    repoUrl = repoUrl.Replace("git@", "");
+                    repoUrl = Regex.Replace(repoUrl, "\\.git$", "");
                 }
+                return repoUrl;
             }
             return "";
         }
+    }
 
-        public static string GetRepoHttpsUrl (string packageId)
-		{
-			Match m = Regex.Match (packageId, "^[^@]+@([^#]+)(#.+)?$");
-			if (m.Success)
-			{
-				var repoUrl = m.Groups [1].Value;
-				repoUrl = Regex.Replace (repoUrl, "(git:)?git@([^:]+):", "https://$2/");
-				repoUrl = repoUrl.Replace ("ssh://", "https://");
-				repoUrl = repoUrl.Replace ("git@", "");
-				repoUrl = Regex.Replace (repoUrl, "\\.git$", "");
-
-				return repoUrl;
-			}
-			return "";
-		}
+    public static class ButtonExtension
+    {
+        public static void OverwriteCallback(this Button button, Action action)
+        {
+            button.RemoveManipulator(button.clickable);
+            button.clickable = new Clickable(action);
+            button.AddManipulator(button.clickable);
+        }
     }
 }

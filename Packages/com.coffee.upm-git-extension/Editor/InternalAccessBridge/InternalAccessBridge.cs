@@ -20,23 +20,12 @@ using UnityEngine.Experimental.UIElements;
 
 [assembly: IgnoresAccessChecksTo("Unity.PackageManagerUI.Editor")]
 [assembly: IgnoresAccessChecksTo("UnityEditor")]
-namespace UnityEditor.PackageManager.UI
+namespace UnityEditor.PackageManager.UI.InternalBridge
 {
-    public static class ButtonExtension
+    public class Bridge
     {
-        public static void OverwriteCallback(this Button button, Action action)
-        {
-            button.RemoveManipulator(button.clickable);
-            button.clickable = new Clickable(action);
-            button.AddManipulator(button.clickable);
-        }
-    }
-
-    public class InternalBridge
-    {
-
-        private static InternalBridge instance = new InternalBridge();
-        public static InternalBridge Instance { get { return instance; } }
+        private static Bridge instance = new Bridge();
+        public static Bridge Instance { get { return instance; } }
 
         VisualElement loadingSpinner = null;
         VisualElement packageList = null;
@@ -48,13 +37,16 @@ namespace UnityEditor.PackageManager.UI
         object SelectedPackage { get { return Expose.FromObject (packageDetails).Get ("SelectedPackage").As<PackageInfo> (); } }
 #endif
 
-        private InternalBridge() { }
+        private Bridge() { }
 
+        /// <summary>
+		/// Setup bridge.
+		/// </summary>
+		/// <param name="loadingSpinner"></param>
+		/// <param name="packageList"></param>
+		/// <param name="packageDetails"></param>
         public void Setup(VisualElement loadingSpinner, VisualElement packageList, VisualElement packageDetails)
         {
-
-            Debug.Log("Setup");
-
             this.loadingSpinner = loadingSpinner as LoadingSpinner;
             this.packageList = packageList as PackageList;
             this.packageDetails = packageDetails as PackageDetails;
@@ -68,7 +60,7 @@ namespace UnityEditor.PackageManager.UI
             var selectedPackage = SelectedPackage as PackageInfo;
             if (selectedPackage.Info.source == PackageSource.Git)
             {
-                action(PackageUtilsXXX.GetFilePath(selectedPackage.Info.resolvedPath, filePattern));
+                action(PackageUtils.GetFilePathWithPattern(selectedPackage.Info.resolvedPath, filePattern));
             }
             else
             {
@@ -76,28 +68,43 @@ namespace UnityEditor.PackageManager.UI
             }
         }
 
-
-        public void ViewDocClick(Action<string> action)
+		/// <summary>
+		/// On click 'View Documentation' callback.
+		/// </summary>
+		public void ViewDocClick(Action<string> action)
         {
             ViewDocmentationClick("README.*", action, ()=>Expose.FromObject(packageDetails).Call("ViewDocClick"));
         }
-        public void ViewChangelogClick(Action<string> action)
+
+		/// <summary>
+		/// On click 'View changelog' callback.
+		/// </summary>
+		public void ViewChangelogClick(Action<string> action)
         {
             ViewDocmentationClick("CHANGELOG.*", action, ()=>Expose.FromObject(packageDetails).Call("ViewChangelogClick"));
         }
-        public void ViewLicensesClick(Action<string> action)
+
+		/// <summary>
+		/// On click 'View licenses' callback.
+		/// </summary>
+		public void ViewLicensesClick(Action<string> action)
         {
             ViewDocmentationClick("LICENSE.*", action, ()=>Expose.FromObject(packageDetails).Call("ViewLicensesClick"));
         }
 
-        public void ViewRepoClick()
+		/// <summary>
+		/// On click 'View repository' callback.
+		/// </summary>
+		public void ViewRepoClick()
         {
             var selectedPackage = SelectedPackage as PackageInfo;
-            Application.OpenURL(PackageUtilsXXX.GetRepoHttpsUrl(selectedPackage.Info.packageId));
+            Application.OpenURL(PackageUtils.GetRepoUrl(selectedPackage.Info.packageId, true));
         }
 
-
-        static IEnumerable<Package> GetAllPackages()
+		/// <summary>
+		/// Get all installed packages.
+		/// </summary>
+		static IEnumerable<Package> GetAllPackages()
         {
 #if UNITY_2019_1_OR_NEWER
             return PackageCollection.packages.Values.Distinct();
@@ -112,27 +119,37 @@ namespace UnityEditor.PackageManager.UI
         }
 
 
-        public void StartSpinner()
+		/// <summary>
+		/// Start spinner.
+		/// </summary>
+		public void StartSpinner()
         {
             (loadingSpinner as LoadingSpinner)?.Start();
         }
 
-        public void StopSpinner()
+		/// <summary>
+		/// Stop spinner.
+		/// </summary>
+		public void StopSpinner()
         {
             (loadingSpinner as LoadingSpinner)?.Stop();
         }
-        static readonly Regex s_RepoUrl = new Regex("^([^@]+)@([^#]+)(#.+)?$", RegexOptions.Compiled);
 
-        public void UpdateClick()
+		bool reloading;
+
+		/// <summary>
+		/// On click 'Update package' callback.
+		/// </summary>
+		public void UpdateClick()
         {
             var packageInfo = SelectedPackage as PackageInfo;
             if (packageInfo.Info.source == PackageSource.Git)
             {
                 string packageId = packageInfo.Info.packageId;
-                string url = s_RepoUrl.Replace(packageId, "$2");
+				string url = PackageUtils.GetRepoUrl(packageId);
                 string refName = packageInfo.VersionId.Split('@')[1];
-                PackageUtilsXXX.RemovePackage(packageInfo.Name);
-                PackageUtilsXXX.InstallPackage(packageInfo.Name, url, refName);
+                PackageUtils.UninstallPackage(packageInfo.Name);
+                PackageUtils.InstallPackage(packageInfo.Name, url, refName);
             }
             else
             {
@@ -140,12 +157,15 @@ namespace UnityEditor.PackageManager.UI
             }
         }
 
-        public void RemoveClick()
+		/// <summary>
+		/// On click 'Remove package' callback.
+		/// </summary>
+		public void RemoveClick()
         {
             var packageInfo = SelectedPackage as PackageInfo;
             if (packageInfo.Info.source == PackageSource.Git)
             {
-                PackageUtilsXXX.RemovePackage(packageInfo.Name);
+                PackageUtils.UninstallPackage(packageInfo.Name);
             }
             else
             {
@@ -153,12 +173,12 @@ namespace UnityEditor.PackageManager.UI
             }
         }
 
-        int frameCount = 0;
-        bool reloading;
 
-        public void UpdateGitPackages()
+		/// <summary>
+		/// Update all infomations of git packages.
+		/// </summary>
+		public void UpdateGitPackages()
         {
-            Debug.Log("UpdateGitPackages");
             if (reloading) return;
 
             // Get git packages.
@@ -182,17 +202,16 @@ namespace UnityEditor.PackageManager.UI
                 var packageName = pInfo.Name;
                 pInfo.Origin = (PackageSource)99;
                 var json = JsonUtility.ToJson(pInfo);
-                var repoUrl = s_RepoUrl.Replace(pInfo.PackageId, "$2");
+                var repoUrl = PackageUtils.GetRepoUrl(packageId);
 
-                // Get available branch/tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
-                GitUtils.GetRefs(pInfo.Name, repoUrl, refs =>
+				// Get available branch/tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
+				GitUtils.GetRefs(pInfo.Name, repoUrl, refs =>
                 {
                     UpdatePackageVersions(package, refs);
                     jobs.Remove(packageName);
                     if (jobs.Count == 0)
                     {
                         // StopSpinner();
-                        frameCount = Time.frameCount;
                         reloading = true;
                         UpdatePackageCollection();
                         reloading = false;
@@ -202,7 +221,10 @@ namespace UnityEditor.PackageManager.UI
             }
         }
 
-        void UpdatePackageVersions(Package package, IEnumerable<string> versions)
+		/// <summary>
+		/// Update package info.
+		/// </summary>
+		void UpdatePackageVersions(Package package, IEnumerable<string> versions)
         {
             var pInfo = package.Current;
             var json = JsonUtility.ToJson(pInfo);
@@ -237,7 +259,10 @@ namespace UnityEditor.PackageManager.UI
             }
         }
 
-        void UpdatePackageCollection()
+		/// <summary>
+		/// Update package collection to reflesh package list.
+		/// </summary>
+		void UpdatePackageCollection()
         {
             var packageWindow = UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault();
             packageWindow.Collection.UpdatePackageCollection(false);
