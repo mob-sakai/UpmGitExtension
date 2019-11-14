@@ -6,8 +6,8 @@ PluginImporter:
   iconMap: {}
   executionOrder: {}
   defineConstraints:
-  - UNITY_2018_3
-  - UNITY_2018_4
+  - UNITY_2018_3_OR_NEWER
+  - !UNITY_2019_1_OR_NEWER
   - '!UPM_GIT_EXT_DEBUG'
   isPreloaded: 0
   isOverridable: 1
