@@ -1,0 +1,19 @@
+{
+    "name": "Unity.PackageManagerCaptain.Editor",
+    "references": [
+        "Unity.PackageManagerUI.Editor"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UPM_GIT_EXT_DEBUG"
+    ],
+    "versionDefines": []
+}
