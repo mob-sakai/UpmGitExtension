@@ -201,7 +201,8 @@ namespace UnityEditor.PackageManager.UI
 			args = args.Select (x => x is Expose ? ((Expose)x).Value : x).ToArray ();
 
 			// Find method
-			if (TryInvoke (methodName, Value, Type.GetMethods (Flag | BindingFlags.InvokeMethod), genericTypes, args, out Expose result))
+			Expose result;
+			if (TryInvoke (methodName, Value, Type.GetMethods (Flag | BindingFlags.InvokeMethod), genericTypes, args, out result))
 			{
 				return result;
 			}
@@ -221,7 +222,8 @@ namespace UnityEditor.PackageManager.UI
 			args = args.Select (x => x is Expose ? ((Expose)x).Value : x).ToArray ();
 
 			// Find method
-			if (TryInvoke (methodName, Value, Type.GetMethods (Flag | BindingFlags.InvokeMethod), args, out Expose result))
+			Expose result;
+			if (TryInvoke (methodName, Value, Type.GetMethods (Flag | BindingFlags.InvokeMethod), args, out result))
 			{
 				return result;
 			}
@@ -269,9 +271,9 @@ namespace UnityEditor.PackageManager.UI
 		{
 			Type ret = Type.GetType (name);
 
-			if (ret == null && s_TypeByName.TryGetValue (name, out ret))
+			if (ret == null && !s_TypeByName.TryGetValue (name, out ret))
 			{
-				return ret ?? throw new AmbiguousMatchException (string.Format ("Type '{0}' is ambigous. Use full name or assembly qualified name.", name));
+				throw new AmbiguousMatchException (string.Format ("Type '{0}' is ambigous. Use full name or assembly qualified name.", name));
 			}
 
 			return ret;

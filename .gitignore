@@ -14,8 +14,12 @@ Desktop.ini
 /Logs
 /Library
 /Temp
-.vs
-obj
-node_modules
+
+# VS
+.vs/
 .vscode/
-BridgeCompiler-osx-x64
+obj/
+bin/
+
+# NPM
+node_modules/

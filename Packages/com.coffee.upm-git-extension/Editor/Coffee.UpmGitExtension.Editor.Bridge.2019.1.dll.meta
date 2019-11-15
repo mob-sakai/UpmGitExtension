@@ -6,7 +6,6 @@ PluginImporter:
   iconMap: {}
   executionOrder: {}
   defineConstraints:
-  - '!DEVELOP_BRIDGE_UGE'
   - 'UNITY_2019_1'
   isPreloaded: 0
   isOverridable: 1
