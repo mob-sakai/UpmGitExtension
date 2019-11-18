@@ -203,15 +203,17 @@ namespace Coffee.PackageManager
 			menu.DropDown(versionSelectButton.worldBound);
 		}
 
-		void onClick_FindPackage ()
-		{
-		}
-
 		void onClick_InstallPackage ()
 		{
-			PackageUtils.InstallPackage(packageNameLabel.text, PackageUtils.GetRepoUrl (repoUrlText.value), refName);
-			root.SetEnabled (false);
+			PackageUtils.InstallPackage(packageNameLabel.text, GetRepoUrl(repoUrlText.value), refName);
 			onClick_Close ();
+		}
+
+		public static string GetRepoUrl(string url)
+		{
+			Match m = Regex.Match(url, "(git@[^:]+):(.*)");
+			string ret = m.Success ? string.Format("ssh://{0}/{1}", m.Groups[1].Value, m.Groups[2].Value) : url;
+			return ret.EndsWith(".git", System.StringComparison.Ordinal) ? ret : ret + ".git";
 		}
 	}
 }
