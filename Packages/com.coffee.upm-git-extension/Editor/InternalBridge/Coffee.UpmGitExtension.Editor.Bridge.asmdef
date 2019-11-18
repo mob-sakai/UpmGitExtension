@@ -9,11 +9,8 @@
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": true,
+    "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": false,
-    "defineConstraints": [
-        "DEVELOP_BRIDGE_UGE"
-    ],
-    "versionDefines": []
+    "defineConstraints": []
 }

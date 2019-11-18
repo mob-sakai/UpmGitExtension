@@ -17,7 +17,6 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 
-
 [assembly: IgnoresAccessChecksTo("Unity.PackageManagerUI.Editor")]
 [assembly: IgnoresAccessChecksTo("UnityEditor")]
 namespace UnityEditor.PackageManager.UI.InternalBridge
@@ -148,9 +147,9 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 string packageId = packageInfo.Info.packageId;
 				string url = PackageUtils.GetRepoUrl(packageId);
                 string refName = packageInfo.VersionId.Split('@')[1];
-                PackageUtils.UninstallPackage(packageInfo.Name);
-                PackageUtils.InstallPackage(packageInfo.Name, url, refName);
-            }
+				PackageUtils.UninstallPackage (packageInfo.Name);
+				PackageUtils.InstallPackage (packageInfo.Name, url, refName);
+			}
             else
             {
                 Expose.FromObject(packageDetails).Call("UpdateClick");
