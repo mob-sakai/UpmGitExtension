@@ -93,7 +93,9 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
     public static class GitUtils
     {
         static readonly Regex REG_REFS = new Regex("refs/(tags|remotes/origin)/([^/]+),(.+),(.+)$", RegexOptions.Compiled | RegexOptions.Multiline);
-        const string GET_REFS_SCRIPT = "Packages/com.coffee.upm-git-extension/Editor/Commands/get-available-refs";
+        static readonly string GET_REFS_SCRIPT = "Packages/com.coffee.upm-git-extension/Editor/Commands/get-available-refs"
+                                                    .Replace('\\', '/')
+                                                    .Replace('/', Path.DirectorySeparatorChar);
 
         /// <summary>
         /// Fetch the all branch/tag names where the package can be installed from the repository.
@@ -144,7 +146,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 Arguments = args,
                 CreateNoWindow = true,
                 FileName = script,
-                UseShellExecute = true,
+                UseShellExecute = false,
             };
 
             var launchProcess = System.Diagnostics.Process.Start(startInfo);
