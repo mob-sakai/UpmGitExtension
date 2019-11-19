@@ -142,6 +142,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		public void UpdateClick()
         {
+            reloading = false;
             Debug.LogFormat("[UpdateClick]");
             var packageInfo = SelectedPackage as PackageInfo;
             if (packageInfo.Info.source == PackageSource.Git)
@@ -163,6 +164,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		public void RemoveClick()
         {
+            reloading = false;
             Debug.LogFormat("[RemoveClick]");
             var packageInfo = SelectedPackage as PackageInfo;
             if (packageInfo.Info.source == PackageSource.Git)
@@ -223,7 +225,6 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                         reloading = true;
                         UpdatePackageCollection();
                         reloading = false;
-
                     }
                 });
             }
