@@ -182,7 +182,11 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		public void UpdateGitPackages()
         {
             Debug.LogFormat("[UpdateGitPackages] reloading = {0}", reloading);
-            if (reloading) return;
+            if (reloading)
+            {
+                reloading = false;
+                return;
+            }
 
             // Get git packages.
             var gitPackages = GetAllPackages()
