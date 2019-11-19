@@ -1,0 +1,6 @@
+!*~
+*.sln
+Editor/InternalBridge
+InternalBridge.meta
+*.asmdef.2018.3~
+*.asmdef.2019.2~
