@@ -132,7 +132,7 @@ namespace Coffee.InternalAccessible
         static void CompileCsproj(string proj, string dll)
         {
 #if UNITY_2019_2_OR_NEWER
-            var compiler = "Packages/com.coffee.internal-accessible/Compiler~/Compiler1.4.csproj";
+            var compiler = "Packages/com.coffee.internal-accessible/Compiler~/Compiler2.0.csproj";
 #else
             var compiler = "Packages/com.coffee.internal-accessible/Compiler~/Compiler1.1.csproj";
 #endif
