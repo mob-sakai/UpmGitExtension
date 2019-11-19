@@ -131,16 +131,13 @@ namespace Coffee.InternalAccessible
 
         static void CompileCsproj(string proj, string dll)
         {
-            proj = proj.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
-            dll = dll.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
-
 #if UNITY_2019_2_OR_NEWER
             var compiler = "Packages/com.coffee.internal-accessible/Compiler~/Compiler1.4.csproj";
 #else
             var compiler = "Packages/com.coffee.internal-accessible/Compiler~/Compiler1.1.csproj";
 #endif
-			var outputDll = Path.GetFileName(dll);
-            var args = string.Format("{0} {1}", proj, dll);
+            var outputDll = Path.GetFileName(dll);
+            var args = string.Format("\"{0}\" \"{1}\"", Path.GetFullPath(proj), Path.GetFullPath(dll));
             UnityEngine.Debug.LogFormat("Start compile {0}", proj);
 
             DotNet.Run(compiler, args, (success, stdout) =>

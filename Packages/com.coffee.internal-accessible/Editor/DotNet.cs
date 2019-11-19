@@ -13,7 +13,7 @@ namespace Coffee.InternalAccessible
 
         public static void Restore(string proj, System.Action<bool> callback)
         {
-            proj = proj.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
+            proj = string.Format("\"{0}\"", Path.GetFullPath(proj));
             Execute(string.Format("restore {0}", proj), (success, stdout, stderr) =>
             {
                 if (!success)
@@ -24,7 +24,7 @@ namespace Coffee.InternalAccessible
 
         public static void Run(string proj, string args, System.Action<bool, string> resultCallback)
         {
-            proj = proj.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
+            proj = string.Format("\"{0}\"", Path.GetFullPath(proj));
             var commandArgs = string.Format("run -p {0} -- {1}", proj, args);
             Execute(commandArgs, (success, stdout, stderr) =>
             {
