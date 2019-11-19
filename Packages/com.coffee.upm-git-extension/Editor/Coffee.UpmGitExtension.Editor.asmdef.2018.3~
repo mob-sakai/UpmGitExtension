@@ -1,6 +1,7 @@
 {
-    "name": "Unity.PackageManagerCaptain.Editor",
+    "name": "Coffee.UpmGitExtension.Editor",
     "references": [
+        "Unity.PackageManagerCaptain.Editor",
         "Unity.PackageManagerUI.Editor"
     ],
     "optionalUnityReferences": [],
@@ -9,10 +10,10 @@
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Markdig_UGE.dll"
+    ],
     "autoReferenced": false,
-    "defineConstraints": [
-        "UGE_DEVELOP"
-    ]
+    "defineConstraints": []
 }

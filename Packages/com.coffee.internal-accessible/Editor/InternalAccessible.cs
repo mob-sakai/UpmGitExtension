@@ -94,7 +94,13 @@ namespace Coffee.InternalAccessible
         
     }
 
-    public class Postprocessor : AssetPostprocessor
+    internal class Settings : ScriptableSingleton<Settings>
+    {
+        public bool IsDevelopMode = false;
+
+    }
+
+    internal class Postprocessor : AssetPostprocessor
     {
         static Regex s_RegIntrenalBridge = new Regex("^Packages/com.coffee.upm-git-extension/Editor/InternalBridge/[^/]+.cs$", RegexOptions.Compiled);
 
@@ -104,33 +110,18 @@ namespace Coffee.InternalAccessible
 
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
+            if (!Settings.instance.IsDevelopMode)
+                return;
+
             var scriptPaths = importedAssets
                 .Union(deletedAssets)
                 .Union(movedAssets)
                 .Union(movedFromAssetPaths)
                 .Where(x => x.EndsWith(".cs", System.StringComparison.Ordinal))
-                //.Distinct()
                 ;
-
-            //foreach (var asset in InternalAccessibleAsset.GetAllFromScriptPath(scriptPaths))
-            //{
-            //    Debug.Log(asset.CsProjPath);
-            //    Debug.Log(asset.DllPath);
-            //    Debug.Log(asset.CurrentCondition);
-            //    //CompileCsproj(asset.CsProjPath, asset.DllPath);
-            //}
 
             if (scriptPaths.Any())
             {
-
-                //CompilationPipeline.GetAssemblyDefinitionFilePathFromScriptPath()
-                // foreach (var asset in InternalAccessibleAsset.GetAll())
-                // {
-                //     var regex = asset.regex;
-                //     if(allAssets.Any(regex.IsMatch))
-                //     {
-                //     }
-                // }
                 if (scriptPaths.Any(s_RegIntrenalBridge.IsMatch))
                 {
                     CompileBridge();
@@ -140,6 +131,9 @@ namespace Coffee.InternalAccessible
 
         static void CompileCsproj(string proj, string dll)
         {
+            proj = proj.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
+            dll = dll.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
+
             var compiler = "Packages/com.coffee.internal-accessible/Compiler~/Compiler.csproj";
             var outputDll = Path.GetFileName(dll);
             var args = string.Format("{0} {1}", proj, dll);
@@ -147,6 +141,9 @@ namespace Coffee.InternalAccessible
 
             DotNet.Run(compiler, args, (success, stdout) =>
             {
+                if (!success)
+                    return;
+
                 UnityEngine.Debug.Log("Compile Complete! ");
                 EditorApplication.delayCall += () =>
                 {
@@ -156,16 +153,25 @@ namespace Coffee.InternalAccessible
             });
         }
 
-        [MenuItem("Assets/Switch Bridge")]
-        static void SwitchBridge()
+        [MenuItem("Assets/Develop Mode")]
+        static void DevelopBridge()
         {
-            foreach (var asset in InternalAccessibleAsset.GetAll())
+            var targets = new[] {
+                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.asmdef",
+                "Packages/com.coffee.upm-git-extension/Editor/InternalBridge/Coffee.UpmGitExtension.Editor.Bridge.asmdef"
+            };
+
+#if UNITY_2019_2_OR_NEWER
+            const string suffix = ".2019.2~";
+#else
+            const string suffix = ".2018.3~";
+#endif
+            foreach(var t in targets)
             {
-                Debug.Log(asset.CsProjPath);
-                Debug.Log(asset.DllPath);
-                //CompileCsproj(asset.CsProjPath, asset.DllPath);
-                Debug.Log(asset.CurrentCondition);
+                File.Copy(t + suffix, t, true);
             }
+
+            Settings.instance.IsDevelopMode = true;
         }
 
         [MenuItem("Assets/Compile Bridge")]

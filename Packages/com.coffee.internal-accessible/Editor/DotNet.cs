@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using System.Diagnostics;
+using System.IO;
 
-namespace Coffee.InternalAccessable
+namespace Coffee.InternalAccessible
 {
     public class DotNet
     {
@@ -12,6 +13,7 @@ namespace Coffee.InternalAccessable
 
         public static void Restore(string proj, System.Action<bool> callback)
         {
+            proj = proj.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
             Execute(string.Format("restore {0}", proj), (success, stdout, stderr) =>
             {
                 if (!success)
@@ -22,21 +24,24 @@ namespace Coffee.InternalAccessable
 
         public static void Run(string proj, string args, System.Action<bool, string> resultCallback)
         {
-            var commandArgs = string.Format("run -p {0} -- {1}", proj, args);
+            proj = proj.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
+            var commandArgs = string.Format("run -f netcoreapp1.1 -p {0} -- {1}", proj, args);
             Execute(commandArgs, (success, stdout, stderr) =>
             {
                 if (success)
                     resultCallback(success, stdout);
                 else
-                    RunWithRestore(proj, args, resultCallback);
+                    RunWithRestore(proj, commandArgs, resultCallback);
             });
         }
 
-        public static void RunWithRestore(string proj, string args, System.Action<bool, string> resultCallback)
+        static void RunWithRestore(string proj, string commandArgs, System.Action<bool, string> resultCallback)
         {
-            Restore(proj, _ =>
+            Restore(proj, restoreSuccess =>
             {
-                var commandArgs = string.Format("run -p {0} -- {1}", proj, args);
+                if (!restoreSuccess)
+                    return;
+
                 Execute(commandArgs, (success, stdout, stderr) =>
                 {
                     if (!success)
@@ -61,7 +66,7 @@ namespace Coffee.InternalAccessable
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
 
-            var p = System.Diagnostics.Process.Start(startInfo);
+            var p = Process.Start(startInfo);
             if (p == null || p.Id == 0 || p.HasExited)
             {
                 resultCallback(false, "", "");
