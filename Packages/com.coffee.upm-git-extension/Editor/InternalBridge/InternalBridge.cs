@@ -105,6 +105,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		static IEnumerable<Package> GetAllPackages()
         {
+            Debug.LogFormat("[GetAllPackages]");
 #if UNITY_2019_1_OR_NEWER
             return PackageCollection.packages.Values.Distinct();
 #else
@@ -141,6 +142,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		public void UpdateClick()
         {
+            Debug.LogFormat("[UpdateClick]");
             var packageInfo = SelectedPackage as PackageInfo;
             if (packageInfo.Info.source == PackageSource.Git)
             {
@@ -161,6 +163,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		public void RemoveClick()
         {
+            Debug.LogFormat("[RemoveClick]");
             var packageInfo = SelectedPackage as PackageInfo;
             if (packageInfo.Info.source == PackageSource.Git)
             {
@@ -178,6 +181,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		public void UpdateGitPackages()
         {
+            Debug.LogFormat("[UpdateGitPackages] reloading = {0}", reloading);
             if (reloading) return;
 
             // Get git packages.
@@ -197,6 +201,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 var package = p;
                 var pInfo = p.Current;
                 pInfo.IsLatest = false;
+                Debug.LogFormat("[UpdateGitPackages] packageName = {0}", pInfo.Name);
 
                 var packageName = pInfo.Name;
                 pInfo.Origin = (PackageSource)99;
@@ -225,6 +230,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		void UpdatePackageVersions(Package package, IEnumerable<string> versions)
         {
+            Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}", package.Current.Name, versions.Count());
             var pInfo = package.Current;
             var json = JsonUtility.ToJson(pInfo);
             var versionInfos = versions
@@ -253,6 +259,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 
             if (0 < versionInfos.Length)
             {
+                Debug.LogFormat("[UpdatePackageVersions] package source changing");
                 versionInfos.OrderBy(v => v.Version).Last().IsLatest = true;
                 Expose.FromObject(package).Set("source", versionInfos);
             }
@@ -263,6 +270,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 		/// </summary>
 		void UpdatePackageCollection()
         {
+            Debug.LogFormat("[UpdatePackageCollection]");
             var packageWindow = UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault();
             packageWindow.Collection.UpdatePackageCollection(false);
         }

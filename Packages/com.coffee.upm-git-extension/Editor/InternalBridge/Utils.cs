@@ -114,6 +114,8 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             // Results are cached for 5 minutes.
             if (cacheFile.Exists && (DateTime.Now - cacheFile.LastWriteTime).TotalMinutes < 5)
             {
+                Debug.LogFormat("[GetRefs] cached! {0} {1} {2}", packageName, repoUrl, cacheFile);
+
                 var versions = REG_REFS.Matches(File.ReadAllText(cacheFile.FullName))
                     .Cast<Match>()
                     .Where(m => packageName.Length == 0 || packageName == m.Groups[4].Value)
@@ -127,6 +129,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                     ? GET_REFS_SCRIPT + ".bat"
                     : GET_REFS_SCRIPT + ".sh";
                 var args = string.Format("{0} {1} {2}", repoUrl, cacheDir.FullName, Application.unityVersion);
+                Debug.LogFormat("[GetRefs] script = {0}, args = {1}", Path.GetFullPath(script), args);
                 ExecuteShell(Path.GetFullPath(script), args, (success) =>
                 {
                     if (success)
@@ -147,6 +150,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 UseShellExecute = false,
             };
 
+            Debug.LogFormat("[ExecuteShell] script = {0}, args = {1}", script, args);
             var launchProcess = System.Diagnostics.Process.Start(startInfo);
             if (launchProcess == null || launchProcess.HasExited == true || launchProcess.Id == 0)
             {
@@ -158,6 +162,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 //Add process callback.
                 launchProcess.Exited += (sender, e) =>
                 {
+                    Debug.LogFormat("[ExecuteShell] exit {0}", launchProcess.ExitCode);
                     bool success = 0 == launchProcess.ExitCode;
                     if (!success)
                     {
@@ -184,6 +189,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         /// <param name="refName">Reference name for install (option)</param>
         public static void InstallPackage(string packageName, string repoUrl, string refName)
         {
+            Debug.LogFormat("[InstallPackage] packageName = {0}, repoUrl = {1}, refName = {2}", packageName, repoUrl, refName);
             UpdateManifestJson(dependencies =>
             {
                 // Remove from dependencies.
@@ -205,6 +211,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         /// <param name="packageName">Package name</param>
         public static void UninstallPackage(string packageName)
         {
+            Debug.LogFormat("[UninstallPackage] packageName = {0}", packageName);
             UpdateManifestJson(dependencies => dependencies.Remove(packageName));
         }
 
@@ -214,6 +221,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         /// <param name="actionForDependencies">Action for dependencies</param>
         static void UpdateManifestJson(Action<Dictionary<string, object>> actionForDependencies)
         {
+            Debug.LogFormat("[UpdateManifestJson]");
             const string manifestPath = "Packages/manifest.json";
             var manifest = MiniJSON.Json.Deserialize(File.ReadAllText(manifestPath)) as Dictionary<string, object>;
             actionForDependencies(manifest["dependencies"] as Dictionary<string, object>);
