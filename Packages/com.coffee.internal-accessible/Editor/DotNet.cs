@@ -25,7 +25,7 @@ namespace Coffee.InternalAccessible
         public static void Run(string proj, string args, System.Action<bool, string> resultCallback)
         {
             proj = proj.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
-            var commandArgs = string.Format("run -f netcoreapp1.1 -p {0} -- {1}", proj, args);
+            var commandArgs = string.Format("run -p {0} -- {1}", proj, args);
             Execute(commandArgs, (success, stdout, stderr) =>
             {
                 if (success)
