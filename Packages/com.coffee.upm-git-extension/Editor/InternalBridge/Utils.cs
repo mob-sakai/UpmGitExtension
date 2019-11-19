@@ -92,7 +92,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 
     public static class GitUtils
     {
-        static readonly Regex REG_REFS = new Regex("refs/(tags|remotes/origin)/([^/]+),(.+),(.+)$", RegexOptions.Compiled | RegexOptions.Multiline);
+        static readonly Regex REG_REFS = new Regex("refs/(tags|remotes/origin)/([^/]+),(.+),([^\\s\\r\\n]+)", RegexOptions.Compiled | RegexOptions.Multiline);
 		static readonly string GET_REFS_SCRIPT = "Packages/com.coffee.upm-git-extension/Editor/Commands/get-available-refs";
 
         /// <summary>
