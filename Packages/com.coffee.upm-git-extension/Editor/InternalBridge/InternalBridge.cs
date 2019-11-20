@@ -30,146 +30,122 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         VisualElement packageList = null;
         VisualElement packageDetails = null;
 
-#if UNITY_2019_1_OR_NEWER
-        object SelectedPackage { get { return Expose.FromObject (packageDetails).Get ("TargetVersion").As<PackageInfo>(); } }
+        bool reloading;
+
+        LoadingSpinner GetLoadingSpinner() { return loadingSpinner as LoadingSpinner; }
+        PackageList GetPackageList() { return packageList as PackageList; }
+        PackageDetails GetPackageDetails() { return packageDetails as PackageDetails; }
+
+#if UNITY_2019_3_OR_NEWER
+        PackageInfo GetSelectedPackage() { return GetTargetPackage().packageInfo; }
+        UpmPackageVersion GetTargetPackage() { return Expose.FromObject(packageDetails).Get("targetVersion").As<UpmPackageVersion>(); }
+#elif UNITY_2019_1_OR_NEWER
+		PackageManager.PackageInfo GetSelectedPackage() { return Expose.FromObject(packageDetails).Get("TargetVersion").As<PackageInfo>().Info; }
 #else
-        object SelectedPackage { get { return Expose.FromObject (packageDetails).Get ("SelectedPackage").As<PackageInfo> (); } }
+        PackageManager.PackageInfo GetSelectedPackage() { return Expose.FromObject(packageDetails).Get("SelectedPackage").As<PackageInfo>().Info; }
 #endif
 
         private Bridge() { }
 
+        public void Setup(VisualElement root)
+        {
+            loadingSpinner = root.Q<LoadingSpinner>();
+            packageList = root.Q<PackageList>();
+            packageDetails = root.Q<PackageDetails>();
+            Debug.LogFormat("[Bridge.Setup] {0}, {1}, {2},", loadingSpinner, packageList, packageDetails);
+
+#if UNITY_2019_3_OR_NEWER
+            GetPackageList().onPackageListLoaded -= UpdateGitPackages;
+            GetPackageList().onPackageListLoaded += UpdateGitPackages;
+
+            PackageDatabase.instance.onPackagesChanged += (added, removed, updated, p4) =>
+            {
+                // Installed with git
+                if (removed.Concat(updated).Any(x => x.installedVersion.packageInfo.source == PackageSource.Git))
+                {
+                    EditorApplication.delayCall += UpdatePackageCollection;
+                }
+
+                // Installed with git
+                if (added.Concat(updated).Any(x => x.installedVersion.packageInfo.source == PackageSource.Git))
+                {
+                    EditorApplication.delayCall += UpdateGitPackages;
+                }
+            };
+#else
+			GetPackageList().OnLoaded -= UpdateGitPackages;
+            GetPackageList().OnLoaded += UpdateGitPackages;
+#endif
+        }
+
         /// <summary>
-		/// Setup bridge.
-		/// </summary>
-		/// <param name="loadingSpinner"></param>
-		/// <param name="packageList"></param>
-		/// <param name="packageDetails"></param>
-        public void Setup(VisualElement loadingSpinner, VisualElement packageList, VisualElement packageDetails)
+        /// On click 'View repository' callback.
+        /// </summary>
+        public void ViewRepoClick()
         {
-            this.loadingSpinner = loadingSpinner as LoadingSpinner;
-            this.packageList = packageList as PackageList;
-            this.packageDetails = packageDetails as PackageDetails;
-
-            (packageList as PackageList).OnLoaded -= UpdateGitPackages;
-            (packageList as PackageList).OnLoaded += UpdateGitPackages;
+            Application.OpenURL(PackageUtils.GetRepoUrl(GetSelectedPackage().packageId, true));
         }
 
-        void ViewDocmentationClick(string filePattern, Action<string> action, Action defaultAction)
+#if UNITY_2019_3_OR_NEWER
+        static IEnumerable<UpmPackage> GetAllPackages()
         {
-            var selectedPackage = SelectedPackage as PackageInfo;
-            if (selectedPackage.Info.source == PackageSource.Git)
-            {
-                action(PackageUtils.GetFilePathWithPattern(selectedPackage.Info.resolvedPath, filePattern));
-            }
-            else
-            {
-                defaultAction();
-            }
+            return PackageDatabase.instance.upmPackages.Cast<UpmPackage>();
         }
-
-		/// <summary>
-		/// On click 'View Documentation' callback.
-		/// </summary>
-		public void ViewDocClick(Action<string> action)
-        {
-            ViewDocmentationClick("README.*", action, ()=>Expose.FromObject(packageDetails).Call("ViewDocClick"));
-        }
-
-		/// <summary>
-		/// On click 'View changelog' callback.
-		/// </summary>
-		public void ViewChangelogClick(Action<string> action)
-        {
-            ViewDocmentationClick("CHANGELOG.*", action, ()=>Expose.FromObject(packageDetails).Call("ViewChangelogClick"));
-        }
-
-		/// <summary>
-		/// On click 'View licenses' callback.
-		/// </summary>
-		public void ViewLicensesClick(Action<string> action)
-        {
-            ViewDocmentationClick("LICENSE.*", action, ()=>Expose.FromObject(packageDetails).Call("ViewLicensesClick"));
-        }
-
-		/// <summary>
-		/// On click 'View repository' callback.
-		/// </summary>
-		public void ViewRepoClick()
-        {
-            var selectedPackage = SelectedPackage as PackageInfo;
-            Application.OpenURL(PackageUtils.GetRepoUrl(selectedPackage.Info.packageId, true));
-        }
-
-		/// <summary>
-		/// Get all installed packages.
-		/// </summary>
+#elif UNITY_2019_1_OR_NEWER
 		static IEnumerable<Package> GetAllPackages()
         {
-            Debug.LogFormat("[GetAllPackages]");
-#if UNITY_2019_1_OR_NEWER
-            return PackageCollection.packages.Values.Distinct();
+			return PackageCollection.packages.Values.Distinct();
+        }
 #else
+		static IEnumerable<Package> GetAllPackages()
+        {
             var collection = PackageCollection.Instance;
-            return collection?.LatestListPackages
+			return return collection?.LatestListPackages
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(collection.GetPackageByName)
                 .Distinct() ?? Enumerable.Empty<Package>();
+        }
 #endif
-        }
 
-
-		/// <summary>
-		/// Start spinner.
-		/// </summary>
-		public void StartSpinner()
+        /// <summary>
+        /// On click 'Update package' callback.
+        /// </summary>
+        public void UpdateClick()
         {
-            (loadingSpinner as LoadingSpinner)?.Start();
-        }
-
-		/// <summary>
-		/// Stop spinner.
-		/// </summary>
-		public void StopSpinner()
-        {
-            (loadingSpinner as LoadingSpinner)?.Stop();
-        }
-
-		bool reloading;
-
-		/// <summary>
-		/// On click 'Update package' callback.
-		/// </summary>
-		public void UpdateClick()
-        {
+            Debug.LogFormat("[Bridge.UpdateClick]");
             reloading = false;
-            Debug.LogFormat("[UpdateClick]");
-            var packageInfo = SelectedPackage as PackageInfo;
-            if (packageInfo.Info.source == PackageSource.Git)
+            var selectedPackage = GetSelectedPackage();
+            if (selectedPackage.source == PackageSource.Git)
             {
-                string packageId = packageInfo.Info.packageId;
-				string url = PackageUtils.GetRepoUrl(packageId);
-                string refName = packageInfo.VersionId.Split('@')[1];
-				PackageUtils.UninstallPackage (packageInfo.Name);
-				PackageUtils.InstallPackage (packageInfo.Name, url, refName);
-			}
+                string packageId = selectedPackage.packageId;
+                string url = PackageUtils.GetRepoUrl(packageId);
+#if UNITY_2019_3_OR_NEWER
+                string refName = GetTargetPackage().packageInfo.git.revision;
+#else
+				string refName = selectedPackage.version.Split('@')[1];
+#endif
+                PackageUtils.UninstallPackage(selectedPackage.name);
+                PackageUtils.InstallPackage(selectedPackage.name, url, refName);
+            }
             else
             {
                 Expose.FromObject(packageDetails).Call("UpdateClick");
             }
         }
 
-		/// <summary>
-		/// On click 'Remove package' callback.
-		/// </summary>
-		public void RemoveClick()
+        /// <summary>
+        /// On click 'Remove package' callback.
+        /// </summary>
+        public void RemoveClick()
         {
+            Debug.LogFormat("[Bridge.UpdateClick]");
             reloading = false;
             Debug.LogFormat("[RemoveClick]");
-            var packageInfo = SelectedPackage as PackageInfo;
-            if (packageInfo.Info.source == PackageSource.Git)
+            var selectedPackage = GetSelectedPackage();
+            if (selectedPackage.source == PackageSource.Git)
             {
-                PackageUtils.UninstallPackage(packageInfo.Name);
+                PackageUtils.UninstallPackage(selectedPackage.name);
             }
             else
             {
@@ -177,13 +153,12 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             }
         }
 
-
-		/// <summary>
-		/// Update all infomations of git packages.
-		/// </summary>
-		public void UpdateGitPackages()
+        /// <summary>
+        /// Update all infomations of git packages.
+        /// </summary>
+        public void UpdateGitPackages()
         {
-            Debug.LogFormat("[UpdateGitPackages] reloading = {0}", reloading);
+            Debug.LogFormat("[Bridge.UpdateGitPackages] reloading = {0}", reloading);
             if (reloading)
             {
                 reloading = false;
@@ -192,19 +167,45 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 
             // Get git packages.
             var gitPackages = GetAllPackages()
-                .Where(x => x != null && x.Current != null && (x.Current.Origin == PackageSource.Git || x.Current.Origin == (PackageSource)99))
+#if UNITY_2019_3_OR_NEWER
+                .Where(x => x != null && x.installedVersion != null && x.installedVersion.HasTag(PackageTag.Git))
+#else
+				.Where(x => x != null && x.Current != null && (x.Current.Origin == PackageSource.Git || x.Current.Origin == (PackageSource)99))
+#endif
                 .ToArray();
 
             if (gitPackages.Length == 0) return;
 
             // Start job.
-            // StartSpinner();
-            HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.Current.Name));
+#if UNITY_2019_3_OR_NEWER
+            HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.installedVersion.name));
+#else
+			HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.Current.Name));
+#endif
 
             // Update
             foreach (var p in gitPackages)
             {
                 var package = p;
+#if UNITY_2019_3_OR_NEWER
+                var pInfo = p.installedVersion as UpmPackageVersion;
+                var packageName = p.name;
+                var repoUrl = PackageUtils.GetRepoUrl(pInfo.uniqueId);
+
+                // Get available branch / tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
+                GitUtils.GetRefs(pInfo.name, repoUrl, refs =>
+                {
+                    UpdatePackageVersions(package, refs);
+                    jobs.Remove(packageName);
+                    if (jobs.Count == 0)
+                    {
+                        // StopSpinner();
+                        reloading = true;
+                        UpdatePackageCollection();
+                        reloading = false;
+                    }
+                });
+#else
                 var pInfo = p.Current;
                 pInfo.IsLatest = false;
                 Debug.LogFormat("[UpdateGitPackages] packageName = {0}", pInfo.Name);
@@ -227,17 +228,85 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                         reloading = false;
                     }
                 });
+#endif
             }
         }
 
-		/// <summary>
-		/// Update package info.
-		/// </summary>
-		void UpdatePackageVersions(Package package, IEnumerable<string> versions)
+        /// <summary>
+        /// Update package info.
+        /// </summary>
+#if UNITY_2019_3_OR_NEWER
+        void UpdatePackageVersions(UpmPackage package, IEnumerable<string> versions)
         {
-            Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}", package.Current.Name, versions.Count());
-            var pInfo = package.Current;
-            var json = JsonUtility.ToJson(pInfo);
+            var pInfo = package.installedVersion as UpmPackageVersion;
+            var json = JsonUtility.ToJson(pInfo.packageInfo);
+
+            string packageName, repoUrl, installedRefName;
+            PackageUtils.SplitPackageId(pInfo.uniqueId, out packageName, out repoUrl, out installedRefName);
+
+            Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}, current = {2}", package.name, versions.Count(), pInfo.version);
+            var versionInfos = versions
+                .Select(ver =>
+                {
+                    Debug.LogFormat("[UpdatePackageVersions] version = {0}", ver);
+                    var splited = ver.Split(',');
+                    var refName = splited[0];
+                    var version = splited[1];
+                    var semver = SemVersion.Parse(version == refName ? version : version + "-" + refName);
+
+                    var info = JsonUtility.FromJson<PackageInfo>(json);
+                    Expose.FromObject(info).Set("m_Version", version);
+                    Expose.FromObject(info).Set("m_Git", new GitInfo("", refName));
+
+                    var p = new UpmPackageVersion(info, false, semver, pInfo.displayName);
+
+                    // Update tag.
+                    PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
+                    if ((semver.Major == 0 && string.IsNullOrEmpty(semver.Prerelease)) ||
+                    PackageTag.Preview.ToString().Equals(semver.Prerelease.Split('.')[0], StringComparison.InvariantCultureIgnoreCase))
+                        tag |= PackageTag.Preview;
+
+                    Expose.FromObject(p).Set("m_Tag", tag);
+                    Expose.FromObject(p).Set("m_IsFullyFetched", true);
+                    Expose.FromObject(p).Set("m_PackageId", string.Format("{0}@{1}#{2}", packageName, repoUrl, semver));
+
+                    return p;
+                })
+                .Concat(new[] { pInfo })
+                .Where(p => p == pInfo || p.version != pInfo.version)
+                .ToArray();
+
+            if (0 < versionInfos.Length)
+            {
+                // Unlock version tag.
+                var t = Expose.FromObject(pInfo).Get("m_Tag").As<PackageTag>();
+                Expose.FromObject(pInfo).Set("m_Tag", t & ~PackageTag.VersionLocked);
+
+                Debug.LogFormat("[UpdatePackageVersions] package source changing");
+                package.UpdateVersions(versionInfos);
+            }
+        }
+
+        void UpdatePackageCollection()
+        {
+            Debug.LogFormat("[UpdatePackageCollection]");
+            var empty = Enumerable.Empty<IPackage>();
+            var updated = GetAllPackages()
+                .Where(x => x != null && x.installedVersion != null && x.installedVersion.HasTag(PackageTag.Git));
+
+            foreach (var p in updated)
+            {
+                Debug.LogFormat("  -> {0}, {1}", p.name, p.installedVersion.version);
+            }
+
+            (PageManager.instance.GetCurrentPage() as Page).OnPackagesChanged(empty, empty, empty, updated);
+        }
+#else
+		void UpdatePackageVersions(Package package, IEnumerable<string> versions)
+		{
+			Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}", package.Current.Name, versions.Count());
+			var pInfo = package.Current;
+			var json = JsonUtility.ToJson(pInfo);
             var versionInfos = versions
                 .Select(ver =>
                 {
@@ -270,29 +339,68 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             }
         }
 
-		/// <summary>
-		/// Update package collection to reflesh package list.
-		/// </summary>
 		void UpdatePackageCollection()
         {
             Debug.LogFormat("[UpdatePackageCollection]");
             var packageWindow = UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault();
             packageWindow.Collection.UpdatePackageCollection(false);
         }
+#endif
+
+#if UNITY_2018
+		private static string GetOfflineDocumentationUrl(UpmPackageVersion version)
+		{
+			if (version?.isAvailableOnDisk ?? false)
+			{
+				var docsFolder = Path.Combine(version.packageInfo.resolvedPath, "Documentation~");
+				if (!Directory.Exists(docsFolder))
+					docsFolder = Path.Combine(version.packageInfo.resolvedPath, "Documentation");
+				if (Directory.Exists(docsFolder))
+				{
+					var mdFiles = Directory.GetFiles(docsFolder, "*.md", SearchOption.TopDirectoryOnly);
+					var docsMd = mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "index.md")
+						?? mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "tableofcontents.md") ?? mdFiles.FirstOrDefault();
+					if (!string.IsNullOrEmpty(docsMd))
+						return new Uri(docsMd).AbsoluteUri;
+				}
+			}
+			return string.Empty;
+		}
+
+		private static string GetOfflineChangelogUrl(UpmPackageVersion version)
+		{
+			if (version?.isAvailableOnDisk ?? false)
+			{
+				var changelogFile = Path.Combine(version.packageInfo.resolvedPath, "CHANGELOG.md");
+				return File.Exists(changelogFile) ? new Uri(changelogFile).AbsoluteUri : string.Empty;
+			}
+			return string.Empty;
+		}
+
+		private static string GetOfflineLicensesUrl(UpmPackageVersion version)
+		{
+			if (version?.isAvailableOnDisk ?? false)
+			{
+				var licenseFile = Path.Combine(version.packageInfo.resolvedPath, "LICENSE.md");
+				return File.Exists(licenseFile) ? new Uri(licenseFile).AbsoluteUri : string.Empty;
+			}
+			return string.Empty;
+		}
+#endif
     }
 }
 
 
 namespace System.Runtime.CompilerServices
 {
-	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-	public class IgnoresAccessChecksToAttribute : Attribute
-	{
-		public IgnoresAccessChecksToAttribute(string assemblyName)
-		{
-			AssemblyName = assemblyName;
-		}
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+    public class IgnoresAccessChecksToAttribute : Attribute
+    {
+        public IgnoresAccessChecksToAttribute(string assemblyName)
+        {
+            AssemblyName = assemblyName;
+        }
 
-		public string AssemblyName { get; }
-	}
+        public string AssemblyName { get; }
+    }
 }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System;
-
+using Debug = UnityEditor.PackageManager.UI.InternalBridge.Debug;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
@@ -67,8 +67,6 @@ namespace Coffee.PackageManager
             if (!initialized || packageInfo == null)
                 return;
 
-            // Update document actions.
-
             if (packageInfo.source == PackageSource.Git)
             {
                 // Show remove button for git package.
@@ -81,7 +79,7 @@ namespace Coffee.PackageManager
                 UIUtils.SetElementDisplay(tagGit, true);
             }
 
-
+			// Show hosting service logo.
             var host = Settings.GetHostData(packageInfo.packageId);
             var hostButton = root.Q<Button>("hostButton");
             hostButton.style.backgroundImage = host.Logo;
@@ -89,18 +87,10 @@ namespace Coffee.PackageManager
         }
 
         //################################
-        // Private Static Members.
-        //################################
-
-
-
-        //################################
         // Private Members.
         //################################
         VisualElement root;
 		bool initialized;
-
-
 
         /// <summary>
         /// Initializes UI.
@@ -112,20 +102,16 @@ namespace Coffee.PackageManager
 
 			initialized = true;
 
+			Debug.Log("[UpmGitExtension.InitializeUI]");
+			root = UIUtils.GetRoot(this).Q<TemplateContainer>("");
 
-            root = UIUtils.GetRoot(this).Q("container");
+			Debug.Log("[UpmGitExtension.InitializeUI] Setup internal bridge:");
+			var internalBridge = Bridge.Instance;
+			internalBridge.Setup(root);
 
-            var internalBridge = Bridge.Instance;
-            internalBridge.Setup(root.Q("packageSpinner"), root.Q("packageList"), root.Q("detailsGroup"));
-
-
-            // Document actions.
-            root.Q<Button>("viewDocumentation").OverwriteCallback(()=>internalBridge.ViewDocClick(MarkdownUtils.OpenInBrowser));
-            root.Q<Button>("viewChangelog").OverwriteCallback(()=>internalBridge.ViewChangelogClick(MarkdownUtils.OpenInBrowser));
-            root.Q<Button>("viewLicenses").OverwriteCallback(()=>internalBridge.ViewLicensesClick(MarkdownUtils.OpenInBrowser));
-
-            var hostButton = root.Q<Button>("hostButton");
-            if (hostButton == null)
+			Debug.Log("[UpmGitExtension.InitializeUI] Setup host button:");
+			var hostButton = root.Q<Button>("hostButton");
+			if (hostButton == null)
             {
                 hostButton = new Button(internalBridge.ViewRepoClick) { name = "hostButton", tooltip = "View on browser" };
                 hostButton.RemoveFromClassList("unity-button");
@@ -133,49 +119,44 @@ namespace Coffee.PackageManager
                 hostButton.AddToClassList("link");
 				hostButton.style.marginRight = 2;
 				hostButton.style.marginLeft = 2;
+				hostButton.style.width = 16;
+				hostButton.style.height = 16;
+				root.Q("detailVersion").parent.Add(hostButton);
 
 #if !UNITY_2019_1_OR_NEWER
 				hostButton.style.sliceBottom = 0;
 				hostButton.style.sliceTop = 0;
 				hostButton.style.sliceRight = 0;
 				hostButton.style.sliceLeft = 0;
-				#endif
+#endif
+			}
 
-				hostButton.style.width = 16;
-				hostButton.style.height = 16;
-                root.Q("detailVersion").parent.Add(hostButton);
-            }
-
-            // Install package window.
-            var installPackageWindow = new InstallPackageWindow();
+			// Install package window.
+			Debug.Log("[UpmGitExtension.InitializeUI] Setup install window:");
+			var installPackageWindow = new InstallPackageWindow();
             root.Add(installPackageWindow);
 
             // Add button to open InstallPackageWindow
-            var addButton = root.Q("toolbarAddButton") ?? root.Q("moreAddOptionsButton");
+			Debug.Log("[UpmGitExtension.InitializeUI] Add button to open install window:");
+            var addButton = root.Q("toolbarAddMenu") ?? root.Q("toolbarAddButton") ?? root.Q("moreAddOptionsButton");
             var gitButton = new GitButton(installPackageWindow.Open);
-            addButton.parent.Insert(addButton.parent.IndexOf(addButton) + 1, gitButton);
-
+            addButton.parent.Insert(0, gitButton);
+			
 #if UNITY_2018
             var space = new VisualElement();
             space.style.flexGrow = 1;
             addButton.parent.Insert(addButton.parent.IndexOf(addButton), space);
 #endif
 
+			Debug.Log("[UpmGitExtension.InitializeUI] Setup update button:");
+			var updateButton = root.Q<Button>("update");
+			updateButton.OverwriteCallback(internalBridge.UpdateClick);
 
-#if UNITY_2019_1_OR_NEWER
-			var updateButton = root.Q("packageToolBar").Q<Button>("update");
-#else
-            // OnPackageListLoaded ();
-            internalBridge.UpdateGitPackages();
-            var updateButton = root.Q("updateCombo").Q<Button>("update");
-#endif
-
-            var detailView = Expose.FromObject(root.Q("detailsGroup"));
+			Debug.Log("[UpmGitExtension.InitializeUI] Setup remove button:");
             var removeButton = root.Q<Button>("remove");
+			removeButton.OverwriteCallback(internalBridge.RemoveClick);
 
-
-            updateButton.OverwriteCallback(internalBridge.UpdateClick);
-            removeButton.OverwriteCallback(internalBridge.RemoveClick);
-        }
-    }
+			internalBridge.UpdateGitPackages();
+		}
+	}
 }
