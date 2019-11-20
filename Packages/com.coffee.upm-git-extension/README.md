@@ -12,7 +12,7 @@ This package extends the UI of Unity Package Manager (UPM) for the packages inst
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
 [![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)
 
-<< [Description](#Description) | [WebGL Demo](#demo) | [Download](https://github.com/mob-sakai/UpmGitExtension/releases) | [Usage](#usage) | [Development Note](#development-note) >>
+<< [Description](#description) | [Install](#install) | [Usage](#usage) | [Development Note](#development-note) >>
 
 ### What's new? [See changelog ![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg?label=last%20updated)](https://github.com/mob-sakai/UpmGitExtension/blob/upm/CHANGELOG.md)
 ### Do you want to receive notifications for new releases? [Watch this repo ![](https://img.shields.io/github/watchers/mob-sakai/UpmGitExtension.svg?style=social&label=Watch)](https://github.com/mob-sakai/UpmGitExtension/subscription)
@@ -38,7 +38,7 @@ This project extends the UI of Unity Package Manager for package installed using
 ### Features
 
 * Link to git repository URL
-* Link to markdown converted offline documents
+* Link to offline documents
   * Readme
   * Changelog
   * License
@@ -47,18 +47,17 @@ This project extends the UI of Unity Package Manager for package installed using
 * Update package with a specific tag/branch
 * Remove package
 * Support Unity 2018.3 or later
-* Support .Net 3.5 and 4.x both
-* Version fillterring
+* Support .Net 4.x
+* Version filtering
 * Support [GitDependencyResolverForUnity](https://github.com/mob-sakai/GitDependencyResolverForUnity) in Unity 2019.1 or later
 
 
 ### Future plans
 
 * Display license
-* Version fetch for Unity 2019.x
-* Check Unity version before install
-* Override the document URL with package.json
 * [Support git dependency in the package](https://github.com/mob-sakai/GitDependencyResolverForUnity)
+* Custom package list
+* 
 
 
 <br><br><br><br>
@@ -68,7 +67,7 @@ Find `Packages/manifest.json` in your project and edit it to look like this:
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#1.0.2",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#upm",
     ...
   },
 }
