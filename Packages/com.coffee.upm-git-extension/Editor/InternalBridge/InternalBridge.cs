@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
+#define UNITY_2019_1_9_OR_NEWER
+#endif
+using System;
 using System.Text;
 using System.Linq;
 using System.Collections;
@@ -8,7 +11,7 @@ using UnityEditor.PackageManager.UI;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Runtime.CompilerServices;
-#if !UNITY_2019_2_OR_NEWER
+#if !UNITY_2019_1_9_OR_NEWER
 using Semver;
 #endif
 #if UNITY_2019_1_OR_NEWER
@@ -32,7 +35,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 
         bool reloading;
 
-        LoadingSpinner GetLoadingSpinner() { return loadingSpinner as LoadingSpinner; }
+		LoadingSpinner GetLoadingSpinner () { return loadingSpinner as LoadingSpinner; }
         PackageList GetPackageList() { return packageList as PackageList; }
         PackageDetails GetPackageDetails() { return packageDetails as PackageDetails; }
 
@@ -341,11 +344,10 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                     var newPInfo = JsonUtility.FromJson(json, typeof(PackageInfo)) as PackageInfo;
 
                     newPInfo.Version = SemVersion.Parse(version == refName ? version : version + "-" + refName);
-#if UNITY_2019_2_OR_NEWER
-                    newPInfo.IsInstalled = false;
-#else
-                    newPInfo.IsCurrent = false;
-#endif
+
+                    var exPackageInfo = Expose.FromObject(newPInfo);
+                    exPackageInfo.Set(exPackageInfo.Has("IsInstalled") ? "IsInstalled" : "IsCurrent", false);
+
                     newPInfo.IsVerified = false;
                     newPInfo.Origin = (PackageSource)99;
                     newPInfo.Info = pInfo.Info;

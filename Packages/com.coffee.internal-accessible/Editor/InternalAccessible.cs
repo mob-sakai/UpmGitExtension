@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
+#define UNITY_2019_1_9_OR_NEWER
+#endif
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -163,12 +166,12 @@ namespace Coffee.InternalAccessible
                 "Packages/com.coffee.upm-git-extension/Editor/InternalBridge/Coffee.UpmGitExtension.Editor.Bridge.asmdef"
             };
 
-#if UNITY_2019_2_OR_NEWER
+#if UNITY_2019_1_9_OR_NEWER
             const string suffix = ".2019.2~";
 #else
-            const string suffix = ".2018.3~";
+			const string suffix = ".2018.3~";
 #endif
-            foreach(var t in targets)
+			foreach (var t in targets)
             {
                 File.Copy(t + suffix, t, true);
             }
@@ -182,22 +185,22 @@ namespace Coffee.InternalAccessible
             s_MiSyncSolution.Invoke(null, new object[0]);
 
             CompileCsproj(
-#if UNITY_2019_2_OR_NEWER
-                "Unity.InternalAPIEditorBridgeDev.001.csproj",
+#if UNITY_2019_1_9_OR_NEWER
+				"Unity.InternalAPIEditorBridgeDev.001.csproj",
 #else
                 "Unity.PackageManagerCaptain.Editor.csproj",
 #endif
 
 #if UNITY_2019_3_OR_NEWER
                 "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2019.3.dll"
-#elif UNITY_2019_2_OR_NEWER
-                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2019.2.dll"
+#elif UNITY_2019_1_9_OR_NEWER
+				"Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2019.2.dll"
 #elif UNITY_2019_1_OR_NEWER
                 "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2019.1.dll"
 #else
                 "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2018.3.dll"
 #endif
-            );
+			);
         }
     }
 }

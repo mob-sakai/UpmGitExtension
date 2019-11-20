@@ -6,12 +6,31 @@ PluginImporter:
   iconMap: {}
   executionOrder: {}
   defineConstraints:
-  - 'UNITY_2019_1'
+  - UNITY_2019_1_OR_NEWER
+  - '!UNITY_2019_1_9'
+  - '!UNITY_2019_1_10'
+  - '!UNITY_2019_1_11'
+  - '!UNITY_2019_1_12'
+  - '!UNITY_2019_1_13'
+  - '!UNITY_2019_1_14'
+  - '!UNITY_2019_2_OR_NEWER'
   isPreloaded: 0
   isOverridable: 1
   isExplicitlyReferenced: 1
   validateReferences: 1
   platformData:
+  - first:
+      '': Any
+    second:
+      enabled: 0
+      settings:
+        Exclude Editor: 0
+        Exclude Linux: 1
+        Exclude Linux64: 1
+        Exclude LinuxUniversal: 1
+        Exclude OSXUniversal: 1
+        Exclude Win: 1
+        Exclude Win64: 1
   - first:
       Any: 
     second:
@@ -22,7 +41,51 @@ PluginImporter:
     second:
       enabled: 1
       settings:
+        CPU: AnyCPU
         DefaultValueInitialized: true
+        OS: AnyOS
+  - first:
+      Facebook: Win
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  - first:
+      Facebook: Win64
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  - first:
+      Standalone: Linux
+    second:
+      enabled: 0
+      settings:
+        CPU: x86
+  - first:
+      Standalone: Linux64
+    second:
+      enabled: 0
+      settings:
+        CPU: x86_64
+  - first:
+      Standalone: OSXUniversal
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  - first:
+      Standalone: Win
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  - first:
+      Standalone: Win64
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
   - first:
       Windows Store Apps: WindowsStoreApps
     second:

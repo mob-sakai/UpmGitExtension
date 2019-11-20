@@ -1,4 +1,7 @@
-﻿#if UNITY_2019_1_OR_NEWER
+﻿#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
+#define UNITY_2019_1_9_OR_NEWER
+#endif
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
 using UnityEngine.Experimental.UIElements;
@@ -187,8 +190,8 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         public static Dictionary<string, object> DeserializeFile(string file)
         {
             var text = File.ReadAllText(file);
-#if UNITY_2019_2_OR_NEWER
-            return Json.Deserialize(text) as Dictionary<string, object>;
+#if UNITY_2019_1_9_OR_NEWER
+			return Json.Deserialize(text) as Dictionary<string, object>;
 #else
             return Expose.FromType(Type.GetType("UnityEditor.Json, UnityEditor")).Call("Deserialize", text).As<Dictionary<string, object>>();
 #endif
@@ -196,7 +199,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 
         public static void SerializeFile(string file, Dictionary<string, object> json)
         {
-#if UNITY_2019_2_OR_NEWER
+#if UNITY_2019_1_9_OR_NEWER
 			var text = Json.Serialize(json);
 #elif UNITY_2019_1_OR_NEWER
             var text = Expose.FromType(Type.GetType("UnityEditor.Json, UnityEditor")).Call("Serialize", json, false, "  ").As<string>();
