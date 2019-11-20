@@ -13,87 +13,87 @@ using System.Diagnostics;
 
 namespace UnityEditor.PackageManager.UI.InternalBridge
 {
-	public class Debug
-	{
-		[Conditional("DEBUG")]
-		public static void Log(object message)
-		{
-			UnityEngine.Debug.Log(message);
-		}
-		
-		[Conditional("DEBUG")]
-		public static void LogFormat(string format, params object[] args)
-		{
-			UnityEngine.Debug.LogFormat(format, args);
-		}
-		
-		public static void LogError(object message)
-		{
-			UnityEngine.Debug.LogError(message);
-		}
-		
-		public static void LogErrorFormat(string format, params object[] args)
-		{
-			UnityEngine.Debug.LogErrorFormat(format, args);
-		}
-		
-		public static void LogException(Exception e)
-		{
-			UnityEngine.Debug.LogException(e);
-		}
-	}
+    public class Debug
+    {
+        [Conditional("DEBUG")]
+        public static void Log(object message)
+        {
+            UnityEngine.Debug.Log(message);
+        }
+
+        [Conditional("DEBUG")]
+        public static void LogFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(format, args);
+        }
+
+        public static void LogError(object message)
+        {
+            UnityEngine.Debug.LogError(message);
+        }
+
+        public static void LogErrorFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogErrorFormat(format, args);
+        }
+
+        public static void LogException(Exception e)
+        {
+            UnityEngine.Debug.LogException(e);
+        }
+    }
 
 
-	public static class UIUtils
-	{
-		const string kDisplayNone = "display-none";
-		public static void SetElementDisplay (VisualElement element, bool value)
-		{
-			if (element == null)
-				return;
+    public static class UIUtils
+    {
+        const string kDisplayNone = "display-none";
+        public static void SetElementDisplay(VisualElement element, bool value)
+        {
+            if (element == null)
+                return;
 
-			SetElementClass (element, kDisplayNone, !value);
-			element.visible = value;
-		}
+            SetElementClass(element, kDisplayNone, !value);
+            element.visible = value;
+        }
 
-		public static bool IsElementDisplay (VisualElement element)
-		{
-			return !HasElementClass (element, kDisplayNone);
-		}
+        public static bool IsElementDisplay(VisualElement element)
+        {
+            return !HasElementClass(element, kDisplayNone);
+        }
 
-		public static void SetElementClass (VisualElement element, string className, bool value)
-		{
-			if (element == null)
-				return;
+        public static void SetElementClass(VisualElement element, string className, bool value)
+        {
+            if (element == null)
+                return;
 
-			if (value)
-				element.AddToClassList (className);
-			else
-				element.RemoveFromClassList (className);
-		}
+            if (value)
+                element.AddToClassList(className);
+            else
+                element.RemoveFromClassList(className);
+        }
 
-		public static bool HasElementClass (VisualElement element, string className)
-		{
-			if (element == null)
-				return false;
+        public static bool HasElementClass(VisualElement element, string className)
+        {
+            if (element == null)
+                return false;
 
-			return element.ClassListContains (className);
-		}
+            return element.ClassListContains(className);
+        }
 
-		public static VisualElement GetRoot (VisualElement element)
-		{
-			while (element != null && element.parent != null)
-			{
-				element = element.parent;
-			}
-			return element;
-		}
-	}
+        public static VisualElement GetRoot(VisualElement element)
+        {
+            while (element != null && element.parent != null)
+            {
+                element = element.parent;
+            }
+            return element;
+        }
+    }
 
     public static class GitUtils
     {
         static readonly Regex REG_REFS = new Regex("refs/(tags|remotes/origin)/([^/]+),(.+),([^\\s\\r\\n]+)", RegexOptions.Compiled | RegexOptions.Multiline);
-		static readonly string GET_REFS_SCRIPT = "Packages/com.coffee.upm-git-extension/Editor/Commands/get-available-refs";
+        static readonly string GET_REFS_SCRIPT = "Packages/com.coffee.upm-git-extension/Editor/Commands/get-available-refs";
 
         /// <summary>
         /// Fetch the all branch/tag names where the package can be installed from the repository.
@@ -107,11 +107,11 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         public static void GetRefs(string packageName, string repoUrl, Action<IEnumerable<string>> callback)
         {
             Debug.LogFormat("[GitUtils.GetRefs] Start get refs: {0}, {1}", packageName, repoUrl);
-			if(string.IsNullOrEmpty(repoUrl))
-			{
-				callback(Enumerable.Empty<string>());
-				return;
-			}
+            if (string.IsNullOrEmpty(repoUrl))
+            {
+                callback(Enumerable.Empty<string>());
+                return;
+            }
 
             var appDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var cacheRoot = new DirectoryInfo(Path.Combine(appDir, "UpmGitExtension"));
@@ -149,7 +149,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         {
             Debug.LogFormat("[GitUtils.ExecuteShell] script = {0}, args = {1}", script, args);
             var startInfo = new System.Diagnostics.ProcessStartInfo
-			{
+            {
                 Arguments = args,
                 CreateNoWindow = true,
                 FileName = script,
@@ -182,20 +182,20 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 
     }
 
-	public static class JsonUtils
-	{
-		public static Dictionary<string, object> DeserializeFile(string file)
-		{
-			return Json.Deserialize(File.ReadAllText(file)) as Dictionary<string, object>;
-		}
+    public static class JsonUtils
+    {
+        public static Dictionary<string, object> DeserializeFile(string file)
+        {
+            return Json.Deserialize(File.ReadAllText(file)) as Dictionary<string, object>;
+        }
 
-		public static void SerializeFile(string file, Dictionary<string, object> json)
-		{
-			File.WriteAllText(file, Json.Serialize(json, true));
-		}
-	}
+        public static void SerializeFile(string file, Dictionary<string, object> json)
+        {
+            File.WriteAllText(file, Json.Serialize(json, true));
+        }
+    }
 
-	public static class PackageUtils
+    public static class PackageUtils
     {
         static readonly Regex REG_PACKAGE_ID = new Regex("^([^@]+)@([^#]+)(#(.+))?$", RegexOptions.Compiled);
 
@@ -244,8 +244,8 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             var manifest = JsonUtils.DeserializeFile(manifestPath);
             actionForDependencies(manifest["dependencies"] as Dictionary<string, object>);
 
-			// Save manifest.json.
-			JsonUtils.SerializeFile(manifestPath, manifest);
+            // Save manifest.json.
+            JsonUtils.SerializeFile(manifestPath, manifest);
             EditorApplication.delayCall += () => AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
         }
 
@@ -277,7 +277,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             if (m.Success)
             {
                 var repoUrl = m.Groups[2].Value;
-                if(asHttps)
+                if (asHttps)
                 {
                     repoUrl = Regex.Replace(repoUrl, "(git:)?git@([^:]+):", "https://$2/");
                     repoUrl = repoUrl.Replace("ssh://", "https://");
@@ -289,15 +289,15 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             return "";
         }
 
-		public static void SplitPackageId(string packageId, out string packageName, out string repoUrl, out string refName)
-		{
-			Match m = REG_PACKAGE_ID.Match(packageId);
-			packageName = m.Groups[1].Value;
-			repoUrl = m.Groups[2].Value;
-			refName = m.Groups[4].Value
-				;
-		}
-	}
+        public static void SplitPackageId(string packageId, out string packageName, out string repoUrl, out string refName)
+        {
+            Match m = REG_PACKAGE_ID.Match(packageId);
+            packageName = m.Groups[1].Value;
+            repoUrl = m.Groups[2].Value;
+            refName = m.Groups[4].Value
+                ;
+        }
+    }
 
     public static class ButtonExtension
     {

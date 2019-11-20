@@ -73,7 +73,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 }
             };
 #else
-			GetPackageList().OnLoaded -= UpdateGitPackages;
+            GetPackageList().OnLoaded -= UpdateGitPackages;
             GetPackageList().OnLoaded += UpdateGitPackages;
 #endif
         }
@@ -97,10 +97,10 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 			return PackageCollection.packages.Values.Distinct();
         }
 #else
-		static IEnumerable<Package> GetAllPackages()
+        static IEnumerable<Package> GetAllPackages()
         {
             var collection = PackageCollection.Instance;
-			return return collection?.LatestListPackages
+            return collection?.LatestListPackages
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(collection.GetPackageByName)
@@ -123,7 +123,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 #if UNITY_2019_3_OR_NEWER
                 string refName = GetTargetPackage().packageInfo.git.revision;
 #else
-				string refName = selectedPackage.version.Split('@')[1];
+                string refName = selectedPackage.version.Split('@')[1];
 #endif
                 PackageUtils.UninstallPackage(selectedPackage.name);
                 PackageUtils.InstallPackage(selectedPackage.name, url, refName);
@@ -170,7 +170,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 #if UNITY_2019_3_OR_NEWER
                 .Where(x => x != null && x.installedVersion != null && x.installedVersion.HasTag(PackageTag.Git))
 #else
-				.Where(x => x != null && x.Current != null && (x.Current.Origin == PackageSource.Git || x.Current.Origin == (PackageSource)99))
+                .Where(x => x != null && x.Current != null && (x.Current.Origin == PackageSource.Git || x.Current.Origin == (PackageSource)99))
 #endif
                 .ToArray();
 
@@ -180,7 +180,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 #if UNITY_2019_3_OR_NEWER
             HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.installedVersion.name));
 #else
-			HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.Current.Name));
+            HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.Current.Name));
 #endif
 
             // Update
@@ -215,8 +215,8 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 var json = JsonUtility.ToJson(pInfo);
                 var repoUrl = PackageUtils.GetRepoUrl(pInfo.PackageId);
 
-				// Get available branch/tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
-				GitUtils.GetRefs(pInfo.Name, repoUrl, refs =>
+                // Get available branch/tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
+                GitUtils.GetRefs(pInfo.Name, repoUrl, refs =>
                 {
                     UpdatePackageVersions(package, refs);
                     jobs.Remove(packageName);
@@ -302,11 +302,11 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             (PageManager.instance.GetCurrentPage() as Page).OnPackagesChanged(empty, empty, empty, updated);
         }
 #else
-		void UpdatePackageVersions(Package package, IEnumerable<string> versions)
-		{
-			Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}", package.Current.Name, versions.Count());
-			var pInfo = package.Current;
-			var json = JsonUtility.ToJson(pInfo);
+        void UpdatePackageVersions(Package package, IEnumerable<string> versions)
+        {
+            Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}", package.Current.Name, versions.Count());
+            var pInfo = package.Current;
+            var json = JsonUtility.ToJson(pInfo);
             var versionInfos = versions
                 .Select(ver =>
                 {
@@ -339,7 +339,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             }
         }
 
-		void UpdatePackageCollection()
+        void UpdatePackageCollection()
         {
             Debug.LogFormat("[UpdatePackageCollection]");
             var packageWindow = UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault();
