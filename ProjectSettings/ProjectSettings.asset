@@ -521,7 +521,7 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   scriptingDefineSymbols:
-    1: DEVELOP_BRIDGE_UGE
+    1: DEBUG_UGE_DEVELOP
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}

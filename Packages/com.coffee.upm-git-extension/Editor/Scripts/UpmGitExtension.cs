@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System;
-using Debug = UnityEditor.PackageManager.UI.InternalBridge.Debug;
+using System.Diagnostics;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
@@ -17,6 +17,21 @@ using UnityEngine.Experimental.UIElements;
 
 namespace Coffee.PackageManager
 {
+    public class Debug
+    {
+        [Conditional("DEBUG_UGE_DEVELOP")]
+        public static void Log(object message)
+        {
+            UnityEngine.Debug.Log(message);
+        }
+
+        [Conditional("DEBUG_UGE_DEVELOP")]
+        public static void LogFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(format, args);
+        }
+    }
+
     [InitializeOnLoad]
     internal class UpmGitExtension : VisualElement, IPackageManagerExtension
     {
