@@ -23,7 +23,11 @@ public class InternalAccessableCompiler
 
 		// CSharpCompilationOptions
 		// MetadataImportOptions.All
-		var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)
+		var compilationOptions = new CSharpCompilationOptions(
+				OutputKind.DynamicallyLinkedLibrary,
+				allowUnsafe: true,
+				optimizationLevel: OptimizationLevel.Release
+			)
 			.WithMetadataImportOptions(MetadataImportOptions.All);
 
 		// BindingFlags.IgnoreAccessibility
@@ -45,10 +49,11 @@ public class InternalAccessableCompiler
 		var preprocessorSymbols = csproj
 			.Select(line => reg_preprocessorSymbols.Match(line))
 			.Where(match => match.Success)
-			.SelectMany(match => match.Groups[1].Value.Split(';'));
+			.SelectMany(match => match.Groups[1].Value.Split(';'))
+			.Where(x=>x != "DEBUG");
 
 		// Get all source codes.
-		var parserOption = new CSharpParseOptions(LanguageVersion.CSharp7, preprocessorSymbols: preprocessorSymbols);
+		var parserOption = new CSharpParseOptions(LanguageVersion.Latest, preprocessorSymbols: preprocessorSymbols);
 		var reg_cs = new Regex("<Compile Include=\"(.*\\.cs)\"", RegexOptions.Compiled);
 		var syntaxTrees = csproj
 			.Select(line => reg_cs.Match(line))
