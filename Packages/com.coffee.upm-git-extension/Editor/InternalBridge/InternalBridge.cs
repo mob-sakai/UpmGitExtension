@@ -37,12 +37,14 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         PackageDetails GetPackageDetails() { return packageDetails as PackageDetails; }
 
 #if UNITY_2019_3_OR_NEWER
-        PackageInfo GetSelectedPackage() { return GetTargetPackage().packageInfo; }
-        UpmPackageVersion GetTargetPackage() { return Expose.FromObject(packageDetails).Get("targetVersion").As<UpmPackageVersion>(); }
+        PackageInfo GetSelectedPackage() { return GetSelectedVersion().packageInfo; }
+        UpmPackageVersion GetSelectedVersion() { return Expose.FromObject(packageDetails).Get("targetVersion").As<UpmPackageVersion>(); }
 #elif UNITY_2019_1_OR_NEWER
-		PackageManager.PackageInfo GetSelectedPackage() { return Expose.FromObject(packageDetails).Get("TargetVersion").As<PackageInfo>().Info; }
+        PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
+        PackageInfo GetSelectedVersion() { return Expose.FromObject(packageDetails).Get("TargetVersion").As<PackageInfo>(); }
 #else
-        PackageManager.PackageInfo GetSelectedPackage() { return Expose.FromObject(packageDetails).Get("SelectedPackage").As<PackageInfo>().Info; }
+        PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
+        PackageInfo GetSelectedVersion() { return Expose.FromObject(packageDetails).Get("SelectedPackage").As<PackageInfo>(); }
 #endif
 
         private Bridge() { }
@@ -121,9 +123,9 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 string packageId = selectedPackage.packageId;
                 string url = PackageUtils.GetRepoUrl(packageId);
 #if UNITY_2019_3_OR_NEWER
-                string refName = GetTargetPackage().packageInfo.git.revision;
+                string refName = GetSelectedVersion().packageInfo.git.revision;
 #else
-                string refName = selectedPackage.version.Split('@')[1];
+                string refName = GetSelectedVersion().VersionId.Split('@')[1];
 #endif
                 PackageUtils.UninstallPackage(selectedPackage.name);
                 PackageUtils.InstallPackage(selectedPackage.name, url, refName);
@@ -348,44 +350,58 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 #endif
 
 #if UNITY_2018
-		private static string GetOfflineDocumentationUrl(UpmPackageVersion version)
-		{
-			if (version?.isAvailableOnDisk ?? false)
-			{
-				var docsFolder = Path.Combine(version.packageInfo.resolvedPath, "Documentation~");
-				if (!Directory.Exists(docsFolder))
-					docsFolder = Path.Combine(version.packageInfo.resolvedPath, "Documentation");
-				if (Directory.Exists(docsFolder))
-				{
-					var mdFiles = Directory.GetFiles(docsFolder, "*.md", SearchOption.TopDirectoryOnly);
-					var docsMd = mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "index.md")
-						?? mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "tableofcontents.md") ?? mdFiles.FirstOrDefault();
-					if (!string.IsNullOrEmpty(docsMd))
-						return new Uri(docsMd).AbsoluteUri;
-				}
-			}
-			return string.Empty;
-		}
+        public void ViewDocClick()
+        {
+            var packageInfo = GetSelectedPackage();
+            if (packageInfo.source == PackageSource.Git)
+            {
+                var docsFolder = Path.Combine(packageInfo.resolvedPath, "Documentation~");
+                if (!Directory.Exists(docsFolder))
+                    docsFolder = Path.Combine(packageInfo.resolvedPath, "Documentation");
+                if (Directory.Exists(docsFolder))
+                {
+                    var mdFiles = Directory.GetFiles(docsFolder, "*.md", SearchOption.TopDirectoryOnly);
+                    var docsMd = mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "index.md")
+                        ?? mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "tableofcontents.md") ?? mdFiles.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(docsMd))
+                    {
+                        Application.OpenURL(new Uri(docsMd).AbsoluteUri);
+                        return;
+                    }
+                }
+            }
+            Expose.FromObject(GetPackageDetails()).Call("ViewDocClick");
+        }
 
-		private static string GetOfflineChangelogUrl(UpmPackageVersion version)
-		{
-			if (version?.isAvailableOnDisk ?? false)
-			{
-				var changelogFile = Path.Combine(version.packageInfo.resolvedPath, "CHANGELOG.md");
-				return File.Exists(changelogFile) ? new Uri(changelogFile).AbsoluteUri : string.Empty;
-			}
-			return string.Empty;
-		}
+        public void ViewChangelogClick()
+        {
+            var packageInfo = GetSelectedPackage();
+            if (packageInfo.source == PackageSource.Git)
+            {
+                var changelogFile = Path.Combine(packageInfo.resolvedPath, "CHANGELOG.md");
+                if (File.Exists(changelogFile))
+                {
+                    Application.OpenURL(new Uri(changelogFile).AbsoluteUri);
+                    return;
+                }
+            }
+            Expose.FromObject(GetPackageDetails()).Call("ViewChangelogClick");
+        }
 
-		private static string GetOfflineLicensesUrl(UpmPackageVersion version)
-		{
-			if (version?.isAvailableOnDisk ?? false)
-			{
-				var licenseFile = Path.Combine(version.packageInfo.resolvedPath, "LICENSE.md");
-				return File.Exists(licenseFile) ? new Uri(licenseFile).AbsoluteUri : string.Empty;
-			}
-			return string.Empty;
-		}
+        public void ViewLicensesClick()
+        {
+            var packageInfo = GetSelectedPackage();
+            if (packageInfo.source == PackageSource.Git)
+            {
+                var licenseFile = Path.Combine(packageInfo.resolvedPath, "LICENSE.md");
+                if (File.Exists(licenseFile))
+                {
+                    Application.OpenURL(new Uri(licenseFile).AbsoluteUri);
+                    return;
+                }
+            }
+            Expose.FromObject(GetPackageDetails()).Call("ViewLicensesClick");
+        }
 #endif
     }
 }

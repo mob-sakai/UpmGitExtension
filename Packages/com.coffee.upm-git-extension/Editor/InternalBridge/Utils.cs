@@ -186,12 +186,24 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
     {
         public static Dictionary<string, object> DeserializeFile(string file)
         {
-            return Json.Deserialize(File.ReadAllText(file)) as Dictionary<string, object>;
+            var text = File.ReadAllText(file);
+#if UNITY_2019_2_OR_NEWER
+            return Json.Deserialize(text) as Dictionary<string, object>;
+#else
+            return Expose.FromType(Type.GetType("UnityEditor.Json, UnityEditor")).Call("Deserialize", text).As<Dictionary<string, object>>();
+#endif
         }
 
         public static void SerializeFile(string file, Dictionary<string, object> json)
         {
-            File.WriteAllText(file, Json.Serialize(json, true));
+#if UNITY_2019_2_OR_NEWER
+			var text = Json.Serialize(json);
+#elif UNITY_2019_1_OR_NEWER
+            var text = Expose.FromType(Type.GetType("UnityEditor.Json, UnityEditor")).Call("Serialize", json, false, "  ").As<string>();
+#else
+            var text = Expose.FromType(Type.GetType("UnityEditor.Json, UnityEditor")).Call("Serialize", json).As<string>();
+#endif
+			File.WriteAllText(file, text);
         }
     }
 

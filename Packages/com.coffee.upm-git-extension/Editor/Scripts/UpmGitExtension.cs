@@ -146,6 +146,11 @@ namespace Coffee.PackageManager
             var space = new VisualElement();
             space.style.flexGrow = 1;
             addButton.parent.Insert(addButton.parent.IndexOf(addButton), space);
+
+            Debug.Log("[UpmGitExtension.InitializeUI] Setup document actions:");
+            root.Q<Button>("viewDocumentation").OverwriteCallback(internalBridge.ViewDocClick);
+            root.Q<Button>("viewChangelog").OverwriteCallback(internalBridge.ViewChangelogClick);
+            root.Q<Button>("viewLicenses").OverwriteCallback(internalBridge.ViewLicensesClick);
 #endif
 
             Debug.Log("[UpmGitExtension.InitializeUI] Setup update button:");
