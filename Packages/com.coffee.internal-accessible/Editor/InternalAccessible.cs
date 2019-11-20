@@ -110,6 +110,7 @@ namespace Coffee.InternalAccessible
 
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
+			return;
             if (!Settings.instance.IsDevelopMode)
                 return;
 
