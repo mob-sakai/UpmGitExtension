@@ -60,16 +60,16 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             GetPackageList().onPackageListLoaded -= UpdateGitPackages;
             GetPackageList().onPackageListLoaded += UpdateGitPackages;
 
-            PackageDatabase.instance.onPackagesChanged += (added, removed, updated, p4) =>
+            PackageDatabase.instance.onPackagesChanged += (added, removed, _, updated) =>
             {
-                // Installed with git
-                if (removed.Concat(updated).Any(x => x.installedVersion.packageInfo.source == PackageSource.Git))
+                // Removed or updated.
+                if (removed.Concat(updated).Any(x => x != null && x.installedVersion.packageInfo.source == PackageSource.Git))
                 {
                     EditorApplication.delayCall += UpdatePackageCollection;
                 }
 
                 // Installed with git
-                if (added.Concat(updated).Any(x => x.installedVersion.packageInfo.source == PackageSource.Git))
+                if (added.Concat(updated).Any(x => x != null && x.installedVersion.packageInfo.source == PackageSource.Git))
                 {
                     EditorApplication.delayCall += UpdateGitPackages;
                 }
@@ -268,6 +268,17 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                     PackageTag.Preview.ToString().Equals(semver.Prerelease.Split('.')[0], StringComparison.InvariantCultureIgnoreCase))
                         tag |= PackageTag.Preview;
 
+                    if (semver.IsRelease())
+                    {
+                        tag |= PackageTag.Release;
+                    }
+                    else
+                    {
+                        if ((semver.Major == 0 && string.IsNullOrEmpty(semver.Prerelease)) ||
+                            PackageTag.Preview.ToString().Equals(semver.Prerelease.Split('.')[0], StringComparison.InvariantCultureIgnoreCase))
+                            tag |= PackageTag.Preview;
+                    }
+
                     Expose.FromObject(p).Set("m_Tag", tag);
                     Expose.FromObject(p).Set("m_IsFullyFetched", true);
                     Expose.FromObject(p).Set("m_PackageId", string.Format("{0}@{1}#{2}", packageName, repoUrl, semver));
@@ -276,10 +287,22 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 })
                 .Concat(new[] { pInfo })
                 .Where(p => p == pInfo || p.version != pInfo.version)
+                .OrderBy(x => x.version)
                 .ToArray();
 
             if (0 < versionInfos.Length)
             {
+                // Add verify tag on latest version.
+                var latest = versionInfos
+                    .Where(x=>x.version.IsRelease())
+                    .LastOrDefault();
+                if(latest != null)
+                {
+                    var tag = Expose.FromObject(latest).Get("m_Tag").As<PackageTag>();
+                    tag |= PackageTag.Verified;
+                    Expose.FromObject(latest).Set("m_Tag", tag);
+                }
+
                 // Unlock version tag.
                 var t = Expose.FromObject(pInfo).Get("m_Tag").As<PackageTag>();
                 Expose.FromObject(pInfo).Set("m_Tag", t & ~PackageTag.VersionLocked);
