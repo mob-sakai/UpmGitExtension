@@ -26,7 +26,8 @@ public class InternalAccessableCompiler
 		var compilationOptions = new CSharpCompilationOptions(
 				OutputKind.DynamicallyLinkedLibrary,
 				allowUnsafe: true,
-				optimizationLevel: OptimizationLevel.Release
+				optimizationLevel: OptimizationLevel.Release,
+				deterministic: true
 			)
 			.WithMetadataImportOptions(MetadataImportOptions.All);
 
