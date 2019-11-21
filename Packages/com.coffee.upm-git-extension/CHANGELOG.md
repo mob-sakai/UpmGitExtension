@@ -1,3 +1,11 @@
+# [1.0.0-preview.3](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0-preview.2@preview...v1.0.0-preview.3@preview) (2019-11-21)
+
+
+### Bug Fixes
+
+* develop flow ([e03701a](https://github.com/mob-sakai/UpmGitExtension/commit/e03701a1491f61beacbedf51599d20ba11f37337))
+* Update dlls ([19e3a57](https://github.com/mob-sakai/UpmGitExtension/commit/19e3a57013247a0f0229d2d73c616438cc1bc1e7))
+
 # [1.0.0-preview.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0-preview.1@preview...v1.0.0-preview.2@preview) (2019-11-21)
 
 
