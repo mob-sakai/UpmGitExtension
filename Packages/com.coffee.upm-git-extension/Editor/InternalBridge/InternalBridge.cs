@@ -346,7 +346,8 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                     newPInfo.Version = SemVersion.Parse(version == refName ? version : version + "-" + refName);
 
                     var exPackageInfo = Expose.FromObject(newPInfo);
-                    exPackageInfo.Set(exPackageInfo.Has("IsInstalled") ? "IsInstalled" : "IsCurrent", false);
+					var memberName = 0 < Application.unityVersion.CompareTo("2019.2") ? "IsInstalled" : "IsCurrent";
+					exPackageInfo.Set(memberName, false);
 
                     newPInfo.IsVerified = false;
                     newPInfo.Origin = (PackageSource)99;
