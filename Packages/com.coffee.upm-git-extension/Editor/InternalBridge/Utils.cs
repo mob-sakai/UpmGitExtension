@@ -134,11 +134,15 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             // Run script and cache result.
             else
             {
-                var script = Application.platform == RuntimePlatform.WindowsEditor
-                    ? GET_REFS_SCRIPT + ".bat"
-                    : GET_REFS_SCRIPT + ".sh";
-                var args = string.Format("{0} {1} {2}", repoUrl, cacheDir.FullName, Application.unityVersion);
-                ExecuteShell(Path.GetFullPath(script), args, (success) =>
+				var execute = Application.platform == RuntimePlatform.WindowsEditor
+					? "cmd.exe"
+					: "/bin/sh";
+
+				var script = Application.platform == RuntimePlatform.WindowsEditor
+                    ? "/C " + Path.GetFullPath(GET_REFS_SCRIPT) + ".bat"
+                    : Path.GetFullPath(GET_REFS_SCRIPT) + ".sh";
+                var args = string.Format("{0} {1} {2} {3}", script, repoUrl, cacheDir.FullName, Application.unityVersion);
+                ExecuteShell(execute, args, (success) =>
                 {
                     if (success)
                         GetRefs(packageName, repoUrl, callback);
