@@ -13,8 +13,7 @@ namespace Coffee.InternalAccessible
 
         public static void Restore(string proj, System.Action<bool> callback)
         {
-            proj = string.Format("\"{0}\"", Path.GetFullPath(proj));
-            Execute(string.Format("restore {0}", proj), (success, stdout, stderr) =>
+            Execute(string.Format("restore \"{0}\"", Path.GetFullPath(proj)), (success, stdout, stderr) =>
             {
                 if (!success)
                     UnityEngine.Debug.LogError(stderr);
@@ -24,8 +23,7 @@ namespace Coffee.InternalAccessible
 
         public static void Run(string proj, string args, System.Action<bool, string> resultCallback)
         {
-            proj = string.Format("\"{0}\"", Path.GetFullPath(proj));
-            var commandArgs = string.Format("run -p {0} -- {1}", proj, args);
+            var commandArgs = string.Format("run -p \"{0}\" -- {1}", Path.GetFullPath(proj), args);
             Execute(commandArgs, (success, stdout, stderr) =>
             {
                 if (success)
@@ -60,6 +58,7 @@ namespace Coffee.InternalAccessible
 
         public static void Execute(string args, System.Action<bool, string, string> resultCallback = null, bool wait = false)
         {
+            UnityEngine.Debug.LogFormat("[DotNet.Execute] {0} {1}", startInfo.FileName, args);
             startInfo.Arguments = args;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
