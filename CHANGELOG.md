@@ -1,3 +1,12 @@
+# [1.0.0-preview.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0-preview.1@preview...v1.0.0-preview.2@preview) (2019-11-21)
+
+
+### Bug Fixes
+
+* Fix compiler ([488d317](https://github.com/mob-sakai/UpmGitExtension/commit/488d3172a9c25e93dab60147860cd42facc2d643))
+* Fix dll for 2019.3 ([be250df](https://github.com/mob-sakai/UpmGitExtension/commit/be250dfe7b4a859bb35ddd5d257624b69d392520))
+* Fix member name of PackageInfo ([424d840](https://github.com/mob-sakai/UpmGitExtension/commit/424d8401657e86480f2f8f872e70ccfb549a2507))
+
 # 1.0.0-preview.1 (2019-11-21)
 
 
