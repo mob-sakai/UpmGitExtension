@@ -87,6 +87,11 @@ namespace UnityEditor.PackageManager.UI
             return (T)Value;
         }
 
+        public bool Has(string memberName)
+        {
+            return  Type.GetMember(memberName, Flag) != null;
+        }
+
         public Expose Get(string memberName)
         {
             var pi = Type.GetProperty(memberName, Flag | BindingFlags.GetProperty);
@@ -175,46 +180,46 @@ namespace UnityEditor.PackageManager.UI
             throw new MissingMemberException(Type.Name, "Indexer");
         }
 
-        public Expose Call<T0>(string methodName, params object[] args)
-        {
-            return Call(new[] { typeof(T0) }, methodName, args);
-        }
+        //public Expose Call<T0>(string methodName, params object[] args)
+        //{
+        //    return Call(new[] { typeof(T0) }, methodName, args);
+        //}
 
-        public Expose Call<T0, T1>(string methodName, params object[] args)
-        {
-            return Call(new[] { typeof(T0), typeof(T1) }, methodName, args);
-        }
+        //public Expose Call<T0, T1>(string methodName, params object[] args)
+        //{
+        //    return Call(new[] { typeof(T0), typeof(T1) }, methodName, args);
+        //}
 
-        public Expose Call<T0, T1, T2>(string methodName, params object[] args)
-        {
-            return Call(new[] { typeof(T0), typeof(T1), typeof(T2) }, methodName, args);
-        }
+        //public Expose Call<T0, T1, T2>(string methodName, params object[] args)
+        //{
+        //    return Call(new[] { typeof(T0), typeof(T1), typeof(T2) }, methodName, args);
+        //}
 
-        public Expose Call<T0, T1, T2, T3>(string methodName, params object[] args)
-        {
-            return Call(new[] { typeof(T0), typeof(T1), typeof(T2), typeof(T3) }, methodName, args);
-        }
+        //public Expose Call<T0, T1, T2, T3>(string methodName, params object[] args)
+        //{
+        //    return Call(new[] { typeof(T0), typeof(T1), typeof(T2), typeof(T3) }, methodName, args);
+        //}
 
 
-        public Expose Call(Type[] genericTypes, string methodName, params object[] args)
-        {
-            args = args.Select(x => x is Expose ? ((Expose)x).Value : x).ToArray();
+        //public Expose Call(Type[] genericTypes, string methodName, params object[] args)
+        //{
+        //    args = args.Select(x => x is Expose ? ((Expose)x).Value : x).ToArray();
 
-            // Find method
-            Expose result;
-            if (TryInvoke(methodName, Value, Type.GetMethods(Flag | BindingFlags.InvokeMethod), genericTypes, args, out result))
-            {
-                return result;
-            }
+        //    // Find method
+        //    Expose result;
+        //    if (TryInvoke(methodName, Value, Type.GetMethods(Flag | BindingFlags.InvokeMethod), genericTypes, args, out result))
+        //    {
+        //        return result;
+        //    }
 
-            args = new[] { Value }.Concat(args).ToArray();
-            if (Value != null && TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), genericTypes, args, out result))
-            {
-                return result;
-            }
+        //    args = new[] { Value }.Concat(args).ToArray();
+        //    if (Value != null && TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), genericTypes, args, out result))
+        //    {
+        //        return result;
+        //    }
 
-            throw new MissingMemberException(Type.Name, methodName);
-        }
+        //    throw new MissingMemberException(Type.Name, methodName);
+        //}
 
 
         public Expose Call(string methodName, params object[] args)
@@ -252,20 +257,18 @@ namespace UnityEditor.PackageManager.UI
             }
 
             // Find extension method
-            if (Value != null
-                && TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), null, args, out result))
-            {
-                if (
-                    TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), null, args, out result)
-                    || TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), new[] { Type }, args, out result)
-                )
-                    return result;
-            }
+            //if (Value != null
+            //    && TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), null, args, out result))
+            //{
+            //    if (
+            //        TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), null, args, out result)
+            //        || TryInvoke(methodName, null, s_extensionMethods.Where(x => Is(Type, x.Key)).SelectMany(x => x.Value), new[] { Type }, args, out result)
+            //    )
+            //        return result;
+            //}
 
             throw new MissingMemberException(Type.Name, methodName);
         }
-
-
 
         public static Type GetType(string name)
         {
@@ -289,46 +292,46 @@ namespace UnityEditor.PackageManager.UI
         //return GetType(new [] { typeof(T).AssemblyQualifiedName }.Concat( genericTypes).ToArray());
         //}
 
-        public static Type GetType(params string[] genericTypes)
-        {
-            return GetType(genericTypes.Select(x => GetType(x)).ToArray());
-        }
+        //public static Type GetType(params string[] genericTypes)
+        //{
+        //    return GetType(genericTypes.Select(x => GetType(x)).ToArray());
+        //}
 
-        public static Type GetType(params Type[] genericTypes)
-        {
-            if (genericTypes.Length == 0)
-            {
-                throw new ArgumentException("Requires one or more Type objects", "genericTypes");
-            }
-            else if (genericTypes.Length == 1)
-            {
-                if (!genericTypes[0].IsGenericTypeDefinition)
-                {
-                    return genericTypes[0];
-                }
-                throw new ArgumentException("Missing generic type parameter", "genericTypes");
-            }
-            else
-            {
-                if (genericTypes[0].IsGenericTypeDefinition)
-                {
-                    return genericTypes[0].MakeGenericType(genericTypes.Skip(1).ToArray());
-                }
-                throw new ArgumentException("Missing generic type definition", "genericTypes");
-            }
-        }
+        //public static Type GetType(params Type[] genericTypes)
+        //{
+        //    if (genericTypes.Length == 0)
+        //    {
+        //        throw new ArgumentException("Requires one or more Type objects", "genericTypes");
+        //    }
+        //    else if (genericTypes.Length == 1)
+        //    {
+        //        if (!genericTypes[0].IsGenericTypeDefinition)
+        //        {
+        //            return genericTypes[0];
+        //        }
+        //        throw new ArgumentException("Missing generic type parameter", "genericTypes");
+        //    }
+        //    else
+        //    {
+        //        if (genericTypes[0].IsGenericTypeDefinition)
+        //        {
+        //            return genericTypes[0].MakeGenericType(genericTypes.Skip(1).ToArray());
+        //        }
+        //        throw new ArgumentException("Missing generic type definition", "genericTypes");
+        //    }
+        //}
 
 
-        static Type ToBaseClass(Type type)
-        {
-            if (!type.IsGenericType || !type.IsConstructedGenericType || type.IsGenericTypeDefinition)
-                return type;
+        //static Type ToBaseClass(Type type)
+        //{
+        //    if (!type.IsGenericType || !type.IsConstructedGenericType || type.IsGenericTypeDefinition)
+        //        return type;
 
-            if (type.GenericTypeArguments[0].IsGenericParameter)
-                return type.GetGenericTypeDefinition();
+        //    if (type.GenericTypeArguments[0].IsGenericParameter)
+        //        return type.GetGenericTypeDefinition();
 
-            return type;
-        }
+        //    return type;
+        //}
 
         static bool TryInvoke(string methodName, object instance, IEnumerable<MethodInfo> methodInfos, object[] args, out Expose result)
         {
@@ -343,35 +346,35 @@ namespace UnityEditor.PackageManager.UI
             return false;
         }
 
-        static bool TryInvoke(string methodName, object instance, IEnumerable<MethodInfo> methodInfos, Type[] genericTypes, object[] args, out Expose result)
-        {
-            bool isGeneric = genericTypes != null && 0 < genericTypes.Length;
-            foreach (MethodInfo methodInfo in methodInfos)
-            {
-                MethodInfo mi = methodInfo;
-                if (mi.Name != methodName || isGeneric && !mi.IsGenericMethod)
-                    continue;
+        //static bool TryInvoke(string methodName, object instance, IEnumerable<MethodInfo> methodInfos, Type[] genericTypes, object[] args, out Expose result)
+        //{
+        //    bool isGeneric = genericTypes != null && 0 < genericTypes.Length;
+        //    foreach (MethodInfo methodInfo in methodInfos)
+        //    {
+        //        MethodInfo mi = methodInfo;
+        //        if (mi.Name != methodName || isGeneric && !mi.IsGenericMethod)
+        //            continue;
 
-                try
-                {
-                    if (isGeneric)
-                    {
-                        mi = mi.GetGenericMethodDefinition().MakeGenericMethod(genericTypes);
-                    }
+        //        try
+        //        {
+        //            if (isGeneric)
+        //            {
+        //                mi = mi.GetGenericMethodDefinition().MakeGenericMethod(genericTypes);
+        //            }
 
-                    if (IsInvokable(mi, args))
-                    {
-                        result = Expose.FromObject(mi.Invoke(instance, args));
-                        return true;
-                    }
-                }
-                catch
-                {
-                }
-            }
-            result = null;
-            return false;
-        }
+        //            if (IsInvokable(mi, args))
+        //            {
+        //                result = Expose.FromObject(mi.Invoke(instance, args));
+        //                return true;
+        //            }
+        //        }
+        //        catch
+        //        {
+        //        }
+        //    }
+        //    result = null;
+        //    return false;
+        //}
 
         static bool IsInvokable(MethodInfo methodInfo, object[] args)
         {
