@@ -89,7 +89,14 @@ namespace UnityEditor.PackageManager.UI
 
         public bool Has(string memberName)
         {
-            return  Type.GetMember(memberName, Flag) != null;
+            try
+            {
+                return Type.GetMember(memberName, Flag) != null;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public Expose Get(string memberName)
