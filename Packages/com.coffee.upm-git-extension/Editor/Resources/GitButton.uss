@@ -6,7 +6,6 @@
   padding-bottom: 2px;
   padding-left: 4px;
   padding-right: 4px;
-  border-right: 0px;
 }
 
 .git-button-image {

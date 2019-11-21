@@ -156,6 +156,7 @@ namespace Coffee.PackageManager
             var addButton = root.Q("toolbarAddMenu") ?? root.Q("toolbarAddButton") ?? root.Q("moreAddOptionsButton");
             var gitButton = new GitButton(installPackageWindow.Open);
             addButton.parent.Insert(0, gitButton);
+            gitButton.style.borderRightWidth = 1;
 
 #if UNITY_2018
             var space = new VisualElement();
