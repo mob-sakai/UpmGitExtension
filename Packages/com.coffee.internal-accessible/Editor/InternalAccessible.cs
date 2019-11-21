@@ -163,7 +163,7 @@ namespace Coffee.InternalAccessible
         {
             var targets = new[] {
                 "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.asmdef",
-                "Packages/com.coffee.upm-git-extension/Editor/InternalBridge/Coffee.UpmGitExtension.Editor.Bridge.asmdef"
+                "Packages/com.coffee.upm-git-extension/Editor/InternalBridge/Coffee.UpmGitExtension.Bridge.asmdef"
             };
 
 #if UNITY_2019_1_9_OR_NEWER
@@ -192,13 +192,13 @@ namespace Coffee.InternalAccessible
 #endif
 
 #if UNITY_2019_3_OR_NEWER
-                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2019.3.dll"
+                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Bridge.2019.3.dll"
 #elif UNITY_2019_1_9_OR_NEWER
-				"Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2019.2.dll"
+				"Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Bridge.2019.2.dll"
 #elif UNITY_2019_1_OR_NEWER
-                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2019.1.dll"
+                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Bridge.2019.1.dll"
 #else
-                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Editor.Bridge.2018.3.dll"
+                "Packages/com.coffee.upm-git-extension/Editor/Coffee.UpmGitExtension.Bridge.2018.3.dll"
 #endif
 			);
         }
