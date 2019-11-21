@@ -9,33 +9,33 @@ using UnityEditor.Experimental.UIElements;
 
 namespace Coffee.PackageManager
 {
-	internal class GitButton : ToolbarButton
-	{
-		//################################
-		// Constant or Static Members.
-		//################################
-		const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
-		const string StylePath = ResourcesPath + "GitButton.uss";
+    internal class GitButton : ToolbarButton
+    {
+        //################################
+        // Constant or Static Members.
+        //################################
+        const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
+        const string StylePath = ResourcesPath + "GitButton.uss";
 
-		public static bool IsResourceReady()
-		{
-			return EditorGUIUtility.Load(StylePath);
-		}
+        public static bool IsResourceReady()
+        {
+            return EditorGUIUtility.Load(StylePath);
+        }
 
-		public GitButton (System.Action action) : base (action)
-		{
+        public GitButton(System.Action action) : base(action)
+        {
 #if UNITY_2019_1_OR_NEWER
 			styleSheets.Add (UnityEditor.AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
 #else
-			AddStyleSheetPath (StylePath);
+            AddStyleSheetPath(StylePath);
 #endif
 
-			AddToClassList ("git-button");
+            AddToClassList("git-button");
 
-			var image = new VisualElement ();
-			image.AddToClassList ("git-button-image");
+            var image = new VisualElement();
+            image.AddToClassList("git-button-image");
 
-			Add (image);
-		}
-	}
+            Add(image);
+        }
+    }
 }

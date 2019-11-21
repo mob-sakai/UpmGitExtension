@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.UI.InternalBridge;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -12,254 +13,207 @@ using UnityEngine.Experimental.UIElements;
 
 namespace Coffee.PackageManager
 {
-	internal class InstallPackageWindow : VisualElement
-	{
-		//################################
-		// Constant or Static Members.
-		//################################
-		const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
-		const string TemplatePath = ResourcesPath + "InstallPackageWindow.uxml";
-		const string StylePath = ResourcesPath + "InstallPackageWindow.uss";
+    internal class InstallPackageWindow : VisualElement
+    {
+        //################################
+        // Constant or Static Members.
+        //################################
+        const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
+        const string TemplatePath = ResourcesPath + "InstallPackageWindow.uxml";
+        const string StylePath = ResourcesPath + "InstallPackageWindow.uss";
 
-		public static bool IsResourceReady()
-		{
-			return EditorGUIUtility.Load(TemplatePath) && EditorGUIUtility.Load(StylePath);
-		}
+        public static bool IsResourceReady()
+        {
+            return EditorGUIUtility.Load(TemplatePath) && EditorGUIUtility.Load(StylePath);
+        }
 
-		//################################
-		// Public Members.
-		//################################
-		public InstallPackageWindow ()
-		{
-			UIUtils.SetElementDisplay (this, false);
-			VisualTreeAsset asset = EditorGUIUtility.Load (TemplatePath) as VisualTreeAsset;
+        //################################
+        // Public Members.
+        //################################
+        public InstallPackageWindow()
+        {
+            UIUtils.SetElementDisplay(this, false);
+            VisualTreeAsset asset = EditorGUIUtility.Load(TemplatePath) as VisualTreeAsset;
 
 #if UNITY_2019_1_OR_NEWER
 			root = asset.CloneTree ();
 			styleSheets.Add (AssetDatabase.LoadAssetAtPath<StyleSheet> (StylePath));
 #else
-			root = asset.CloneTree(null);
-			AddStyleSheetPath (StylePath);
+            root = asset.CloneTree(null);
+            AddStyleSheetPath(StylePath);
 #endif
-			// Add ui elements and class (for miximize).
-			AddToClassList ("maximized");
-			root.AddToClassList ("maximized");
-			root.AddToClassList ("installPackageWindow");
-			root.AddToClassList (EditorGUIUtility.isProSkin ? "dark" : "right");
-			Add (root);
+            // Add ui elements and class (for miximize).
+            AddToClassList("maximized");
+            root.AddToClassList("maximized");
+            root.AddToClassList("installPackageWindow");
+            root.AddToClassList(EditorGUIUtility.isProSkin ? "dark" : "right");
+            Add(root);
 
-			// Find ui elements.
-			repoUrlText = root.Q<TextField> ("repoUrlText");
-			findVersionsButton = root.Q<Button> ("findVersionsButton");
-			findVersionsError = root.Q ("findVersionsError");
+            // Find ui elements.
+            repoUrlText = root.Q<TextField>("repoUrlText");
+            findVersionsButton = root.Q<Button>("findVersionsButton");
+            findVersionsError = root.Q("findVersionsError");
 
-			versionContainer = root.Q ("versionContainer");
-			versionSelectButton = root.Q<Button> ("versionSelectButton");
-			findPackageButton = root.Q<Button> ("findPackageButton");
-			findPackageError = root.Q ("findPackageError");
+            versionContainer = root.Q("versionContainer");
+            versionSelectButton = root.Q<Button>("versionSelectButton");
 
-			packageContainer = root.Q ("packageContainer");
-			packageNameLabel = root.Q<Label> ("packageNameLabel");
-			installPackageButton = root.Q<Button> ("installPackageButton");
-			installPackageError = root.Q ("installPackageError");
+            packageContainer = root.Q("packageContainer");
+            packageNameLabel = root.Q<Label>("packageNameLabel");
+            installPackageButton = root.Q<Button>("installPackageButton");
 
-			closeButton = root.Q<Button> ("closeButton");
+            closeButton = root.Q<Button>("closeButton");
 
-			showAllVersionsToggle = root.Q<Toggle> ("showAllVersionsToggle");
 
-			// Url container
+            // Url container
 #if UNITY_2019_1_OR_NEWER
 			repoUrlText.RegisterValueChangedCallback ((evt) => onChange_RepoUrl (evt.newValue));
 #else
-			repoUrlText.OnValueChanged((evt) => onChange_RepoUrl (evt.newValue));
+            repoUrlText.OnValueChanged((evt) => onChange_RepoUrl(evt.newValue));
 #endif
-			findVersionsButton.clickable.clicked += onClick_FindVersions;
+            findVersionsButton.clickable.clicked += onClick_FindVersions;
 
-			// Version container
-			versionSelectButton.clickable.clicked += onClick_SelectVersions;
-			findPackageButton.clickable.clicked += onClick_FindPackage;
+            // Version container
+            versionSelectButton.clickable.clicked += onClick_SelectVersions;
 
-			// Package container
-			installPackageButton.clickable.clicked += onClick_InstallPackage;
-			
-			// Controll container
-			closeButton.clickable.clicked += onClick_Close;
+            // Package container
+            installPackageButton.clickable.clicked += onClick_InstallPackage;
 
-			// Show all version
-			showAllVersionsToggle.value = Settings.showAllVersions;
-#if UNITY_2019_1_OR_NEWER
-			showAllVersionsToggle.RegisterValueChangedCallback((evt) => Settings.showAllVersions = evt.newValue);
-#else
-			showAllVersionsToggle.OnValueChanged((evt) => Settings.showAllVersions = evt.newValue);
-#endif
+            // Controll container
+            closeButton.clickable.clicked += onClick_Close;
 
-			SetPhase (Phase.InputRepoUrl);
-		}
+            SetPhase(Phase.InputRepoUrl);
+        }
 
-		public void Open ()
-		{
-			UIUtils.SetElementDisplay (this, true);
-			SetPhase (Phase.InputRepoUrl);
-		}
+        public void Open()
+        {
+            UIUtils.SetElementDisplay(this, true);
+            SetPhase(Phase.InputRepoUrl);
+        }
 
-		//################################
-		// Private Members.
-		//################################
-		static readonly Regex regSemVer = new Regex(@"^\d+", RegexOptions.Compiled);
-		readonly VisualElement root;
-		readonly VisualElement versionContainer;
-		readonly VisualElement packageContainer;
-		readonly VisualElement findVersionsError;
-		readonly VisualElement findPackageError;
-		readonly VisualElement installPackageError;
-		readonly Button closeButton;
-		readonly Button installPackageButton;
-		readonly Button findVersionsButton;
-		readonly Button versionSelectButton;
-		readonly Button findPackageButton;
-		readonly Toggle showAllVersionsToggle;
-		readonly Label packageNameLabel;
-		readonly TextField repoUrlText;
-		IEnumerable<string> versions = new string [0];
+        //################################
+        // Private Members.
+        //################################
+        static readonly Regex regSemVer = new Regex(@"^\d+", RegexOptions.Compiled);
+        readonly VisualElement root;
+        readonly VisualElement versionContainer;
+        readonly VisualElement packageContainer;
+        readonly VisualElement findVersionsError;
+        readonly Button closeButton;
+        readonly Button installPackageButton;
+        readonly Button findVersionsButton;
+        readonly Button versionSelectButton;
+        readonly Label packageNameLabel;
+        readonly TextField repoUrlText;
+        IEnumerable<string> versions = new string[0];
+        string refName = "";
 
-		enum Phase
-		{
-			InputRepoUrl,
-			FindVersions,
-			SelectVersion,
-			FindPackage,
-			InstallPackage,
-		}
+        enum Phase
+        {
+            InputRepoUrl,
+            FindVersions,
+            SelectVersion,
+            FindPackage,
+            InstallPackage,
+        }
 
-		void SetPhase (Phase phase)
-		{
-			bool canFindVersions = Phase.FindVersions <= phase;
-			repoUrlText.value = canFindVersions ? repoUrlText.value : "";
-			findVersionsButton.SetEnabled (canFindVersions);
-			if (phase == Phase.FindVersions)
-				repoUrlText.Focus ();
+        void SetPhase(Phase phase)
+        {
+            bool canFindVersions = Phase.FindVersions <= phase;
+            repoUrlText.value = canFindVersions ? repoUrlText.value : "";
+            findVersionsButton.SetEnabled(canFindVersions);
+            if (phase == Phase.FindVersions)
+                repoUrlText.Focus();
 
-			bool canSelectVersion = Phase.SelectVersion <= phase;
-			versionContainer.SetEnabled (canSelectVersion);
-			versionSelectButton.SetEnabled (canSelectVersion);
-			versionSelectButton.text = canSelectVersion ? versionSelectButton.text : "-- Select package version --";
-			if (canSelectVersion)
-			{
-				findVersionsError.visible = false;
-				findPackageError.visible = false;
-				installPackageError.visible = false;
-			}
+            bool canSelectVersion = Phase.SelectVersion <= phase;
+            versionContainer.SetEnabled(canSelectVersion);
+            versionSelectButton.SetEnabled(canSelectVersion);
+            versionSelectButton.text = canSelectVersion ? versionSelectButton.text : "-- Select package version --";
+            if (canSelectVersion)
+            {
+                findVersionsError.visible = false;
+            }
 
-			bool canFindPackage = Phase.FindPackage <= phase;
-			findPackageButton.SetEnabled (canFindPackage);
 
-			bool canInstallPackage = Phase.InstallPackage <= phase;
-			packageContainer.SetEnabled (canInstallPackage);
-			packageNameLabel.text = canInstallPackage ? packageNameLabel.text : "";
-			if (canInstallPackage || phase == Phase.InputRepoUrl)
-			{
-				findVersionsError.visible = false;
-				findPackageError.visible = false;
-				installPackageError.visible = false;
-			}
-		}
+            bool canInstallPackage = Phase.InstallPackage <= phase;
+            packageContainer.SetEnabled(canInstallPackage);
+            packageNameLabel.text = canInstallPackage ? packageNameLabel.text : "";
+            if (canInstallPackage || phase == Phase.InputRepoUrl)
+            {
+                findVersionsError.visible = false;
+            }
+        }
 
-		void onClick_Close ()
-		{
-			UIUtils.SetElementDisplay (this, false);
-		}
+        void onClick_Close()
+        {
+            UIUtils.SetElementDisplay(this, false);
+        }
 
-		void onChange_RepoUrl (string url)
-		{
-			SetPhase (string.IsNullOrEmpty (url) ? Phase.InputRepoUrl : Phase.FindVersions);
-		}
+        void onChange_RepoUrl(string url)
+        {
+            SetPhase(string.IsNullOrEmpty(url) ? Phase.InputRepoUrl : Phase.FindVersions);
+        }
 
-		void onClick_FindVersions ()
-		{
-			SetPhase (Phase.FindVersions);
-			root.SetEnabled (false);
-			GitUtils.GetRefs (repoUrlText.value, refs =>
-			{
-				root.SetEnabled (true);
-				bool hasError = !refs.Any ();
-				findVersionsError.visible = hasError;
-				if (!hasError)
-				{
-					versions = refs;
-					SetPhase (Phase.SelectVersion);
-				}
-			});
-		}
+        void onClick_FindVersions()
+        {
+            SetPhase(Phase.FindVersions);
+            root.SetEnabled(false);
+            GitUtils.GetRefs("", repoUrlText.value, refs =>
+           {
+               root.SetEnabled(true);
+               bool hasError = !refs.Any();
+               findVersionsError.visible = hasError;
+               if (!hasError)
+               {
+                   versions = refs;
+                   SetPhase(Phase.SelectVersion);
+               }
+           });
+        }
 
-		void onClick_SelectVersions ()
-		{
-			SetPhase (Phase.SelectVersion);
+        void onClick_SelectVersions()
+        {
+            SetPhase(Phase.SelectVersion);
 
-			var menu = new GenericMenu ();
-			var currentRefName = versionSelectButton.text;
+            var menu = new GenericMenu();
+            var currentRefName = versionSelectButton.text;
 
-			GenericMenu.MenuFunction2 callback = (x) =>
-			{
-				versionSelectButton.text = x as string;
-				SetPhase (Phase.FindPackage);
-			};
+            GenericMenu.MenuFunction2 callback = (x) =>
+            {
+                var splited = x as string[];
+                versionSelectButton.text = splited[0];
+                packageNameLabel.text = splited[1];
+                refName = splited[2];
+                SetPhase(Phase.InstallPackage);
+            };
 
-			var orderdVers = versions.OrderByDescending(x => x).ToArray();
+            var orderdVers = versions
+                .OrderByDescending(x => x.Split(',')[1]).ToArray();
 
-			foreach (var t in orderdVers.Where(x => regSemVer.IsMatch(x)))
-				menu.AddItem(new GUIContent(t), currentRefName == t, callback, t);
+            foreach (var t in orderdVers)
+            {
+                var splited = t.Split(',');
+                var refName = splited[0];
+                var version = splited[1];
+                var packageName = splited[2];
+                var text = version == refName ? version : version + " - " + refName;
+                var packageId = string.Format("{0}@{1}#{2}", packageName, PackageUtils.GetRepoUrl(repoUrlText.value), refName);
+                menu.AddItem(new GUIContent(text), currentRefName == text, callback, new[] { text, packageName, refName });
+            }
 
-			menu.AddDisabledItem(GUIContent.none);
+            menu.DropDown(versionSelectButton.worldBound);
+        }
 
-			if(Settings.showAllVersions)
-			{
-				foreach (var t in orderdVers.Where (x => !regSemVer.IsMatch (x)))
-					menu.AddItem (new GUIContent (t), currentRefName == t, callback, t);
-			}
-			else
-			{
-				foreach (var t in orderdVers.Where (x => !regSemVer.IsMatch (x) && x.Contains("upm")))
-					menu.AddItem (new GUIContent (t), currentRefName == t, callback, t);
-			}
+        void onClick_InstallPackage()
+        {
+            PackageUtils.InstallPackage(packageNameLabel.text, GetRepoUrl(repoUrlText.value), refName);
+            onClick_Close();
+        }
 
-			menu.DropDown(versionSelectButton.worldBound);
-		}
-
-		void onClick_FindPackage ()
-		{
-			root.SetEnabled (false);
-			SetPhase (Phase.FindPackage);
-			GitUtils.GetPackageJson (repoUrlText.value, versionSelectButton.text, packageName =>
-			{
-				root.SetEnabled (true);
-				bool hasError = string.IsNullOrEmpty (packageName);
-				findPackageError.visible = hasError;
-				if (!hasError)
-				{
-					EditorApplication.delayCall += () => packageNameLabel.text = packageName;
-					SetPhase (Phase.InstallPackage);
-				}
-			});
-		}
-
-		void onClick_InstallPackage ()
-		{
-			root.SetEnabled (false);
-			var url = PackageUtils.GetRepoUrl (repoUrlText.value);
-			var _packageId = string.Format ("{0}@{1}#{2}", packageNameLabel.text, url, versionSelectButton.text);
-			PackageUtils.AddPackage (_packageId, req =>
-			{
-				root.SetEnabled (true);
-				if (req.Status == StatusCode.Success)
-				{
-					onClick_Close ();
-				}
-				else if (req.Status == StatusCode.Failure)
-				{
-					installPackageError.tooltip = req.Error.message;
-					installPackageError.visible = true;
-				}
-			});
-		}
-	}
+        public static string GetRepoUrl(string url)
+        {
+            Match m = Regex.Match(url, "(git@[^:]+):(.*)");
+            string ret = m.Success ? string.Format("ssh://{0}/{1}", m.Groups[1].Value, m.Groups[2].Value) : url;
+            return ret.EndsWith(".git", System.StringComparison.Ordinal) ? ret : ret + ".git";
+        }
+    }
 }
