@@ -23,3 +23,6 @@ bin/
 
 # NPM
 node_modules/
+
+# develop worktree
+UpmGitExtension_*/
