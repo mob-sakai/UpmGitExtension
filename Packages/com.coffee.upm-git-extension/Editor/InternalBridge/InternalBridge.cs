@@ -66,13 +66,13 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             PackageDatabase.instance.onPackagesChanged += (added, removed, _, updated) =>
             {
                 // Removed or updated.
-                if (removed.Concat(updated).Any(x => x != null && x.installedVersion.packageInfo.source == PackageSource.Git))
+                if (removed.Concat(updated).Any(x => x?.installedVersion?.packageInfo?.source == PackageSource.Git))
                 {
                     EditorApplication.delayCall += UpdatePackageCollection;
                 }
 
                 // Installed with git
-                if (added.Concat(updated).Any(x => x != null && x.installedVersion.packageInfo.source == PackageSource.Git))
+                if (added.Concat(updated).Any(x => x?.installedVersion?.packageInfo?.source == PackageSource.Git))
                 {
                     EditorApplication.delayCall += UpdateGitPackages;
                 }
