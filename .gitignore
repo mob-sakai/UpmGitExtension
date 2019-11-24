@@ -27,3 +27,4 @@ node_modules/
 # develop worktree
 UpmGitExtension_*/
 !Coffee.UpmGitExtension.Bridge.*.csproj
+test_*/
