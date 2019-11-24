@@ -1,3 +1,11 @@
+# [1.0.0-preview.4](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0-preview.3@preview...v1.0.0-preview.4@preview) (2019-11-24)
+
+
+### Bug Fixes
+
+* Add null check for 2019.3 ([3180a47](https://github.com/mob-sakai/UpmGitExtension/commit/3180a47cf12d766cd325c3833fec316f28e2c182))
+* Disable validate reference for 2018.3 ([7988f8b](https://github.com/mob-sakai/UpmGitExtension/commit/7988f8b3869d0d174ef496929a68c82fd9ed5c31))
+
 # [1.0.0-preview.3](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0-preview.2@preview...v1.0.0-preview.3@preview) (2019-11-21)
 
 
