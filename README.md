@@ -39,7 +39,7 @@ This project extends the UI of Unity Package Manager for package installed using
 
 * Link to git repository URL
 * Link to offline documents
-  * Readme
+  * Documentations
   * Changelog
   * License
 * Support GitHub, GitLab, Bitbucket, etc.
@@ -57,7 +57,6 @@ This project extends the UI of Unity Package Manager for package installed using
 * Display license
 * [Support git dependency in the package](https://github.com/mob-sakai/GitDependencyResolverForUnity)
 * Custom package list
-* 
 
 
 <br><br><br><br>
@@ -67,7 +66,7 @@ Find `Packages/manifest.json` in your project and edit it to look like this:
 ```js
 {
   "dependencies": {
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#upm",
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
     ...
   },
 }
