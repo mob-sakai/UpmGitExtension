@@ -1,3 +1,10 @@
+## [1.0.1-preview.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.1-preview.1@preview...v1.0.1-preview.2@preview) (2019-11-25)
+
+
+### Bug Fixes
+
+* Suppress API upater ([867a149](https://github.com/mob-sakai/UpmGitExtension/commit/867a14985db9af14c2e9cb8fd83bac2134ec5ebe))
+
 ## [1.0.1-preview.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0...v1.0.1-preview.1@preview) (2019-11-25)
 
 
