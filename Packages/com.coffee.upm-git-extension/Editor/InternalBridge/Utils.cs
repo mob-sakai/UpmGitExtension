@@ -141,7 +141,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
                 if (Application.platform == RuntimePlatform.WindowsEditor)
                 {
                     execute = "cmd.exe";
-                    args = string.Format("/C \"{0}.bat\" \"{1}\" \"{2}\" \"{3}\"", Path.GetFullPath(GET_REFS_SCRIPT), repoUrl, dir, unity);
+                    args = string.Format("/C \"\"{0}.bat\" \"{1}\" \"{2}\" \"{3}\"\"", Path.GetFullPath(GET_REFS_SCRIPT), repoUrl, dir, unity);
                 }
                 else
                 {
