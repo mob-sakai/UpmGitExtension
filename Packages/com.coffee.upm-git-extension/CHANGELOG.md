@@ -1,3 +1,10 @@
+## [1.0.1-preview.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.0...v1.0.1-preview.1@preview) (2019-11-25)
+
+
+### Bug Fixes
+
+* **Get-Refs:** Error after updating to latest 1.0.0 [#68](https://github.com/mob-sakai/UpmGitExtension/issues/68) ([2fbcdf2](https://github.com/mob-sakai/UpmGitExtension/commit/2fbcdf241ee4f73b27b19054c65826b33896bc7c))
+
 # 1.0.0 (2019-11-24)
 
 
