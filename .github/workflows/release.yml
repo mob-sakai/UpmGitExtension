@@ -20,7 +20,7 @@ jobs:
           node-version: 12
 
       - name: Release
-        run: npx upm-release@beta --pkg-root Packages/com.coffee.upm-git-extension --debug
+        run: npx upm-release --pkg-root Packages/com.coffee.upm-git-extension --debug
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
           GH_TOKEN: ${{secrets.GH_TOKEN}}

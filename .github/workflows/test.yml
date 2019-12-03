@@ -16,7 +16,7 @@ jobs:
         run: npm ci
 
       - name: Release Test
-        run: npm run release -- --debug --dry-run --no-ci
+        run: npx upm-release --pkg-root Packages/com.coffee.upm-git-extension --debug --dry-run
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
           GH_TOKEN: ${{secrets.GH_TOKEN}}
