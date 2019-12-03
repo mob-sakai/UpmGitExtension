@@ -19,11 +19,8 @@ jobs:
         with:
           node-version: 12
 
-      - name: Install
-        run: npm install -g upm-release@beta
-
       - name: Release
-        run: upm-release --pkg-root Packages/com.coffee.upm-git-extension --debug
+        run: npx upm-release --pkg-root Packages/com.coffee.upm-git-extension --debug
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
           GH_TOKEN: ${{secrets.GH_TOKEN}}
