@@ -1,0 +1,14 @@
+!*~
+.vs/
+.vscode/
+*.sln
+
+Editor/Coffee.OpenSesame/*
+Editor/Coffee.OpenSesame.meta
+Editor/Coffee.OpenSesame.Dev/*
+Editor/Coffee.OpenSesame.Dev.meta
+
+obj/
+bin/
+Tests/
+Tests.meta

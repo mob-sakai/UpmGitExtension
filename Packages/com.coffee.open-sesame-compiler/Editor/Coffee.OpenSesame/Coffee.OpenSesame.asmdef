@@ -1,0 +1,16 @@
+{
+    "name": "Coffee.OpenSesame",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "OPEN_SESAME_DEV"
+    ]
+}
