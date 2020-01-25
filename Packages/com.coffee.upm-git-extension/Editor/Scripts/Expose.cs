@@ -1,4 +1,5 @@
-﻿using System;
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Collections;
@@ -862,3 +863,4 @@ namespace UnityEditor.PackageManager.UI
         }
     }
 }
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.

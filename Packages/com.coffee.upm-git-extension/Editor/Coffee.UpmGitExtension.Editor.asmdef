@@ -10,12 +10,7 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [
-        "Coffee.UpmGitExtension.Bridge.2018.3.dll",
-        "Coffee.UpmGitExtension.Bridge.2019.1.dll",
-        "Coffee.UpmGitExtension.Bridge.2019.2.dll",
-        "Coffee.UpmGitExtension.Bridge.2019.3.dll"
-    ],
+    "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": []
 }

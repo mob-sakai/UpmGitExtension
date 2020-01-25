@@ -1,4 +1,5 @@
-﻿#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
 #define UNITY_2019_1_9_OR_NEWER
 #endif
 using System;
@@ -20,8 +21,6 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 
-[assembly: IgnoresAccessChecksTo("Unity.PackageManagerUI.Editor")]
-[assembly: IgnoresAccessChecksTo("UnityEditor")]
 namespace UnityEditor.PackageManager.UI.InternalBridge
 {
     public class Bridge
@@ -29,9 +28,9 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         private static Bridge instance = new Bridge();
         public static Bridge Instance { get { return instance; } }
 
-        VisualElement loadingSpinner = null;
-        VisualElement packageList = null;
-        VisualElement packageDetails = null;
+        LoadingSpinner loadingSpinner = null;
+        PackageList packageList = null;
+        PackageDetails packageDetails = null;
 
         bool reloading;
 
@@ -135,7 +134,8 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             }
             else
             {
-                Expose.FromObject(packageDetails).Call("UpdateClick");
+                packageDetails.UpdateClick();
+                // Expose.FromObject(packageDetails).Call("UpdateClick");
             }
         }
 
@@ -154,7 +154,7 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
             }
             else
             {
-                Expose.FromObject(packageDetails).Call("RemoveClick");
+                packageDetails.RemoveClick();
             }
         }
 
@@ -431,18 +431,4 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
 #endif
     }
 }
-
-
-namespace System.Runtime.CompilerServices
-{
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    public class IgnoresAccessChecksToAttribute : Attribute
-    {
-        public IgnoresAccessChecksToAttribute(string assemblyName)
-        {
-            AssemblyName = assemblyName;
-        }
-
-        public string AssemblyName { get; }
-    }
-}
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.

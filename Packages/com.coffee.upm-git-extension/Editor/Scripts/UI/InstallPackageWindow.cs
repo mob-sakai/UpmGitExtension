@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -217,3 +218,4 @@ namespace Coffee.PackageManager
         }
     }
 }
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.

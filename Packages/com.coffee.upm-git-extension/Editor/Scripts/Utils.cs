@@ -1,4 +1,5 @@
-﻿#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
 #define UNITY_2019_1_9_OR_NEWER
 #endif
 #if UNITY_2019_1_OR_NEWER
@@ -335,3 +336,5 @@ namespace UnityEditor.PackageManager.UI.InternalBridge
         }
     }
 }
+
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.

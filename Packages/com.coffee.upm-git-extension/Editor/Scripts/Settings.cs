@@ -1,4 +1,5 @@
-﻿using System.Collections;
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -57,3 +58,4 @@ namespace Coffee.PackageManager
         public Texture2D Logo { get { return EditorGUIUtility.isProSkin ? LogoLight : LogoDark; } }
     }
 }
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.

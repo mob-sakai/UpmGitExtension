@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+using UnityEngine;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
@@ -9,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System;
 using System.Diagnostics;
+using UIUtils = UnityEditor.PackageManager.UI.InternalBridge.UIUtils;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
@@ -181,3 +183,5 @@ namespace Coffee.PackageManager
         }
     }
 }
+
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.
