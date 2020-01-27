@@ -12,7 +12,7 @@ using UnityEngine.Experimental.UIElements;
 #endif
 
 
-namespace Coffee.PackageManager.Tests
+namespace Tests
 {
 	// public class UtilsTests
 	// {
