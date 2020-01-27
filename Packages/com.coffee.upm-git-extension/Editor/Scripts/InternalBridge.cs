@@ -18,6 +18,7 @@ using UnityEngine.Experimental.UIElements;
 #if !UNITY_2019_3_OR_NEWER
 using Package = UnityEditor.PackageManager.UI.Package;
 using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
+using UnityEngine;
 #endif
 
 namespace Coffee.PackageManager.UI
@@ -173,6 +174,31 @@ namespace Coffee.PackageManager.UI
 
             (PageManager.instance.GetCurrentPage() as Page).OnPackagesChanged(empty, empty, empty, updated);
         }
+
+        internal static UpmPackageVersion ToPackageVersion(this AvailableVersion self, UpmPackageVersion baseInfo)
+        {
+            var splited = ver.Split(',');
+            var semver = SemVersion.Parse(self.refNameText);
+
+            var newPInfo = JsonUtility.FromJson<PackageInfo>(JsonUtility.ToJson(baseInfo));
+            newPInfo.m_Version = self.version;
+            newPInfo.m_Git = new GitInfo("", self.refName);
+
+            var p = new UpmPackageVersion(newPInfo, false, semver, pInfo.displayName);
+
+            // Update tag.
+            PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
+            if ((semver.Major == 0 && string.IsNullOrEmpty(semver.Prerelease)) ||
+                PackageTag.Preview.ToString().Equals(semver.Prerelease.Split('.')[0], StringComparison.InvariantCultureIgnoreCase))
+                tag |= PackageTag.Preview;
+            else if (semver.IsRelease())
+                tag |= PackageTag.Release;
+
+            p.m_Tag = tag;
+            p.m_IsFullyFetched = true;
+            p.m_PackageId = string.Format("{0}@{1}#{2}", packageName, repoUrl, self.refName);
+            return p;
+        }
 #else
         internal static IEnumerable<Package> GetGitPackages()
         {
@@ -216,6 +242,22 @@ namespace Coffee.PackageManager.UI
         internal static void UpdatePackageCollection()
         {
             UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault().Collection.UpdatePackageCollection(false);
+        }
+
+        internal static PackageInfo ToPackageVersion(this AvailableVersion self, PackageInfo baseInfo)
+        {
+            var newPInfo = JsonUtility.FromJson<PackageInfo>(JsonUtility.ToJson(baseInfo));
+            newPInfo.Version = SemVersion.Parse(self.refNameText);
+    #if UNITY_2019_2_OR_NEWER
+            newPInfo.IsInstalled = false;
+    #else
+            newPInfo.IsCurrent = false;
+    #endif
+            newPInfo.IsVerified = false;
+            newPInfo.Origin = (PackageSource)99;
+            newPInfo.Info = baseInfo.Info;
+            newPInfo.PackageId = string.Format("{0}@{1}", newPInfo.Name, self.refName);
+            return newPInfo;
         }
 #endif
     }
