@@ -21,7 +21,7 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 
-namespace UnityEditor.PackageManager.UI.InternalBridge
+namespace Coffee.PackageManager.UI
 {
     public class Bridge
     {

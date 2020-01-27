@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 
-namespace Coffee.PackageManager
+namespace Coffee.PackageManager.UI
 {
     internal class InstallPackageWindow : VisualElement
     {

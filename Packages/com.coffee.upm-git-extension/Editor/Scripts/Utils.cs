@@ -15,7 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Diagnostics;
 
-namespace UnityEditor.PackageManager.UI.InternalBridge
+namespace Coffee.PackageManager.UI
 {
     public class Debug
     {

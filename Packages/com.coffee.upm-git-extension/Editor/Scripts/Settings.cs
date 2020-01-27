@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 
 
-namespace Coffee.PackageManager
+namespace Coffee.PackageManager.UI
 {
     public class Settings : ScriptableObject
     {
