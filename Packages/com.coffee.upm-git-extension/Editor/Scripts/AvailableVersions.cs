@@ -65,24 +65,33 @@ namespace Coffee.PackageManager.UI
             public AvailableVersion[] versions;
         }
 
-        public static void Clear()
+        public static void ClearAll()
         {
             instance.versions = new AvailableVersion[0];
         }
 
-        public static IEnumerable<AvailableVersion> GetVersions(string packageName)
+        public static void Clear(string packageName = null, string repoUrl = null)
         {
-            return instance.versions.Where(x => x.packageName == packageName);
+            repoUrl = string.IsNullOrEmpty(repoUrl) ? repoUrl : PackageUtils.GetRepoUrl(repoUrl);
+            instance.versions = instance.versions
+                .Where(x => string.IsNullOrEmpty(packageName) || x.packageName != packageName)
+                .Where(x => string.IsNullOrEmpty(repoUrl) || x.repoUrl != repoUrl)
+                .ToArray();
         }
 
-        public static IEnumerable<AvailableVersion> GetVersionsFromRepo(string url)
+        public static IEnumerable<AvailableVersion> GetVersions(string packageName = null, string repoUrl = null)
         {
-            url = PackageUtils.GetRepoUrl(url);
-            return instance.versions.Where(x => x.repoUrl == url);
+            repoUrl = string.IsNullOrEmpty(repoUrl) ? repoUrl : PackageUtils.GetRepoUrl(repoUrl);
+            return instance.versions
+                .Where(x => string.IsNullOrEmpty(packageName) || x.packageName == packageName)
+                .Where(x => string.IsNullOrEmpty(repoUrl) || x.repoUrl == repoUrl);
         }
 
         public static void AddVersions(IEnumerable<AvailableVersion> add)
         {
+            if (add == null || !add.Any())
+                return;
+
             var length = instance.versions.Length;
             var versions = instance.versions
                 .Union(add)
@@ -95,7 +104,7 @@ namespace Coffee.PackageManager.UI
             }
         }
 
-        public static void UpdateAvailableVersions(string packageName, string repoUrl)
+        public static void UpdateAvailableVersions(string packageName = "*", string repoUrl = "", EventHandler callback = null)
         {
             var unity = Application.unityVersion;
 #if UNITY_EDITOR_WIN
@@ -104,13 +113,13 @@ namespace Coffee.PackageManager.UI
             var node = Path.Combine(EditorApplication.applicationContentsPath, "Tools/nodejs/bin/node");
 #endif
 
-            new UnityEditor.Utils.Program(new ProcessStartInfo()
+            var psi = new ProcessStartInfo()
             {
                 FileName = node,
                 Arguments = string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs, packageName, repoUrl, unity)
-            })
-            .Start();
-            Debug.Log(kHeader, "{0} {1}", node, string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs, packageName, repoUrl, unity));
+            };
+            Debug.Log(kHeader, "{0} {1}", psi.FileName, psi.Arguments);
+            new UnityEditor.Utils.Program(psi).Start(callback);
         }
 
         static void OnResultCreated(object o, FileSystemEventArgs e)

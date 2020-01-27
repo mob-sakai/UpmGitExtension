@@ -147,20 +147,22 @@ namespace Coffee.PackageManager.UI
         /// <returns>Repo url</returns>
         public static string GetRepoUrl(string packageId, bool asHttps = false)
         {
+            if (string.IsNullOrEmpty(packageId))
+                return "";
+
             Match m = REG_PACKAGE_ID.Match(packageId);
-            if (m.Success)
+            if (!m.Success)
+                return "";
+
+            var repoUrl = m.Groups[2].Value;
+            if (asHttps)
             {
-                var repoUrl = m.Groups[2].Value;
-                if (asHttps)
-                {
-                    repoUrl = Regex.Replace(repoUrl, "(git:)?git@([^:]+):", "https://$2/");
-                    repoUrl = repoUrl.Replace("ssh://", "https://");
-                    repoUrl = repoUrl.Replace("git@", "");
-                    repoUrl = Regex.Replace(repoUrl, "\\.git$", "");
-                }
-                return repoUrl;
+                repoUrl = Regex.Replace(repoUrl, "(git:)?git@([^:]+):", "https://$2/");
+                repoUrl = repoUrl.Replace("ssh://", "https://");
+                repoUrl = repoUrl.Replace("git@", "");
+                repoUrl = Regex.Replace(repoUrl, "\\.git$", "");
             }
-            return "";
+            return repoUrl;
         }
 
         public static void SplitPackageId(string packageId, out string packageName, out string repoUrl, out string refName)

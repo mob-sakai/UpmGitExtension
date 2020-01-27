@@ -135,7 +135,6 @@ namespace Coffee.PackageManager.UI
                 findVersionsError.visible = false;
             }
 
-
             bool canInstallPackage = Phase.InstallPackage <= phase;
             packageContainer.SetEnabled(canInstallPackage);
             packageNameLabel.text = canInstallPackage ? packageNameLabel.text : "";
@@ -159,15 +158,15 @@ namespace Coffee.PackageManager.UI
         {
             SetPhase(Phase.FindVersions);
             root.SetEnabled(false);
-            AvailableVersions.UpdateAvailableVersions("*", repoUrlText.value);
-            root.SetEnabled(true);
+            AvailableVersions.Clear(repoUrl: repoUrlText.value);
+            AvailableVersions.UpdateAvailableVersions(repoUrl: repoUrlText.value, callback: (s, e)=>{
+                root.SetEnabled(true);
+            });
             SetPhase(Phase.SelectVersion);
         }
 
         void onClick_SelectVersions()
         {
-            SetPhase(Phase.SelectVersion);
-
             var menu = new GenericMenu();
             var currentRefName = versionSelectButton.text;
 
@@ -180,10 +179,9 @@ namespace Coffee.PackageManager.UI
                 SetPhase(Phase.InstallPackage);
             };
 
-            foreach (var v in AvailableVersions.GetVersionsFromRepo(repoUrlText.value).OrderByDescending(v => v.version))
+            foreach (var version in AvailableVersions.GetVersions(repoUrl: repoUrlText.value).OrderByDescending(v => v.version))
             {
-                var version = v;
-                var text = v.refNameText;
+                var text = version.refNameText;
                 menu.AddItem(new GUIContent(text), versionSelectButton.text == text, callback, version);
             }
 
