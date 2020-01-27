@@ -1,4 +1,7 @@
 #if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
+#define UNITY_2019_1_9_OR_NEWER
+#endif
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -7,9 +10,13 @@ using System.IO;
 using System.Linq;
 using System.Diagnostics;
 using System.Text;
+using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
+using UnityEditor.PackageManager;
 // using UnityEditor.PackageManager.UI.InternalBridge;
 // using Debug = UnityEditor.PackageManager.UI.InternalBridge.Debug;
-
+#if !UNITY_2019_1_9_OR_NEWER
+using Semver;
+#endif
 
 namespace Coffee.PackageManager.UI
 {
@@ -39,11 +46,59 @@ namespace Coffee.PackageManager.UI
                 + repoUrl.GetHashCode()
                 + refName.GetHashCode();
         }
+#if UNITY_2019_2_OR_NEWER
+
+        internal UpmPackageVersion ToPackageVersion(UpmPackageVersion baseInfo)
+        {
+            Debug.Log(kHeader, "[UpdatePackageVersions] version = {0}", ver);
+            var splited = ver.Split(',');
+            var semver = SemVersion.Parse(this.refNameText);
+
+            var newPInfo = JsonUtility.FromJson<PackageInfo>(JsonUtility.ToJson(baseInfo));
+            newPInfo.m_Version = this.version;
+            newPInfo.m_Git = new GitInfo("", this.refName);
+
+            var p = new UpmPackageVersion(newPInfo, false, semver, pInfo.displayName);
+
+            // Update tag.
+            PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
+            if ((semver.Major == 0 && string.IsNullOrEmpty(semver.Prerelease)) ||
+                PackageTag.Preview.ToString().Equals(semver.Prerelease.Split('.')[0], StringComparison.InvariantCultureIgnoreCase))
+                tag |= PackageTag.Preview;
+
+            else if (semver.IsRelease())
+                tag |= PackageTag.Release;
+
+            p.m_Tag = tag;
+            p.m_IsFullyFetched = true;
+            p.m_PackageId = string.Format("{0}@{1}#{2}", packageName, repoUrl, this.refName);
+            return p;
+        }
+#else
+        internal PackageInfo ToPackageVersion(PackageInfo baseInfo)
+        {
+            var newPInfo = JsonUtility.FromJson<PackageInfo>(JsonUtility.ToJson(baseInfo));
+
+            newPInfo.Version = SemVersion.Parse(this.refNameText);
+#if UNITY_2019_2_OR_NEWER
+            newPInfo.IsInstalled = false;
+#else
+            newPInfo.IsCurrent = false;
+#endif
+            newPInfo.IsVerified = false;
+            newPInfo.Origin = (PackageSource)99;
+            newPInfo.Info = baseInfo.Info;
+            newPInfo.PackageId = string.Format("{0}@{1}", newPInfo.Name, this.refName);
+            return newPInfo;
+        }
+#endif
     }
 
     public class AvailableVersions : ScriptableSingleton<AvailableVersions>
     {
-        const string kResultDir = "Library/UpmGitExtension/results";
+        const string kCacheDir = "Library/UpmGitExtension";
+        const string kPackageDir = kCacheDir + "/packages";
+        const string kResultDir = kCacheDir + "/results";
         const string kHeader = "<b><color=#c7634c>[AvailableVersions]</color></b> ";
         const string kGetVersionsJs = "Packages/com.coffee.upm-git-extension/Editor/Commands/get-available-versions.js";
 
@@ -62,6 +117,9 @@ namespace Coffee.PackageManager.UI
         {
             Debug.Log(kHeader, "Clear cached versions");
             instance.versions = new AvailableVersion[0];
+
+            if (Directory.Exists(kPackageDir))
+                Directory.Delete(kPackageDir, true);
         }
 
         public static void Clear(string packageName = null, string repoUrl = null)
@@ -102,9 +160,12 @@ namespace Coffee.PackageManager.UI
 
             if (versions.Length != length)
             {
+                Debug.Log(kHeader, "<b>DIRTY</b>");
                 instance.versions = versions;
                 OnChanged();
             }
+            else
+                Debug.Log(kHeader, "NOT DIRTY");
         }
 
         public static void UpdateAvailableVersions(string packageName = "all", string repoUrl = "", Action<bool> callback = null)
@@ -148,7 +209,6 @@ namespace Coffee.PackageManager.UI
                 File.Delete(file);
             }
         }
-
 
         [InitializeOnLoadMethod]
         static void WatchResultJson()

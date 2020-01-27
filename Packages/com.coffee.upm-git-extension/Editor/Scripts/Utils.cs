@@ -16,6 +16,11 @@ using System.IO;
 using System.Linq;
 using System.Diagnostics;
 
+#if !UNITY_2019_1_9_OR_NEWER
+using Semver;
+using UnityEditor.PackageManager;
+#endif
+
 namespace Coffee.PackageManager.UI
 {
     public static class Debug

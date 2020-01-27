@@ -108,7 +108,7 @@ namespace Coffee.PackageManager.UI
             addButton.parent.Insert(addButton.parent.IndexOf(addButton), space);
 #endif
 
-            internalBridge.UpdateGitPackageVersions();
+            internalBridge.UpdateAvailableVersionsForGitPackages();
 
             AvailableVersions.OnChanged += () =>
             {
