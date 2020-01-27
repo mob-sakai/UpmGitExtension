@@ -33,24 +33,28 @@ namespace Coffee.PackageManager.UI
                 .Any(x => x == "UGE_LOG");
         }
 
+        [Conditional("UGE_LOG")]
         static void Log(string header, string format, params object[] args)
         {
             if (logEnabled)
                 UnityEngine.Debug.LogFormat(header + format, args);
         }
 
+        [Conditional("UGE_LOG")]
         public static void Log(string header, object message)
         {
             if (logEnabled)
                 UnityEngine.Debug.Log(header + message);
         }
 
+        [Conditional("UGE_LOG")]
         static void Warning(string header, string format, params object[] args)
         {
             if (logEnabled)
                 UnityEngine.Debug.LogWarningFormat(header + format, args);
         }
 
+        [Conditional("UGE_LOG")]
         public static void Warning(string header, object message)
         {
             if (logEnabled)
@@ -175,12 +179,11 @@ namespace Coffee.PackageManager.UI
             Match m = REG_PACKAGE_ID.Match(packageId);
             packageName = m.Groups[1].Value;
             repoUrl = m.Groups[2].Value;
-            refName = m.Groups[4].Value
-                ;
+            refName = m.Groups[4].Value;
         }
     }
 
-    public static class ButtonExtension
+    public static class VisualElementExtension
     {
         public static void OverwriteCallback(this Button button, Action action)
         {
