@@ -1,45 +1,23 @@
 #if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
-using UnityEditor.PackageManager.UI.InternalBridge;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System;
-using System.Diagnostics;
-using UIUtils = UnityEditor.PackageManager.UI.InternalBridge.UIUtils;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
 using UnityEngine.Experimental.UIElements;
 #endif
 
-namespace Coffee.PackageManager
+namespace Coffee.PackageManager.UI
 {
-    public class Debug
-    {
-        [Conditional("DEBUG_UGE_DEVELOP")]
-        public static void Log(object message)
-        {
-            UnityEngine.Debug.Log(message);
-        }
-
-        [Conditional("DEBUG_UGE_DEVELOP")]
-        public static void LogFormat(string format, params object[] args)
-        {
-            UnityEngine.Debug.LogFormat(format, args);
-        }
-    }
-
     [InitializeOnLoad]
     internal class UpmGitExtension : VisualElement, IPackageManagerExtension
     {
         //################################
         // Constant or Static Members.
         //################################
+        const string kHeader = "<b><color=#c7634c>[UpmGitExtension]</color></b> ";
         static UpmGitExtension()
         {
             PackageManagerExtensions.RegisterExtension(new UpmGitExtension());
@@ -81,26 +59,7 @@ namespace Coffee.PackageManager
         public void OnPackageSelectionChange(PackageInfo packageInfo)
         {
             InitializeUI();
-            if (!initialized || packageInfo == null)
-                return;
-
-            if (packageInfo.source == PackageSource.Git)
-            {
-                // Show remove button for git package.
-                var removeButton = root.Q<Button>("remove");
-                UIUtils.SetElementDisplay(removeButton, true);
-                removeButton.SetEnabled(true);
-
-                // Show git tag.
-                var tagGit = root.Q("tag-git");
-                UIUtils.SetElementDisplay(tagGit, true);
-            }
-
-            // Show hosting service logo.
-            var host = Settings.GetHostData(packageInfo.packageId);
-            var hostButton = root.Q<Button>("hostButton");
-            hostButton.style.backgroundImage = host.Logo;
-            hostButton.visible = packageInfo.source == PackageSource.Git;
+            packageDetailsExtension?.OnPackageSelectionChange(packageInfo);
         }
 
         //################################
@@ -108,6 +67,7 @@ namespace Coffee.PackageManager
         //################################
         VisualElement root;
         bool initialized;
+        PackageDetailsExtension packageDetailsExtension;
 
         /// <summary>
         /// Initializes UI.
@@ -119,42 +79,24 @@ namespace Coffee.PackageManager
 
             initialized = true;
 
-            Debug.Log("[UpmGitExtension.InitializeUI]");
-            root = UIUtils.GetRoot(this).Q<TemplateContainer>("");
+            Debug.Log(kHeader, "[InitializeUI]");
+            root = this.GetRoot().Q<TemplateContainer>("");
 
-            Debug.Log("[UpmGitExtension.InitializeUI] Setup internal bridge:");
+            Debug.Log(kHeader, "[InitializeUI] Setup internal bridge:");
             var internalBridge = Bridge.Instance;
             internalBridge.Setup(root);
 
-            Debug.Log("[UpmGitExtension.InitializeUI] Setup host button:");
-            var hostButton = root.Q<Button>("hostButton");
-            if (hostButton == null)
-            {
-                hostButton = new Button(internalBridge.ViewRepoClick) { name = "hostButton", tooltip = "View on browser" };
-                hostButton.RemoveFromClassList("unity-button");
-                hostButton.RemoveFromClassList("button");
-                hostButton.AddToClassList("link");
-                hostButton.style.marginRight = 2;
-                hostButton.style.marginLeft = 2;
-                hostButton.style.width = 16;
-                hostButton.style.height = 16;
-                root.Q("detailVersion").parent.Add(hostButton);
-
-#if !UNITY_2019_1_OR_NEWER
-                hostButton.style.sliceBottom = 0;
-                hostButton.style.sliceTop = 0;
-                hostButton.style.sliceRight = 0;
-                hostButton.style.sliceLeft = 0;
-#endif
-            }
+            Debug.Log(kHeader, "[InitializeUI] Setup PackageDetails extension:");
+            packageDetailsExtension = new PackageDetailsExtension();
+            packageDetailsExtension.Setup(root);
 
             // Install package window.
-            Debug.Log("[UpmGitExtension.InitializeUI] Setup install window:");
+            Debug.Log(kHeader, "[InitializeUI] Setup install window:");
             var installPackageWindow = new InstallPackageWindow();
             root.Add(installPackageWindow);
 
             // Add button to open InstallPackageWindow
-            Debug.Log("[UpmGitExtension.InitializeUI] Add button to open install window:");
+            Debug.Log(kHeader, "[InitializeUI] Add button to open install window:");
             var addButton = root.Q("toolbarAddMenu") ?? root.Q("toolbarAddButton") ?? root.Q("moreAddOptionsButton");
             var gitButton = new GitButton(installPackageWindow.Open);
             addButton.parent.Insert(0, gitButton);
@@ -164,22 +106,14 @@ namespace Coffee.PackageManager
             var space = new VisualElement();
             space.style.flexGrow = 1;
             addButton.parent.Insert(addButton.parent.IndexOf(addButton), space);
-
-            Debug.Log("[UpmGitExtension.InitializeUI] Setup document actions:");
-            root.Q<Button>("viewDocumentation").OverwriteCallback(internalBridge.ViewDocClick);
-            root.Q<Button>("viewChangelog").OverwriteCallback(internalBridge.ViewChangelogClick);
-            root.Q<Button>("viewLicenses").OverwriteCallback(internalBridge.ViewLicensesClick);
 #endif
 
-            Debug.Log("[UpmGitExtension.InitializeUI] Setup update button:");
-            var updateButton = root.Q<Button>("update");
-            updateButton.OverwriteCallback(internalBridge.UpdateClick);
+            internalBridge.UpdateGitPackageVersions();
 
-            Debug.Log("[UpmGitExtension.InitializeUI] Setup remove button:");
-            var removeButton = root.Q<Button>("remove");
-            removeButton.OverwriteCallback(internalBridge.RemoveClick);
-
-            internalBridge.UpdateGitPackages();
+            AvailableVersions.OnChanged += () =>
+            {
+                Debug.Log(kHeader, "######## Available Versions Is Dirty!!!");
+            };
         }
     }
 }

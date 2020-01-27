@@ -8,6 +8,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -20,33 +22,32 @@ using UnityEngine.UIElements;
 #else
 using UnityEngine.Experimental.UIElements;
 #endif
+using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
 
 namespace Coffee.PackageManager.UI
 {
     public class Bridge
     {
+        const string kHeader = "<b><color=#c7634c>[Bridge]</color></b> ";
+
         private static Bridge instance = new Bridge();
         public static Bridge Instance { get { return instance; } }
 
-        LoadingSpinner loadingSpinner = null;
-        PackageList packageList = null;
-        PackageDetails packageDetails = null;
+        LoadingSpinner loadingSpinner;
+        PackageList packageList;
+        PackageDetails packageDetails;
 
         bool reloading;
 
-		LoadingSpinner GetLoadingSpinner () { return loadingSpinner as LoadingSpinner; }
-        PackageList GetPackageList() { return packageList as PackageList; }
-        PackageDetails GetPackageDetails() { return packageDetails as PackageDetails; }
-
 #if UNITY_2019_3_OR_NEWER
         PackageInfo GetSelectedPackage() { return GetSelectedVersion().packageInfo; }
-        UpmPackageVersion GetSelectedVersion() { return Expose.FromObject(packageDetails).Get("targetVersion").As<UpmPackageVersion>(); }
+        UpmPackageVersion GetSelectedVersion() { return packageDetails.TargetVersion; }
 #elif UNITY_2019_1_OR_NEWER
-        PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
-        PackageInfo GetSelectedVersion() { return Expose.FromObject(packageDetails).Get("TargetVersion").As<PackageInfo>(); }
+        UnityEditor.PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
+        PackageInfo GetSelectedVersion() { return packageDetails.TargetVersion; }
 #else
-        PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
-        PackageInfo GetSelectedVersion() { return Expose.FromObject(packageDetails).Get("SelectedPackage").As<PackageInfo>(); }
+        UnityEditor.PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
+        PackageInfo GetSelectedVersion() { return packageDetails.SelectedPackage; }
 #endif
 
         private Bridge() { }
@@ -56,11 +57,11 @@ namespace Coffee.PackageManager.UI
             loadingSpinner = root.Q<LoadingSpinner>();
             packageList = root.Q<PackageList>();
             packageDetails = root.Q<PackageDetails>();
-            Debug.LogFormat("[Bridge.Setup] {0}, {1}, {2},", loadingSpinner, packageList, packageDetails);
+            Debug.Log(kHeader, "[Setup] {0}, {1}, {2},", loadingSpinner, packageList, packageDetails);
 
 #if UNITY_2019_3_OR_NEWER
-            GetPackageList().onPackageListLoaded -= UpdateGitPackages;
-            GetPackageList().onPackageListLoaded += UpdateGitPackages;
+            packageList.onPackageListLoaded -= UpdateGitPackages;
+            packageList.onPackageListLoaded += UpdateGitPackages;
 
             PackageDatabase.instance.onPackagesChanged += (added, removed, _, updated) =>
             {
@@ -77,8 +78,8 @@ namespace Coffee.PackageManager.UI
                 }
             };
 #else
-            GetPackageList().OnLoaded -= UpdateGitPackages;
-            GetPackageList().OnLoaded += UpdateGitPackages;
+            packageList.OnLoaded -= UpdateGitPackageVersions;
+            packageList.OnLoaded += UpdateGitPackageVersions;
 #endif
         }
 
@@ -98,142 +99,41 @@ namespace Coffee.PackageManager.UI
 #elif UNITY_2019_1_OR_NEWER
 		static IEnumerable<Package> GetAllPackages()
         {
-			return PackageCollection.packages.Values.Distinct();
+			return UnityEditor.PackageManager.UI.PackageCollection.packages.Values.Distinct();
         }
 #else
         static IEnumerable<Package> GetAllPackages()
         {
-            var collection = PackageCollection.Instance;
+            var collection = UnityEditor.PackageManager.UI.PackageCollection.Instance;
             return collection?.LatestListPackages
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(collection.GetPackageByName)
-                .Distinct() ?? Enumerable.Empty<Package>();
+                .Distinct();
         }
 #endif
-
-        /// <summary>
-        /// On click 'Update package' callback.
-        /// </summary>
-        public void UpdateClick()
-        {
-            Debug.LogFormat("[Bridge.UpdateClick]");
-            reloading = false;
-            var selectedPackage = GetSelectedPackage();
-            if (selectedPackage.source == PackageSource.Git)
-            {
-                string packageId = selectedPackage.packageId;
-                string url = PackageUtils.GetRepoUrl(packageId);
-#if UNITY_2019_3_OR_NEWER
-                string refName = GetSelectedVersion().packageInfo.git.revision;
-#else
-                string refName = GetSelectedVersion().VersionId.Split('@')[1];
-#endif
-                PackageUtils.UninstallPackage(selectedPackage.name);
-                PackageUtils.InstallPackage(selectedPackage.name, url, refName);
-            }
-            else
-            {
-                packageDetails.UpdateClick();
-                // Expose.FromObject(packageDetails).Call("UpdateClick");
-            }
-        }
-
-        /// <summary>
-        /// On click 'Remove package' callback.
-        /// </summary>
-        public void RemoveClick()
-        {
-            Debug.LogFormat("[Bridge.UpdateClick]");
-            reloading = false;
-            Debug.LogFormat("[RemoveClick]");
-            var selectedPackage = GetSelectedPackage();
-            if (selectedPackage.source == PackageSource.Git)
-            {
-                PackageUtils.UninstallPackage(selectedPackage.name);
-            }
-            else
-            {
-                packageDetails.RemoveClick();
-            }
-        }
 
         /// <summary>
         /// Update all infomations of git packages.
         /// </summary>
-        public void UpdateGitPackages()
+        public void UpdateGitPackageVersions()
         {
-            Debug.LogFormat("[Bridge.UpdateGitPackages] reloading = {0}", reloading);
-            if (reloading)
-            {
-                reloading = false;
-                return;
-            }
-
-            // Get git packages.
-            var gitPackages = GetAllPackages()
+            // Get packages installed with git.
+            var gitPackageInfos = GetAllPackages()
 #if UNITY_2019_3_OR_NEWER
                 .Where(x => x != null && x.installedVersion != null && x.installedVersion.HasTag(PackageTag.Git))
+                .Select(x => x.installedVersion);
 #else
                 .Where(x => x != null && x.Current != null && (x.Current.Origin == PackageSource.Git || x.Current.Origin == (PackageSource)99))
-#endif
-                .ToArray();
-
-            if (gitPackages.Length == 0) return;
-
-            // Start job.
-#if UNITY_2019_3_OR_NEWER
-            HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.installedVersion.name));
-#else
-            HashSet<string> jobs = new HashSet<string>(gitPackages.Select(p => p.Current.Name));
+                .Select(x => x.Current);
 #endif
 
-            // Update
-            foreach (var p in gitPackages)
+            // Start update task.
+            foreach (var pInfo in gitPackageInfos)
             {
-                var package = p;
-#if UNITY_2019_3_OR_NEWER
-                var pInfo = p.installedVersion as UpmPackageVersion;
-                var packageName = p.name;
-                var repoUrl = PackageUtils.GetRepoUrl(pInfo.uniqueId);
-
-                // Get available branch / tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
-                GitUtils.GetRefs(pInfo.name, repoUrl, refs =>
-                {
-                    UpdatePackageVersions(package, refs);
-                    jobs.Remove(packageName);
-                    if (jobs.Count == 0)
-                    {
-                        // StopSpinner();
-                        reloading = true;
-                        UpdatePackageCollection();
-                        reloading = false;
-                    }
-                });
-#else
-                var pInfo = p.Current;
-                pInfo.IsLatest = false;
-                Debug.LogFormat("[UpdateGitPackages] packageName = {0}", pInfo.Name);
-
                 var packageName = pInfo.Name;
-                pInfo.Origin = (PackageSource)99;
-                var json = JsonUtility.ToJson(pInfo);
                 var repoUrl = PackageUtils.GetRepoUrl(pInfo.PackageId);
-
-                // Get available branch/tag names with package version. (e.g. "refs/tags/1.1.0,1.1.0")
-                GitUtils.GetRefs(pInfo.Name, repoUrl, refs =>
-                {
-                    UpdatePackageVersions(package, refs);
-                    jobs.Remove(packageName);
-                    if (jobs.Count == 0)
-                    {
-                        // StopSpinner();
-                        reloading = true;
-                        UpdatePackageCollection();
-                        reloading = false;
-                    }
-                });
-#endif
+                AvailableVersions.UpdateAvailableVersions(pInfo.Name, repoUrl);
             }
         }
 
@@ -249,19 +149,19 @@ namespace Coffee.PackageManager.UI
             string packageName, repoUrl, installedRefName;
             PackageUtils.SplitPackageId(pInfo.uniqueId, out packageName, out repoUrl, out installedRefName);
 
-            Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}, current = {2}", package.name, versions.Count(), pInfo.version);
+            Debug.Log(kHeader, "[UpdatePackageVersions] packageName = {0}, count = {1}, current = {2}", package.name, versions.Count(), pInfo.version);
             var versionInfos = versions
                 .Select(ver =>
                 {
-                    Debug.LogFormat("[UpdatePackageVersions] version = {0}", ver);
+                    Debug.Log(kHeader, "[UpdatePackageVersions] version = {0}", ver);
                     var splited = ver.Split(',');
                     var refName = splited[0];
                     var version = splited[1];
                     var semver = SemVersion.Parse(version == refName ? version : version + "-" + refName);
 
                     var info = JsonUtility.FromJson<PackageInfo>(json);
-                    Expose.FromObject(info).Set("m_Version", version);
-                    Expose.FromObject(info).Set("m_Git", new GitInfo("", refName));
+                    info.m_Version = version;
+                    info.m_Git = new GitInfo("", refName);
 
                     var p = new UpmPackageVersion(info, false, semver, pInfo.displayName);
 
@@ -282,10 +182,9 @@ namespace Coffee.PackageManager.UI
                             tag |= PackageTag.Preview;
                     }
 
-                    Expose.FromObject(p).Set("m_Tag", tag);
-                    Expose.FromObject(p).Set("m_IsFullyFetched", true);
-                    Expose.FromObject(p).Set("m_PackageId", string.Format("{0}@{1}#{2}", packageName, repoUrl, semver));
-
+                    p.m_Tag = tag;
+                    p.m_IsFullyFetched = true;
+                    m_PackageId = string.Format("{0}@{1}#{2}", packageName, repoUrl, semver);
                     return p;
                 })
                 .Concat(new[] { pInfo })
@@ -301,30 +200,26 @@ namespace Coffee.PackageManager.UI
                     .LastOrDefault();
                 if(latest != null)
                 {
-                    var tag = Expose.FromObject(latest).Get("m_Tag").As<PackageTag>();
-                    tag |= PackageTag.Verified;
-                    Expose.FromObject(latest).Set("m_Tag", tag);
+                    latest.m_Tag |= PackageTag.Verified;
                 }
 
                 // Unlock version tag.
-                var t = Expose.FromObject(pInfo).Get("m_Tag").As<PackageTag>();
-                Expose.FromObject(pInfo).Set("m_Tag", t & ~PackageTag.VersionLocked);
-
-                Debug.LogFormat("[UpdatePackageVersions] package source changing");
+                pInfo.m_Tag = pInfo.m_Tag & ~PackageTag.VersionLocked;
+                Debug.Log(kHeader, "[UpdatePackageVersions] package source changing");
                 package.UpdateVersions(versionInfos);
             }
         }
 
         void UpdatePackageCollection()
         {
-            Debug.LogFormat("[UpdatePackageCollection]");
+            Debug.Log(kHeader, "[UpdatePackageCollection]");
             var empty = Enumerable.Empty<IPackage>();
             var updated = GetAllPackages()
                 .Where(x => x != null && x.installedVersion != null && x.installedVersion.HasTag(PackageTag.Git));
 
             foreach (var p in updated)
             {
-                Debug.LogFormat("  -> {0}, {1}", p.name, p.installedVersion.version);
+                Debug.Log(kHeader, "  -> {0}, {1}", p.name, p.installedVersion.version);
             }
 
             (PageManager.instance.GetCurrentPage() as Page).OnPackagesChanged(empty, empty, empty, updated);
@@ -332,7 +227,7 @@ namespace Coffee.PackageManager.UI
 #else
         void UpdatePackageVersions(Package package, IEnumerable<string> versions)
         {
-            Debug.LogFormat("[UpdatePackageVersions] packageName = {0}, count = {1}", package.Current.Name, versions.Count());
+            Debug.Log(kHeader, "[UpdatePackageVersions] packageName = {0}, count = {1}", package.Current.Name, versions.Count());
             var pInfo = package.Current;
             var json = JsonUtility.ToJson(pInfo);
             var versionInfos = versions
@@ -341,13 +236,14 @@ namespace Coffee.PackageManager.UI
                     var splited = ver.Split(',');
                     var refName = splited[0];
                     var version = splited[1];
-                    var newPInfo = JsonUtility.FromJson(json, typeof(PackageInfo)) as PackageInfo;
+                    var newPInfo = JsonUtility.FromJson<PackageInfo>(json);
 
                     newPInfo.Version = SemVersion.Parse(version == refName ? version : version + "-" + refName);
-
-                    var exPackageInfo = Expose.FromObject(newPInfo);
-					var memberName = 0 < Application.unityVersion.CompareTo("2019.2") ? "IsInstalled" : "IsCurrent";
-					exPackageInfo.Set(memberName, false);
+                #if UNITY_2019_2_OR_NEWER
+                    newPInfo.IsInstalled = false;
+                #else
+                    newPInfo.IsCurrent = false;
+                #endif
 
                     newPInfo.IsVerified = false;
                     newPInfo.Origin = (PackageSource)99;
@@ -361,72 +257,17 @@ namespace Coffee.PackageManager.UI
 
             if (0 < versionInfos.Length)
             {
-                Debug.LogFormat("[UpdatePackageVersions] package source changing");
+                Debug.Log(kHeader, "[UpdatePackageVersions] package source changing");
                 versionInfos.OrderBy(v => v.Version).Last().IsLatest = true;
-                Expose.FromObject(package).Set("source", versionInfos);
+                package.source = versionInfos;
             }
         }
 
         void UpdatePackageCollection()
         {
-            Debug.LogFormat("[UpdatePackageCollection]");
+            Debug.Log(kHeader, "[UpdatePackageCollection]");
             var packageWindow = UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault();
             packageWindow.Collection.UpdatePackageCollection(false);
-        }
-#endif
-
-#if UNITY_2018
-        public void ViewDocClick()
-        {
-            var packageInfo = GetSelectedPackage();
-            if (packageInfo.source == PackageSource.Git)
-            {
-                var docsFolder = Path.Combine(packageInfo.resolvedPath, "Documentation~");
-                if (!Directory.Exists(docsFolder))
-                    docsFolder = Path.Combine(packageInfo.resolvedPath, "Documentation");
-                if (Directory.Exists(docsFolder))
-                {
-                    var mdFiles = Directory.GetFiles(docsFolder, "*.md", SearchOption.TopDirectoryOnly);
-                    var docsMd = mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "index.md")
-                        ?? mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "tableofcontents.md") ?? mdFiles.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(docsMd))
-                    {
-                        Application.OpenURL(new Uri(docsMd).AbsoluteUri);
-                        return;
-                    }
-                }
-            }
-            Expose.FromObject(GetPackageDetails()).Call("ViewDocClick");
-        }
-
-        public void ViewChangelogClick()
-        {
-            var packageInfo = GetSelectedPackage();
-            if (packageInfo.source == PackageSource.Git)
-            {
-                var changelogFile = Path.Combine(packageInfo.resolvedPath, "CHANGELOG.md");
-                if (File.Exists(changelogFile))
-                {
-                    Application.OpenURL(new Uri(changelogFile).AbsoluteUri);
-                    return;
-                }
-            }
-            Expose.FromObject(GetPackageDetails()).Call("ViewChangelogClick");
-        }
-
-        public void ViewLicensesClick()
-        {
-            var packageInfo = GetSelectedPackage();
-            if (packageInfo.source == PackageSource.Git)
-            {
-                var licenseFile = Path.Combine(packageInfo.resolvedPath, "LICENSE.md");
-                if (File.Exists(licenseFile))
-                {
-                    Application.OpenURL(new Uri(licenseFile).AbsoluteUri);
-                    return;
-                }
-            }
-            Expose.FromObject(GetPackageDetails()).Call("ViewLicensesClick");
         }
 #endif
     }
