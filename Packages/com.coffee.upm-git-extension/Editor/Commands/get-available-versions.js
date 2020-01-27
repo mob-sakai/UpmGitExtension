@@ -43,7 +43,10 @@ const IsSupported = (version, unityVersion) => {
   const regVersion = /^(\d+)\.(\d+)\.(\d+)(.*)$/;
   const v = version.match(regVersion);
   const uv = unityVersion.match(regVersion);
-  return v[1] <= uv[1] && v[2] <= uv[2] && v[3] <= uv[3] && v[4] <= uv[4];
+  if (v[1] != uv[1]) return v[1] < uv[1];
+  if (v[2] != uv[2]) return v[2] < uv[2];
+  if (v[3] != uv[3]) return v[3] < uv[3];
+  return v[4] <= uv[4];
 };
 
 const parseRef = text => {
@@ -78,6 +81,7 @@ const parseRef = text => {
     //
     return { packageName: p.name, repoUrl, version: p.version, refName };
   } catch (e) {
+    console.error(e);
     return undefined;
   }
 };
