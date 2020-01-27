@@ -34,10 +34,10 @@ namespace Coffee.PackageManager.UI
         public void Setup(VisualElement root)
         {
             this.root = root;
-            this.packageDetails = root.Q<PackageDetails>();
+            packageDetails = root.Q<PackageDetails>();
 
             Debug.Log(kHeader, "[InitializeUI] Setup host button:");
-            var hostButton = root.Q<Button>("hostButton");
+            var hostButton = packageDetails.Q<Button>("hostButton");
             if (hostButton == null)
             {
                 hostButton = new Button(ViewRepoClick) { name = "hostButton", tooltip = "View on browser" };
@@ -61,17 +61,17 @@ namespace Coffee.PackageManager.UI
 
 #if UNITY_2018
             Debug.Log(kHeader, "[InitializeUI] Setup document actions:");
-            root.Q<Button>("viewDocumentation").OverwriteCallback(ViewDocClick);
-            root.Q<Button>("viewChangelog").OverwriteCallback(ViewChangelogClick);
-            root.Q<Button>("viewLicenses").OverwriteCallback(ViewLicensesClick);
+            packageDetails.Q<Button>("viewDocumentation").OverwriteCallback(ViewDocClick);
+            packageDetails.Q<Button>("viewChangelog").OverwriteCallback(ViewChangelogClick);
+            packageDetails.Q<Button>("viewLicenses").OverwriteCallback(ViewLicensesClick);
 #endif
 
             Debug.Log(kHeader, "[InitializeUI] Setup update button:");
-            var updateButton = root.Q<Button>("update");
+            var updateButton = packageDetails.Q<Button>("update");
             updateButton.OverwriteCallback(UpdateClick);
 
             Debug.Log(kHeader, "[InitializeUI] Setup remove button:");
-            var removeButton = root.Q<Button>("remove");
+            var removeButton = packageDetails.Q<Button>("remove");
             removeButton.OverwriteCallback(RemoveClick);
         }
 
@@ -85,6 +85,7 @@ namespace Coffee.PackageManager.UI
             if (packageInfo == null)
                 return;
 
+            Debug.Log(kHeader, $"OnPackageSelectionChange {packageInfo.packageId}");
             if (packageInfo.source == PackageSource.Git)
             {
                 // Show remove button for git package.
@@ -98,10 +99,12 @@ namespace Coffee.PackageManager.UI
             }
 
             // Show hosting service logo.
-            var host = Settings.GetHostData(packageInfo.packageId);
             var hostButton = root.Q<Button>("hostButton");
-            hostButton.style.backgroundImage = host.Logo;
-            hostButton.visible = packageInfo.source == PackageSource.Git;
+            if (hostButton != null)
+            {
+                hostButton.style.backgroundImage = GetHostLogo(packageInfo.packageId);
+                hostButton.visible = packageInfo.source == PackageSource.Git;
+            }
         }
 
 
@@ -121,6 +124,26 @@ namespace Coffee.PackageManager.UI
         UnityEditor.PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
         UnityEditor.PackageManager.UI.PackageInfo GetSelectedVersion() { return packageDetails.SelectedPackage; }
 #endif
+
+        /// <summary>
+        /// Get host logo.
+        /// </summary>
+        public Texture2D GetHostLogo(string packageId)
+        {
+            const string packageDir = "Packages/com.coffee.upm-git-extension/Editor/Resources/Logos/";
+            if (packageId.Contains("github.com"))
+                return EditorGUIUtility.isProSkin
+                    ? AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Light.png") as Texture2D
+                    : AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Dark.png") as Texture2D;
+            else if (packageId.Contains("bitbucket.com"))
+                return AssetDatabase.LoadMainAssetAtPath(packageDir + "Bitbucket-Logo-Dark.png") as Texture2D;
+            else if (packageId.Contains("gitlab."))
+                return AssetDatabase.LoadMainAssetAtPath(packageDir + "GitLab-Logo-Dark.png") as Texture2D;
+
+            return EditorGUIUtility.isProSkin
+                ? EditorGUIUtility.FindTexture("buildsettings.web.small")
+                : EditorGUIUtility.FindTexture("d_buildsettings.web.small");
+        }
 
         /// <summary>
         /// On click 'Update package' callback.
