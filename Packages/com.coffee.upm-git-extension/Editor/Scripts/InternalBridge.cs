@@ -84,11 +84,10 @@ namespace Coffee.PackageManager.UI
             }
         }
 
-        [MenuItem("UpmGitExtensions/UpdateGitPackageVersions")]
         /// <summary>
         /// Update all infomations of git packages.
         /// </summary>
-        static void UpdateGitPackageVersions()
+        public static void UpdateGitPackageVersions()
         {
             bool changed = false;
             // Start update task.
@@ -164,7 +163,6 @@ namespace Coffee.PackageManager.UI
         {
             self.m_Tag = self.m_Tag & ~PackageTag.VersionLocked;
         }
-
 
         internal static void UpdatePackageCollection()
         {

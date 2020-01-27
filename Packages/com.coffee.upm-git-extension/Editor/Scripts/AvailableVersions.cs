@@ -59,7 +59,6 @@ namespace Coffee.PackageManager.UI
             public AvailableVersion[] versions;
         }
 
-        [MenuItem("UpmGitExtensions/Clear Cached Versions")]
         public static void ClearAll()
         {
             Debug.Log(kHeader, "Clear cached versions");
@@ -84,7 +83,9 @@ namespace Coffee.PackageManager.UI
                 .Where(x => string.IsNullOrEmpty(repoUrl) || x.repoUrl == repoUrl);
         }
 
-        [MenuItem("UpmGitExtensions/Dump Cached Versions")]
+#if UGE_DEV
+        [MenuItem("UpmGitExtension/Dump Cached Versions")]
+#endif
         public static void Dump()
         {
             var sb = new StringBuilder("[AvailableVersions] Dump:\n");

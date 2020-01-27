@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor;
 
 namespace Coffee.UpmGitExtension.Dev
@@ -35,6 +36,22 @@ namespace Coffee.UpmGitExtension.Dev
         {
             Menu.SetChecked(kEnableLoggingText, HasSymbol(kEnableLoggingSymbol));
             return true;
+        }
+
+        [MenuItem("UpmGitExtension/Update Git Package Versions")]
+        static void UpdateGitPackageVersions()
+        {
+            Type.GetType("Coffee.PackageManager.UI.Bridge, Coffee.UpmGitExtension.Editor")
+                .GetMethod("UpdateGitPackageVersions")
+                .Invoke(null, new object[0]);
+        }
+
+        [MenuItem("UpmGitExtension/Clear Cached Versions")]
+        static void ClearCachedVersions()
+        {
+            Type.GetType("Coffee.PackageManager.UI.AvailableVersions, Coffee.UpmGitExtension.Editor")
+                .GetMethod("ClearAll")
+                .Invoke(null, new object[0]);
         }
 
         static string[] GetSymbols()
