@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.PackageManager;
-using UnityEditor.PackageManager.UI.InternalBridge;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -105,7 +105,8 @@ namespace Coffee.PackageManager.UI
         readonly Button versionSelectButton;
         readonly Label packageNameLabel;
         readonly TextField repoUrlText;
-        IEnumerable<string> versions = new string[0];
+        // IEnumerable<string> versions = new string[0];
+        IEnumerable<AvailableVersion> versions = new AvailableVersion[0];
         string refName = "";
 
         enum Phase
@@ -158,17 +159,9 @@ namespace Coffee.PackageManager.UI
         {
             SetPhase(Phase.FindVersions);
             root.SetEnabled(false);
-            GitUtils.GetRefs("", repoUrlText.value, refs =>
-           {
-               root.SetEnabled(true);
-               bool hasError = !refs.Any();
-               findVersionsError.visible = hasError;
-               if (!hasError)
-               {
-                   versions = refs;
-                   SetPhase(Phase.SelectVersion);
-               }
-           });
+            AvailableVersions.UpdateAvailableVersions("*", repoUrlText.value);
+            root.SetEnabled(true);
+            SetPhase(Phase.SelectVersion);
         }
 
         void onClick_SelectVersions()
@@ -178,27 +171,20 @@ namespace Coffee.PackageManager.UI
             var menu = new GenericMenu();
             var currentRefName = versionSelectButton.text;
 
-            GenericMenu.MenuFunction2 callback = (x) =>
+            GenericMenu.MenuFunction2 callback = (v) =>
             {
-                var splited = x as string[];
-                versionSelectButton.text = splited[0];
-                packageNameLabel.text = splited[1];
-                refName = splited[2];
+                var version = v as AvailableVersion;
+                versionSelectButton.text = version.refNameText;
+                packageNameLabel.text = version.packageName;
+                refName = version.refName;
                 SetPhase(Phase.InstallPackage);
             };
 
-            var orderdVers = versions
-                .OrderByDescending(x => x.Split(',')[1]).ToArray();
-
-            foreach (var t in orderdVers)
+            foreach (var v in AvailableVersions.GetVersionsFromRepo(repoUrlText.value).OrderByDescending(v => v.version))
             {
-                var splited = t.Split(',');
-                var refName = splited[0];
-                var version = splited[1];
-                var packageName = splited[2];
-                var text = version == refName ? version : version + " - " + refName;
-                var packageId = string.Format("{0}@{1}#{2}", packageName, PackageUtils.GetRepoUrl(repoUrlText.value), refName);
-                menu.AddItem(new GUIContent(text), currentRefName == text, callback, new[] { text, packageName, refName });
+                var version = v;
+                var text = v.refNameText;
+                menu.AddItem(new GUIContent(text), versionSelectButton.text == text, callback, version);
             }
 
             menu.DropDown(versionSelectButton.worldBound);
