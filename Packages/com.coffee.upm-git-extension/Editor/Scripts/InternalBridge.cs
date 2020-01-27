@@ -233,8 +233,7 @@ namespace Coffee.UpmGitExtension
         internal static void UpdateVersions(this Package self, IEnumerable<PackageInfo> versions)
         {
             versions.OrderBy(v => v.GetVersion()).Last().IsLatest = true;
-            self.source = versions;
-            self.UpdateSource(versions);
+            self.Set("source", versions);
         }
 
         internal static void UpdatePackageCollection()
@@ -245,7 +244,7 @@ namespace Coffee.UpmGitExtension
         internal static PackageInfo ToPackageVersion(this AvailableVersion self, PackageInfo baseInfo)
         {
             var newPInfo = JsonUtility.FromJson<PackageInfo>(JsonUtility.ToJson(baseInfo));
-            newPInfo.Version = SemVersion.Parse(self.refNameText);
+            newPInfo.Version = SemVersion.Parse(self.refNameVersion);
     #if UNITY_2019_2_OR_NEWER
             newPInfo.IsInstalled = false;
     #else

@@ -22,6 +22,7 @@ namespace Coffee.UpmGitExtension
         public string repoUrl = "";
 
         public string refNameText { get { return version == refName ? version : version + " - " + refName; } }
+        public string refNameVersion { get { return version == refName ? version : version + "-" + refName; } }
 
         bool IEquatable<AvailableVersion>.Equals(AvailableVersion other)
         {
