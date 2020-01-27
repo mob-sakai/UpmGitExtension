@@ -1,0 +1,15 @@
+{
+  "name": "release-to-upm",
+  "description": "To release upm package. do `npm run release`.",
+  "version": "1.0.0",
+  "devDependencies": {
+    "git-snapshot": "^2.2.0",
+    "@semantic-release/changelog": "^4.0.0",
+    "@semantic-release/git": "^8.0.0",
+    "@semantic-release/exec": "^4.0.0",
+    "semantic-release": "^16.0.0"
+  },
+  "scripts": {
+    "release": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release --dry-run --no-ci --debug"
+  }
+}
