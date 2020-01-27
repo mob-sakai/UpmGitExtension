@@ -57,7 +57,7 @@ const parseRef = text => {
     const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
     // Check package name.
-    if (packageName != "*" && p.name != packageName) {
+    if (packageName != "all" && p.name != packageName) {
       console.error(
         `error: '${p.name}' is not target package '${packageName}'.`
       );

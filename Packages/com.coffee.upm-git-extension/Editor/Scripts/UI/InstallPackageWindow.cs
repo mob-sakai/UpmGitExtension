@@ -33,7 +33,6 @@ namespace Coffee.PackageManager.UI
         //################################
         public InstallPackageWindow()
         {
-            UIUtils.SetElementDisplay(this, false);
             VisualTreeAsset asset = EditorGUIUtility.Load(TemplatePath) as VisualTreeAsset;
 
 #if UNITY_2019_1_OR_NEWER
@@ -82,13 +81,12 @@ namespace Coffee.PackageManager.UI
             // Controll container
             closeButton.clickable.clicked += onClick_Close;
 
-            SetPhase(Phase.InputRepoUrl);
+            onClick_Close();
         }
 
         public void Open()
         {
             UIUtils.SetElementDisplay(this, true);
-            SetPhase(Phase.InputRepoUrl);
         }
 
         //################################
@@ -105,81 +103,74 @@ namespace Coffee.PackageManager.UI
         readonly Button versionSelectButton;
         readonly Label packageNameLabel;
         readonly TextField repoUrlText;
-        // IEnumerable<string> versions = new string[0];
         IEnumerable<AvailableVersion> versions = new AvailableVersion[0];
-        string refName = "";
+        AvailableVersion currentVersion = null;
 
-        enum Phase
+        void EnableVersionContainer(bool flag)
         {
-            InputRepoUrl,
-            FindVersions,
-            SelectVersion,
-            FindPackage,
-            InstallPackage,
+            versionContainer.SetEnabled(flag);
+            versionSelectButton.SetEnabled(flag);
+            versionSelectButton.text = "-- Select package version --";
         }
 
-        void SetPhase(Phase phase)
+        void EnablePackageContainer(bool flag, string name = "")
         {
-            bool canFindVersions = Phase.FindVersions <= phase;
-            repoUrlText.value = canFindVersions ? repoUrlText.value : "";
-            findVersionsButton.SetEnabled(canFindVersions);
-            if (phase == Phase.FindVersions)
-                repoUrlText.Focus();
-
-            bool canSelectVersion = Phase.SelectVersion <= phase;
-            versionContainer.SetEnabled(canSelectVersion);
-            versionSelectButton.SetEnabled(canSelectVersion);
-            versionSelectButton.text = canSelectVersion ? versionSelectButton.text : "-- Select package version --";
-            if (canSelectVersion)
-            {
-                findVersionsError.visible = false;
-            }
-
-            bool canInstallPackage = Phase.InstallPackage <= phase;
-            packageContainer.SetEnabled(canInstallPackage);
-            packageNameLabel.text = canInstallPackage ? packageNameLabel.text : "";
-            if (canInstallPackage || phase == Phase.InputRepoUrl)
-            {
-                findVersionsError.visible = false;
-            }
+            packageContainer.SetEnabled(flag);
+            installPackageButton.SetEnabled(flag);
+            packageNameLabel.text = name;
         }
 
         void onClick_Close()
         {
             UIUtils.SetElementDisplay(this, false);
+
+            repoUrlText.value = "";
+            findVersionsButton.SetEnabled(false);
+
+            EnableVersionContainer(false);
+            EnablePackageContainer(false);
         }
 
         void onChange_RepoUrl(string url)
         {
-            SetPhase(string.IsNullOrEmpty(url) ? Phase.InputRepoUrl : Phase.FindVersions);
+            var valid = !string.IsNullOrEmpty(url);
+            findVersionsButton.SetEnabled(valid);
+
+            EnableVersionContainer(false);
+            EnablePackageContainer(false);
+
+            findVersionsError.visible = false;
+            currentVersion = null;
         }
 
         void onClick_FindVersions()
         {
-            SetPhase(Phase.FindVersions);
             root.SetEnabled(false);
-            AvailableVersions.Clear(repoUrl: repoUrlText.value);
-            AvailableVersions.UpdateAvailableVersions(repoUrl: repoUrlText.value, callback: (s, e)=>{
+            EnableVersionContainer(false);
+
+            var repoUrl = GetRepoUrl(repoUrlText.value);
+            AvailableVersions.Clear(repoUrl: repoUrl);
+            AvailableVersions.UpdateAvailableVersions(repoUrl: repoUrl, callback: success =>
+            {
                 root.SetEnabled(true);
+                EnableVersionContainer(success);
+                findVersionsError.visible = !success;
             });
-            SetPhase(Phase.SelectVersion);
         }
 
         void onClick_SelectVersions()
         {
             var menu = new GenericMenu();
-            var currentRefName = versionSelectButton.text;
-
             GenericMenu.MenuFunction2 callback = (v) =>
             {
                 var version = v as AvailableVersion;
+                currentVersion = version;
                 versionSelectButton.text = version.refNameText;
-                packageNameLabel.text = version.packageName;
-                refName = version.refName;
-                SetPhase(Phase.InstallPackage);
+                EnablePackageContainer(true, version.packageName);
             };
 
-            foreach (var version in AvailableVersions.GetVersions(repoUrl: repoUrlText.value).OrderByDescending(v => v.version))
+            var repoUrl = GetRepoUrl(repoUrlText.value);
+            foreach (var version in AvailableVersions.GetVersions(repoUrl: repoUrl).OrderByDescending(v => v.version))
             {
                 var text = version.refNameText;
                 menu.AddItem(new GUIContent(text), versionSelectButton.text == text, callback, version);
@@ -190,7 +181,7 @@ namespace Coffee.PackageManager.UI
 
         void onClick_InstallPackage()
         {
-            PackageUtils.InstallPackage(packageNameLabel.text, GetRepoUrl(repoUrlText.value), refName);
+            PackageUtils.InstallPackage(currentVersion.packageName, currentVersion.repoUrl, currentVersion.refName);
             onClick_Close();
         }
 

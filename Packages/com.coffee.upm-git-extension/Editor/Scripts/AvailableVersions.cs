@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Diagnostics;
+using System.Text;
 // using UnityEditor.PackageManager.UI.InternalBridge;
 // using Debug = UnityEditor.PackageManager.UI.InternalBridge.Debug;
 
@@ -13,7 +14,7 @@ using System.Diagnostics;
 namespace Coffee.PackageManager.UI
 {
     [Serializable]
-    public class AvailableVersion : IEquatable<AvailableVersion>, ISerializationCallbackReceiver
+    public class AvailableVersion : IEquatable<AvailableVersion>
     {
         public string packageName = "";
         public string version = "";
@@ -38,15 +39,6 @@ namespace Coffee.PackageManager.UI
                 + repoUrl.GetHashCode()
                 + refName.GetHashCode();
         }
-
-        public void OnBeforeSerialize()
-        {
-        }
-
-        public void OnAfterDeserialize()
-        {
-            repoUrl = PackageUtils.GetRepoUrl(repoUrl);
-        }
     }
 
     public class AvailableVersions : ScriptableSingleton<AvailableVersions>
@@ -65,14 +57,15 @@ namespace Coffee.PackageManager.UI
             public AvailableVersion[] versions;
         }
 
+        [MenuItem("UpmGitExtensions/Clear Cached Versions")]
         public static void ClearAll()
         {
+            Debug.Log(kHeader, "Clear cached versions");
             instance.versions = new AvailableVersion[0];
         }
 
         public static void Clear(string packageName = null, string repoUrl = null)
         {
-            repoUrl = string.IsNullOrEmpty(repoUrl) ? repoUrl : PackageUtils.GetRepoUrl(repoUrl);
             instance.versions = instance.versions
                 .Where(x => string.IsNullOrEmpty(packageName) || x.packageName != packageName)
                 .Where(x => string.IsNullOrEmpty(repoUrl) || x.repoUrl != repoUrl)
@@ -81,10 +74,20 @@ namespace Coffee.PackageManager.UI
 
         public static IEnumerable<AvailableVersion> GetVersions(string packageName = null, string repoUrl = null)
         {
-            repoUrl = string.IsNullOrEmpty(repoUrl) ? repoUrl : PackageUtils.GetRepoUrl(repoUrl);
             return instance.versions
                 .Where(x => string.IsNullOrEmpty(packageName) || x.packageName == packageName)
                 .Where(x => string.IsNullOrEmpty(repoUrl) || x.repoUrl == repoUrl);
+        }
+
+        [MenuItem("UpmGitExtensions/Dump Cached Versions")]
+        public static void Dump()
+        {
+            var sb = new StringBuilder("[AvailableVersions] Dump:\n");
+            foreach(var v in instance.versions.OrderBy(x=>x.packageName).ThenBy(x=>x.version))
+            {
+                sb.AppendLine(JsonUtility.ToJson(v));
+            }
+            Debug.Log(kHeader, sb);
         }
 
         public static void AddVersions(IEnumerable<AvailableVersion> add)
@@ -104,7 +107,7 @@ namespace Coffee.PackageManager.UI
             }
         }
 
-        public static void UpdateAvailableVersions(string packageName = "*", string repoUrl = "", EventHandler callback = null)
+        public static void UpdateAvailableVersions(string packageName = "all", string repoUrl = "", Action<bool> callback = null)
         {
             var unity = Application.unityVersion;
 #if UNITY_EDITOR_WIN
@@ -119,7 +122,12 @@ namespace Coffee.PackageManager.UI
                 Arguments = string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs, packageName, repoUrl, unity)
             };
             Debug.Log(kHeader, "{0} {1}", psi.FileName, psi.Arguments);
-            new UnityEditor.Utils.Program(psi).Start(callback);
+
+            var p = new UnityEditor.Utils.Program(psi);
+            if (callback != null)
+                p.Start((_, __) => callback(p._process.ExitCode == 0));
+            else
+                p.Start();
         }
 
         static void OnResultCreated(object o, FileSystemEventArgs e)
