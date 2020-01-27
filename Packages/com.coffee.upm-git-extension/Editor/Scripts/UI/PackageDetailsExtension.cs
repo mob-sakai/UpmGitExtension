@@ -1,10 +1,10 @@
 #if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
-using System.Collections.Generic;
+using System;
+using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.PackageManager;
-// using UnityEditor.PackageManager.UI.InternalBridge;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -12,14 +12,8 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
-// using Debug = UnityEditor.PackageManager.UI.InternalBridge.Debug;
-using UnityEditor.PackageManager.UI;
-using System.IO;
-using System;
-// using UIUtils = UnityEditor.PackageManager.UI.InternalBridge.UIUtils;
-// using UIUtils = UnityEditor.PackageManager.UI.UIUtils;
 
-namespace Coffee.PackageManager.UI
+namespace Coffee.UpmGitExtension
 {
     internal class PackageDetailsExtension
     {
@@ -115,13 +109,13 @@ namespace Coffee.PackageManager.UI
         PackageDetails packageDetails;
 
 #if UNITY_2019_3_OR_NEWER
-        UnityEditor.PackageInfo GetSelectedPackage() { return GetSelectedVersion().packageInfo; }
+        PackageInfo GetSelectedPackage() { return GetSelectedVersion().packageInfo; }
         UpmPackageVersion GetSelectedVersion() { return packageDetails.TargetVersion; }
 #elif UNITY_2019_1_OR_NEWER
-        UnityEditor.PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
+        PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
         UnityEditor.PackageManager.UI.PackageInfo GetSelectedVersion() { return packageDetails.TargetVersion; }
 #else
-        UnityEditor.PackageManager.PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
+        PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
         UnityEditor.PackageManager.UI.PackageInfo GetSelectedVersion() { return packageDetails.SelectedPackage; }
 #endif
 

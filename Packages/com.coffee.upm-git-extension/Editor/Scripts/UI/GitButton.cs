@@ -8,7 +8,7 @@ using UnityEngine.Experimental.UIElements;
 using UnityEditor.Experimental.UIElements;
 #endif
 
-namespace Coffee.PackageManager
+namespace Coffee.UpmGitExtension
 {
     internal class GitButton : ToolbarButton
     {

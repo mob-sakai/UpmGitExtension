@@ -4,26 +4,26 @@
 #endif
 using System.Linq;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
-#if !UNITY_2019_1_9_OR_NEWER
-using Semver;
-#endif
+using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #else
 using UnityEngine.Experimental.UIElements;
 #endif
+#if !UNITY_2019_1_9_OR_NEWER
+using Semver;
+#endif
 #if !UNITY_2019_3_OR_NEWER
 using Package = UnityEditor.PackageManager.UI.Package;
 using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
-using UnityEngine;
+using PackageCollection = UnityEditor.PackageManager.UI.PackageCollection;
 #endif
 
-namespace Coffee.PackageManager.UI
+namespace Coffee.UpmGitExtension
 {
-    public class Bridge
+    internal class Bridge
     {
         const string kHeader = "<b><color=#c7634c>[Bridge]</color></b> ";
 
@@ -200,11 +200,11 @@ namespace Coffee.PackageManager.UI
 #else
         internal static IEnumerable<Package> GetGitPackages()
         {
-        #if UNITY_2019_1_OR_NEWER
-            return UnityEditor.PackageManager.UI.PackageCollection.packages.Values
-        #else
-            return UnityEditor.PackageManager.UI.PackageCollection.Instance.packages.Values
-        #endif
+    #if UNITY_2019_1_OR_NEWER
+            return PackageCollection.packages.Values
+    #else
+            return PackageCollection.Instance.packages.Values
+    #endif
                 .Distinct()
                 .Where(x => x != null && x.Current != null && (x.Current.Origin == PackageSource.Git || x.Current.Origin == (PackageSource)99));
         }
@@ -214,23 +214,23 @@ namespace Coffee.PackageManager.UI
             return GetGitPackages().Select(x => x.Current);
         }
 
-        internal static UnityEditor.PackageManager.UI.PackageInfo GetInstalledVersion(this UnityEditor.PackageManager.UI.Package self)
+        internal static PackageInfo GetInstalledVersion(this Package self)
         {
             return self.Current;
         }
 
-        internal static void UnlockVersion(this UnityEditor.PackageManager.UI.PackageInfo self)
+        internal static void UnlockVersion(this PackageInfo self)
         {
             self.Origin = (PackageSource)99;
             self.IsLatest = false;
         }
 
-        internal static SemVersion GetVersion(this UnityEditor.PackageManager.UI.PackageInfo self)
+        internal static SemVersion GetVersion(this PackageInfo self)
         {
             return self.Version;
         }
 
-        internal static void UpdateVersions(this UnityEditor.PackageManager.UI.Package self, IEnumerable<UnityEditor.PackageManager.UI.PackageInfo> versions)
+        internal static void UpdateVersions(this Package self, IEnumerable<PackageInfo> versions)
         {
             versions.OrderBy(v => v.GetVersion()).Last().IsLatest = true;
             self.source = versions;

@@ -1,27 +1,18 @@
 #if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
-#if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
-#define UNITY_2019_1_9_OR_NEWER
-#endif
-#if UNITY_2019_1_OR_NEWER
-using UnityEngine.UIElements;
-#else
-using UnityEngine.Experimental.UIElements;
-#endif
 using System.Text.RegularExpressions;
-using UnityEngine;
-using UnityEditor;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Diagnostics;
-
-#if !UNITY_2019_1_9_OR_NEWER
-using Semver;
-using UnityEditor.PackageManager;
+#if UNITY_2019_1_OR_NEWER
+using UnityEngine.UIElements;
+#else
+using UnityEngine.Experimental.UIElements;
 #endif
+using UnityEditor;
 
-namespace Coffee.PackageManager.UI
+namespace Coffee.UpmGitExtension
 {
     public static class Debug
     {

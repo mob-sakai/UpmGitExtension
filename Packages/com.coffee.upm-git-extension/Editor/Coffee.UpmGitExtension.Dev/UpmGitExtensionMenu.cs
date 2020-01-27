@@ -41,7 +41,7 @@ namespace Coffee.UpmGitExtension.Dev
         [MenuItem("UpmGitExtension/Update Git Package Versions")]
         static void UpdateGitPackageVersions()
         {
-            Type.GetType("Coffee.PackageManager.UI.Bridge, Coffee.UpmGitExtension.Editor")
+            Type.GetType("Coffee.UpmGitExtension.Bridge, Coffee.UpmGitExtension")
                 .GetMethod("UpdateGitPackageVersions")
                 .Invoke(null, new object[0]);
         }
@@ -49,7 +49,7 @@ namespace Coffee.UpmGitExtension.Dev
         [MenuItem("UpmGitExtension/Clear Cached Versions")]
         static void ClearCachedVersions()
         {
-            Type.GetType("Coffee.PackageManager.UI.AvailableVersions, Coffee.UpmGitExtension.Editor")
+            Type.GetType("Coffee.UpmGitExtension.AvailableVersions, Coffee.UpmGitExtension")
                 .GetMethod("ClearAll")
                 .Invoke(null, new object[0]);
         }

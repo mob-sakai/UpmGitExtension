@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
@@ -12,7 +11,7 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 
-namespace Coffee.PackageManager.UI
+namespace Coffee.UpmGitExtension
 {
     internal class InstallPackageWindow : VisualElement
     {

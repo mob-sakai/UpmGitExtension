@@ -11,7 +11,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Text;
 
-namespace Coffee.PackageManager.UI
+namespace Coffee.UpmGitExtension
 {
     [Serializable]
     public class AvailableVersion : IEquatable<AvailableVersion>

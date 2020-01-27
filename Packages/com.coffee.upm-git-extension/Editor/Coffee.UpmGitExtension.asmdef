@@ -1,5 +1,5 @@
 {
-    "name": "Coffee.UpmGitExtension.Editor",
+    "name": "Coffee.UpmGitExtension",
     "references": [
         "Unity.PackageManagerUI.Editor"
     ],

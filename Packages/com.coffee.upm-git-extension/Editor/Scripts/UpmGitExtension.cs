@@ -1,6 +1,5 @@
 #if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
 using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 #if UNITY_2019_1_OR_NEWER
@@ -9,7 +8,7 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 
-namespace Coffee.PackageManager.UI
+namespace Coffee.UpmGitExtension
 {
     [InitializeOnLoad]
     internal class UpmGitExtension : VisualElement, IPackageManagerExtension
@@ -109,11 +108,6 @@ namespace Coffee.PackageManager.UI
 #endif
 
             internalBridge.UpdateAvailableVersionsForGitPackages();
-
-            AvailableVersions.OnChanged += () =>
-            {
-                Debug.Log(kHeader, "######## Available Versions Is Dirty!!!");
-            };
         }
     }
 }
