@@ -135,18 +135,19 @@ namespace Coffee.UpmGitExtension
         public static void InstallPackage(string packageName, string repoUrl, string refName)
         {
             Debug.Log(kHeader, "[PackageUtils.InstallPackage] packageName = {0}, repoUrl = {1}, refName = {2}", packageName, repoUrl, refName);
-            UpdateManifestJson(dependencies =>
+            UpdateManifestJson(manifest =>
             {
+                var dependencies = manifest["dependencies"] as Dictionary<string, object>;
                 // Remove from dependencies.
-                dependencies.Remove(packageName);
-                if (!string.IsNullOrEmpty(repoUrl))
-                {
-                    // Add to dependencies.
-                    if (!string.IsNullOrEmpty(refName))
-                        dependencies.Add(packageName, repoUrl + "#" + refName);
-                    else
-                        dependencies.Add(packageName, repoUrl);
-                }
+                dependencies?.Remove(packageName);
+
+                // Add to dependencies.
+                dependencies?.Add(packageName, repoUrl + "#" + refName);
+
+                // Unlock git revision.
+                var locks = manifest["lock"] as Dictionary<string, object>;
+                if (locks != null && locks.ContainsKey(packageName))
+                    locks.Remove(packageName);
             });
         }
 
@@ -157,19 +158,25 @@ namespace Coffee.UpmGitExtension
         public static void UninstallPackage(string packageName)
         {
             Debug.Log(kHeader, "[PackageUtils.UninstallPackage] packageName = {0}", packageName);
-            UpdateManifestJson(dependencies => dependencies.Remove(packageName));
+            UpdateManifestJson(manifest => 
+            {
+                var dependencies = manifest["dependencies"] as Dictionary<string, object>;
+                dependencies?.Remove(packageName);
+            });
         }
 
         /// <summary>
         /// Update manifest.json
         /// </summary>
-        /// <param name="actionForDependencies">Action for dependencies</param>
-        static void UpdateManifestJson(Action<Dictionary<string, object>> actionForDependencies)
+        /// <param name="action">Action for manifest</param>
+        static void UpdateManifestJson(Action<Dictionary<string, object>> action)
         {
             Debug.Log(kHeader, "[PackageUtils.UpdateManifestJson]");
             const string manifestPath = "Packages/manifest.json";
             var manifest = Json.Deserialize(File.ReadAllText(manifestPath)) as Dictionary<string, object>;
-            actionForDependencies(manifest["dependencies"] as Dictionary<string, object>);
+            
+            if(manifest != null && action != null)
+                action(manifest);
 
             // Save manifest.json.
             File.WriteAllText(manifestPath, Json.Serialize(manifest, true));
