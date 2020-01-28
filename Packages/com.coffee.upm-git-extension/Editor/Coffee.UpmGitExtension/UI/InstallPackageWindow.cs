@@ -149,8 +149,9 @@ namespace Coffee.UpmGitExtension
 
             var repoUrl = GetRepoUrl(repoUrlText.value);
             AvailableVersions.Clear(repoUrl: repoUrl);
-            AvailableVersions.UpdateAvailableVersions(repoUrl: repoUrl, callback: success =>
+            AvailableVersionExtensions.UpdateAvailableVersions(repoUrl: repoUrl, callback: exitCode =>
             {
+                bool success = exitCode == 0;
                 root.SetEnabled(true);
                 EnableVersionContainer(success);
                 findVersionsError.visible = !success;

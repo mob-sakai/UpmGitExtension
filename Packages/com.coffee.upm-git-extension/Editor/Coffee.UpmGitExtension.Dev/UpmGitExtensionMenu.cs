@@ -40,7 +40,9 @@ namespace Coffee.UpmGitExtension.Dev
 
         static Type GetType(string fullname)
         {
-            return Type.GetType(fullname + ", Coffee.UpmGitExtension") ?? Type.GetType(fullname + ", Coffee.UpmGitExtension.OSC");
+            return Type.GetType(fullname + ", Coffee.UpmGitExtension")
+                ?? Type.GetType(fullname + ", Coffee.UpmGitExtension.OSC")
+                ?? Type.GetType(fullname + ", Coffee.UpmGitExtension.Core");
         }
 
         [MenuItem("UGE/Update Display Versions")]

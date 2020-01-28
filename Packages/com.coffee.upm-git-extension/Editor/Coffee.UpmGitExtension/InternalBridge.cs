@@ -83,7 +83,7 @@ namespace Coffee.UpmGitExtension
                 var pInfo = package.GetInstalledVersion();
                 var repoUrl = PackageUtils.GetRepoUrl(pInfo.Info.packageId);
                 Debug.Log(kHeader, $"[UpdateAvailableVersionsForGitPackages] {pInfo.PackageId} => {pInfo.Name}, {repoUrl}");
-                AvailableVersions.UpdateAvailableVersions(pInfo.Name, repoUrl);
+                AvailableVersionExtensions.UpdateAvailableVersions(pInfo.Name, repoUrl);
             }
         }
 

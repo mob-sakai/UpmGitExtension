@@ -17,40 +17,28 @@ namespace Coffee.UpmGitExtension
 {
     public static class Debug
     {
-        static bool logEnabled = false;
-        static Debug()
-        {
-            logEnabled = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup)
-                .Split(';', ',')
-                .Any(x => x == "UGE_LOG");
-        }
-
         [Conditional("UGE_LOG")]
         static void Log(string header, string format, params object[] args)
         {
-            if (logEnabled)
-                UnityEngine.Debug.LogFormat(header + format, args);
+            UnityEngine.Debug.LogFormat(header + format, args);
         }
 
         [Conditional("UGE_LOG")]
         public static void Log(string header, object message)
         {
-            if (logEnabled)
-                UnityEngine.Debug.Log(header + message);
+            UnityEngine.Debug.Log(header + message);
         }
 
         [Conditional("UGE_LOG")]
         static void Warning(string header, string format, params object[] args)
         {
-            if (logEnabled)
-                UnityEngine.Debug.LogWarningFormat(header + format, args);
+            UnityEngine.Debug.LogWarningFormat(header + format, args);
         }
 
         [Conditional("UGE_LOG")]
         public static void Warning(string header, object message)
         {
-            if (logEnabled)
-                UnityEngine.Debug.LogWarning(header + message);
+            UnityEngine.Debug.LogWarning(header + message);
         }
 
         public static void Error(string header, string format, params object[] args)
@@ -69,7 +57,7 @@ namespace Coffee.UpmGitExtension
         }
     }
 
-    internal static class ReflectionExtensions
+    public static class ReflectionExtensions
     {
         const BindingFlags FLAGS = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
         static object Inst(this object self)
@@ -134,7 +122,7 @@ namespace Coffee.UpmGitExtension
         /// <param name="refName">Reference name for install (option)</param>
         public static void InstallPackage(string packageName, string repoUrl, string refName)
         {
-            Debug.Log(kHeader, "[PackageUtils.InstallPackage] packageName = {0}, repoUrl = {1}, refName = {2}", packageName, repoUrl, refName);
+            Debug.Log(kHeader, $"[PackageUtils.InstallPackage] packageName = {packageName}, repoUrl = {repoUrl}, refName = {refName}");
             UpdateManifestJson(manifest =>
             {
                 var dependencies = manifest["dependencies"] as Dictionary<string, object>;
@@ -157,7 +145,7 @@ namespace Coffee.UpmGitExtension
         /// <param name="packageName">Package name</param>
         public static void UninstallPackage(string packageName)
         {
-            Debug.Log(kHeader, "[PackageUtils.UninstallPackage] packageName = {0}", packageName);
+            Debug.Log(kHeader, $"[PackageUtils.UninstallPackage] packageName = {packageName}");
             UpdateManifestJson(manifest => 
             {
                 var dependencies = manifest["dependencies"] as Dictionary<string, object>;
@@ -253,5 +241,4 @@ namespace Coffee.UpmGitExtension
         }
     }
 }
-
 #endif // This line is added by Open Sesame Portable. DO NOT remov manually.
