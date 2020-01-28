@@ -1,11 +1,11 @@
 {
   "dependencies": {
     "com.coffee.softmask-for-ugui": "ssh://git@github.com/mob-sakai/SoftMaskForUGUI.git#0.8.1",
-    "com.coffee.upm-git-extension-test-bitbucket": "https://bitbucket.org/mob-sakai/GitPackageTest.git#0.4.0",
-    "com.coffee.upm-git-extension-test-github": "https://github.com/mob-sakai/GitPackageTest.git#0.4.0",
-    "com.coffee.upm-git-extension-test-gitlab": "https://gitlab.com/mob-sakai/GitPackageTest.git#0.4.0",
     "com.unity.package-manager-ui": "2.0.3",
     "com.unity.purchasing": "2.0.3",
+    "com.coffee.upm-git-extension-test-bitbucket": "https://bitbucket.org/mob-sakai/GitPackageTest.git#0.5.0",
+    "com.coffee.upm-git-extension-test-github": "https://github.com/mob-sakai/GitPackageTest.git#upm",
+    "com.coffee.upm-git-extension-test-gitlab": "https://gitlab.com/mob-sakai/GitPackageTest.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
