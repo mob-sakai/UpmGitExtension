@@ -33,7 +33,6 @@ namespace Coffee.UpmGitExtension
         private static Bridge instance = new Bridge();
         public static Bridge Instance { get { return instance; } }
 
-        LoadingSpinner loadingSpinner;
         PackageList packageList;
         PackageDetails packageDetails;
 
@@ -43,10 +42,9 @@ namespace Coffee.UpmGitExtension
 
         public void Setup(VisualElement root)
         {
-            loadingSpinner = root.Q<LoadingSpinner>();
             packageList = root.Q<PackageList>();
             packageDetails = root.Q<PackageDetails>();
-            Debug.Log(kHeader, "[Setup] {0}, {1}, {2},", loadingSpinner, packageList, packageDetails);
+            Debug.Log(kHeader, $"[Setup] {packageList}, {packageDetails},");
 
 #if UNITY_2019_3_OR_NEWER
             packageList.onPackageListLoaded -= UpdateGitPackageVersions;
@@ -273,13 +271,11 @@ namespace Coffee.UpmGitExtension
                 return v;
             });
 
-            self.versionList = new UpmVersionList(versions);
+            self.Set("source", versions);
         }
 
         internal static void UpdatePackageCollection()
         {
-            Debug.Log("",UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault());
-            Debug.Log("",UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault().Collection);
             UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault().Collection.UpdatePackageCollection(false);
         }
 
