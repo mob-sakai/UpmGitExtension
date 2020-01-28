@@ -258,8 +258,6 @@ namespace Coffee.UpmGitExtension
 #else
             newPInfo.IsCurrent = false;
 #endif
-            newPInfo.IsVerified = false;
-            newPInfo.Origin = (PackageSource)99;
             newPInfo.Info = baseInfo.Info;
             newPInfo.PackageId = string.Format("{0}@{1}", newPInfo.Name, self.refNameVersion);
             return newPInfo;
