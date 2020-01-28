@@ -1,2 +1,4 @@
 Editor/Coffee.UpmGitExtension.Dev/*
 Editor/Coffee.UpmGitExtension.Dev.meta
+!Editor/Coffee.UpmGitExtension.Core/*
+!Editor/Coffee.UpmGitExtension.Core.meta
