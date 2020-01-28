@@ -38,14 +38,19 @@ namespace Coffee.UpmGitExtension.Dev
             return true;
         }
 
+        static Type GetType(string fullname)
+        {
+            return Type.GetType(fullname + ", Coffee.UpmGitExtension") ?? Type.GetType(fullname + ", Coffee.UpmGitExtension.OSC");
+        }
+
         [MenuItem("UGE/Update Display Versions")]
         static void UpdateDisplayVersions()
         {
-            Type.GetType("Coffee.UpmGitExtension.Bridge, Coffee.UpmGitExtension")
+            GetType("Coffee.UpmGitExtension.Bridge")
                 .GetMethod("UpdateGitPackageVersions")
                 .Invoke(null, new object[0]);
 
-            Type.GetType("Coffee.UpmGitExtension.Bridge, Coffee.UpmGitExtension")
+            GetType("Coffee.UpmGitExtension.Bridge")
                 .GetMethod("UpdatePackageCollection")
                 .Invoke(null, new object[0]);
         }
@@ -53,7 +58,7 @@ namespace Coffee.UpmGitExtension.Dev
         [MenuItem("UGE/Update Cached Versions")]
         static void UpdateCachedVersions()
         {
-            Type.GetType("Coffee.UpmGitExtension.Bridge, Coffee.UpmGitExtension")
+            GetType("Coffee.UpmGitExtension.Bridge")
                 .GetMethod("UpdateAvailableVersionsForGitPackages")
                 .Invoke(null, new object[0]);
         }
@@ -61,7 +66,7 @@ namespace Coffee.UpmGitExtension.Dev
         [MenuItem("UGE/Dump Cached Versions")]
         static void DumpCachedVersions()
         {
-            Type.GetType("Coffee.UpmGitExtension.AvailableVersions, Coffee.UpmGitExtension")
+            GetType("Coffee.UpmGitExtension.AvailableVersions")
                 .GetMethod("Dump")
                 .Invoke(null, new object[0]);
         }
@@ -69,7 +74,7 @@ namespace Coffee.UpmGitExtension.Dev
         [MenuItem("UGE/Clear Cached Versions")]
         static void ClearCachedVersions()
         {
-            Type.GetType("Coffee.UpmGitExtension.AvailableVersions, Coffee.UpmGitExtension")
+            GetType("Coffee.UpmGitExtension.AvailableVersions")
                 .GetMethod("ClearAll")
                 .Invoke(null, new object[0]);
         }
