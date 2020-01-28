@@ -68,6 +68,8 @@ namespace Coffee.UpmGitExtension
             packageList.OnLoaded += UpdateGitPackageVersions;
 #endif
             AvailableVersions.OnChanged += UpdateGitPackageVersions;
+            UpdateGitPackageVersions();
+            UpdateAvailableVersionsForGitPackages();
         }
 
         /// <summary>
@@ -79,7 +81,8 @@ namespace Coffee.UpmGitExtension
             foreach (var package in PackageExtensions.GetGitPackages())
             {
                 var pInfo = package.GetInstalledVersion();
-                var repoUrl = PackageUtils.GetRepoUrl(pInfo.PackageId);
+                var repoUrl = PackageUtils.GetRepoUrl(pInfo.Info.packageId);
+                Debug.Log(kHeader, $"[UpdateAvailableVersionsForGitPackages] {pInfo.PackageId} => {pInfo.Name}, {repoUrl}");
                 AvailableVersions.UpdateAvailableVersions(pInfo.Name, repoUrl);
             }
         }
@@ -94,8 +97,9 @@ namespace Coffee.UpmGitExtension
             foreach (var package in PackageExtensions.GetGitPackages())
             {
                 var pInfo = package.GetInstalledVersion();
-                var repoUrl = PackageUtils.GetRepoUrl(pInfo.PackageId);
+                var repoUrl = PackageUtils.GetRepoUrl(pInfo.Info.packageId);
                 var versions = AvailableVersions.GetVersions(package.Name, repoUrl);
+                Debug.Log(kHeader, $"[UpdateGitPackageVersions] {pInfo.PackageId} => {pInfo.Name}, {repoUrl}, {versions.Count()}");
                 changed = UpdatePackageVersions(package, versions) | changed;
             }
 
@@ -246,6 +250,8 @@ namespace Coffee.UpmGitExtension
 
         internal static void UpdatePackageCollection()
         {
+            Debug.Log("",UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault());
+            Debug.Log("",UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault().Collection);
             UnityEngine.Resources.FindObjectsOfTypeAll<PackageManagerWindow>().FirstOrDefault().Collection.UpdatePackageCollection(false);
         }
 

@@ -107,7 +107,6 @@ namespace Coffee.UpmGitExtension
             addButton.parent.Insert(addButton.parent.IndexOf(addButton), space);
 #endif
 
-            EditorApplication.delayCall += Bridge.UpdateAvailableVersionsForGitPackages;
         }
     }
 }

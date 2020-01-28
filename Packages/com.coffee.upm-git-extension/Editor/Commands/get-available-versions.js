@@ -81,7 +81,6 @@ const parseRef = text => {
     //
     return { packageName: p.name, repoUrl, version: p.version, refName };
   } catch (e) {
-    console.error(e);
     return undefined;
   }
 };

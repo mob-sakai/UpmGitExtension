@@ -97,13 +97,17 @@ namespace Coffee.UpmGitExtension
         public static void AddVersions(IEnumerable<AvailableVersion> add)
         {
             if (add == null || !add.Any())
+            {
+                Debug.Log(kHeader, $"AddVersions: no versions contains.");
                 return;
+            }
 
             var length = instance.versions.Length;
             var versions = instance.versions
                 .Union(add)
                 .ToArray();
 
+            Debug.Log(kHeader, $"AddVersions {length} -> versions.Length");
             if (versions.Length != length)
             {
                 Debug.Log(kHeader, "<b>DIRTY</b>");
@@ -140,25 +144,33 @@ namespace Coffee.UpmGitExtension
         static void OnResultCreated(object o, FileSystemEventArgs e)
         {
             if (Path.GetExtension(e.Name) == ".json")
-                OnResultCreated(e.Name);
+                EditorApplication.delayCall += () => OnResultCreated(e.Name);
         }
 
         static void OnResultCreated(string file)
         {
             try
             {
-                var info = JsonUtility.FromJson<ResultInfo>(File.ReadAllText(file));
-                EditorApplication.delayCall += () => AvailableVersions.AddVersions(info.versions);
+                var text = File.ReadAllText(file, System.Text.Encoding.UTF8);
+                UnityEngine.Debug.Log($"{kHeader} OnResultCreated {file}:\n{text}");
+                var info = JsonUtility.FromJson<ResultInfo>(text);
+                AddVersions(info.versions);
+            }
+            catch (Exception ex)
+            {
+                Debug.Exception(kHeader, ex);
             }
             finally
             {
-                EditorApplication.delayCall += () => File.Delete(file);
+                File.Delete(file);
             }
         }
 
         [InitializeOnLoadMethod]
         static void WatchResultJson()
         {
+            Debug.Log(kHeader, $"Start to watch .json in {kResultDir}");
+
 #if !UNITY_EDITOR_WIN
             Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
 #endif
@@ -166,12 +178,12 @@ namespace Coffee.UpmGitExtension
                 Directory.CreateDirectory(kResultDir);
 
             foreach (var file in Directory.GetFiles(kResultDir, "*.json"))
-                OnResultCreated(file);
+                EditorApplication.delayCall += () => OnResultCreated(file);
 
             var watcher = new FileSystemWatcher()
             {
                 Path = kResultDir,
-                NotifyFilter = NotifyFilters.CreationTime,
+                NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite,
                 IncludeSubdirectories = false,
                 EnableRaisingEvents = true,
             };
