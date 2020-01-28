@@ -132,7 +132,7 @@ try {
   // Output valid package references to file
   console.log(`\n>> Output valid package references to file: ${outputFile}`);
   console.log(versions);
-  fs.writeFileSync(outputFile, JSON.stringify({ versions }), "utf-8");
+  fs.writeFileSync(outputFile, JSON.stringify({ versions }, space = 2), "utf-8");
 
   console.log("\n######## Complete ########");
 } finally {
