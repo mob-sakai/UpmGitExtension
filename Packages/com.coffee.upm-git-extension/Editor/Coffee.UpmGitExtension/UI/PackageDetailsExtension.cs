@@ -129,14 +129,14 @@ namespace Coffee.UpmGitExtension
                 return EditorGUIUtility.isProSkin
                     ? AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Light.png") as Texture2D
                     : AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Dark.png") as Texture2D;
-            else if (packageId.Contains("bitbucket.com"))
-                return AssetDatabase.LoadMainAssetAtPath(packageDir + "Bitbucket-Logo-Dark.png") as Texture2D;
+            else if (packageId.Contains("bitbucket.org"))
+                return AssetDatabase.LoadMainAssetAtPath(packageDir + "Bitbucket-Logo.png") as Texture2D;
             else if (packageId.Contains("gitlab."))
-                return AssetDatabase.LoadMainAssetAtPath(packageDir + "GitLab-Logo-Dark.png") as Texture2D;
+                return AssetDatabase.LoadMainAssetAtPath(packageDir + "GitLab-Logo.png") as Texture2D;
 
             return EditorGUIUtility.isProSkin
-                ? EditorGUIUtility.FindTexture("buildsettings.web.small")
-                : EditorGUIUtility.FindTexture("d_buildsettings.web.small");
+                ? EditorGUIUtility.FindTexture("d_buildsettings.web.small")
+                : EditorGUIUtility.FindTexture("buildsettings.web.small");
         }
 
         /// <summary>
