@@ -110,7 +110,7 @@ namespace Coffee.UpmGitExtension
 
 #if UNITY_2019_3_OR_NEWER
         PackageInfo GetSelectedPackage() { return GetSelectedVersion().packageInfo; }
-        UpmPackageVersion GetSelectedVersion() { return packageDetails.TargetVersion; }
+        UpmPackageVersion GetSelectedVersion() { return packageDetails.targetVersion as UpmPackageVersion; }
 #elif UNITY_2019_1_OR_NEWER
         PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
         UnityEditor.PackageManager.UI.PackageInfo GetSelectedVersion() { return packageDetails.TargetVersion; }

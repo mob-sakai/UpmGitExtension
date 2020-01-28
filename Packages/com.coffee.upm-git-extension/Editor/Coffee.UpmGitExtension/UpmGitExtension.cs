@@ -57,6 +57,9 @@ namespace Coffee.UpmGitExtension
         /// <param name="packageInfo">The newly selected package information (can be null)</param>
         public void OnPackageSelectionChange(PackageInfo packageInfo)
         {
+            if (packageInfo == null)
+                return;
+
             InitializeUI();
             packageDetailsExtension?.OnPackageSelectionChange(packageInfo);
         }

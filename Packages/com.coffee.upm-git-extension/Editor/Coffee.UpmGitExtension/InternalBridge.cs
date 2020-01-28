@@ -15,7 +15,10 @@ using UnityEngine.Experimental.UIElements;
 #if !UNITY_2019_1_9_OR_NEWER
 using Semver;
 #endif
-#if !UNITY_2019_3_OR_NEWER
+#if UNITY_2019_3_OR_NEWER
+using Package = UnityEditor.PackageManager.UI.UpmPackage;
+using PackageInfo = UnityEditor.PackageManager.UI.UpmPackageVersion;
+#else
 using Package = UnityEditor.PackageManager.UI.Package;
 using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
 using PackageCollection = UnityEditor.PackageManager.UI.PackageCollection;
@@ -46,8 +49,8 @@ namespace Coffee.UpmGitExtension
             Debug.Log(kHeader, "[Setup] {0}, {1}, {2},", loadingSpinner, packageList, packageDetails);
 
 #if UNITY_2019_3_OR_NEWER
-            packageList.onPackageListLoaded -= UpdateGitPackages;
-            packageList.onPackageListLoaded += UpdateGitPackages;
+            packageList.onPackageListLoaded -= UpdateGitPackageVersions;
+            packageList.onPackageListLoaded += UpdateGitPackageVersions;
 
             // PackageDatabase.instance.onPackagesChanged += (added, removed, _, updated) =>
             // {
@@ -80,10 +83,10 @@ namespace Coffee.UpmGitExtension
             // Start update task.
             foreach (var package in PackageExtensions.GetGitPackages())
             {
-                var pInfo = package.GetInstalledVersion();
-                var repoUrl = PackageUtils.GetRepoUrl(pInfo.Info.packageId);
-                Debug.Log(kHeader, $"[UpdateAvailableVersionsForGitPackages] {pInfo.PackageId} => {pInfo.Name}, {repoUrl}");
-                AvailableVersionExtensions.UpdateAvailableVersions(pInfo.Name, repoUrl);
+                var pInfo = package.GetInstalledVersion().GetPackageInfo();
+                var repoUrl = PackageUtils.GetRepoUrl(pInfo.packageId);
+                Debug.Log(kHeader, $"[UpdateAvailableVersionsForGitPackages] {pInfo.packageId} => {pInfo.name}, {repoUrl}");
+                AvailableVersionExtensions.UpdateAvailableVersions(pInfo.name, repoUrl);
             }
         }
 
@@ -96,10 +99,10 @@ namespace Coffee.UpmGitExtension
             // Start update task.
             foreach (var package in PackageExtensions.GetGitPackages())
             {
-                var pInfo = package.GetInstalledVersion();
-                var repoUrl = PackageUtils.GetRepoUrl(pInfo.Info.packageId);
-                var versions = AvailableVersions.GetVersions(package.Name, repoUrl);
-                Debug.Log(kHeader, $"[UpdateGitPackageVersions] {pInfo.PackageId} => {pInfo.Name}, {repoUrl}, {versions.Count()}");
+                var pInfo = package.GetInstalledVersion().GetPackageInfo();
+                var repoUrl = PackageUtils.GetRepoUrl(pInfo.packageId);
+                var versions = AvailableVersions.GetVersions(package.GetName(), repoUrl);
+                Debug.Log(kHeader, $"[UpdateGitPackageVersions] {pInfo.packageId} => {package.GetName()}, {repoUrl}, {versions.Count()}");
                 changed = UpdatePackageVersions(package, versions) | changed;
             }
 
@@ -112,7 +115,7 @@ namespace Coffee.UpmGitExtension
         /// </summary>
         static bool UpdatePackageVersions(Package package, IEnumerable<AvailableVersion> versions)
         {
-            Debug.Log(kHeader, $"[UpdatePackageVersions] {package.Name} has {versions.Count()} versions");
+            Debug.Log(kHeader, $"[UpdatePackageVersions] {package.GetName()} has {versions.Count()} versions");
             var pInfoCurrent = package.GetInstalledVersion();
             pInfoCurrent.UnlockVersion();
 
@@ -123,7 +126,7 @@ namespace Coffee.UpmGitExtension
                 .OrderBy(pInfo => pInfo.GetVersion())
                 .ToArray();
 
-            if (package.source.Count() != versionInfos.Length)
+            if (package.GetVersionCount() != versionInfos.Length)
             {
                 Debug.Log(kHeader, "[UpdatePackageVersions] package source changing");
                 package.UpdateVersions(versionInfos);
@@ -149,14 +152,14 @@ namespace Coffee.UpmGitExtension
                 .Where(x => x != null && x.installedVersion != null && x.installedVersion.HasTag(PackageTag.Git));
         }
 
-        internal static IEnumerable<PackageInfo> GetGitPackageInfos()
+        internal static IEnumerable<UpmPackageVersion> GetGitPackageInfos()
         {
-            return GetGitPackages().Select(x=>x.installedVersion);
+            return GetGitPackages().Select(x=>x.installedVersion).Cast<UpmPackageVersion>();
         }
 
-        internal static UpmPackageVersion GetInstalledVersion(this Package self)
+        internal static UpmPackageVersion GetInstalledVersion(this UpmPackage self)
         {
-            return self.installedVersion;
+            return self.installedVersion as UpmPackageVersion;
         }
 
         internal static SemVersion GetVersion(this UpmPackageVersion self)
@@ -164,7 +167,22 @@ namespace Coffee.UpmGitExtension
             return self.version;
         }
 
-        internal static void UnlockVersion(this UnityEditor.PackageManager.UI.PackageInfo self)
+        internal static UnityEditor.PackageManager.PackageInfo GetPackageInfo(this PackageInfo self)
+        {
+            return self.packageInfo;
+        }
+
+        internal static string GetName(this UpmPackage self)
+        {
+            return self.name;
+        }
+
+        internal static int GetVersionCount(this UpmPackage self)
+        {
+            return self.versionList.all.Count();
+        }
+
+        internal static void UnlockVersion(this UpmPackageVersion self)
         {
             self.m_Tag = self.m_Tag & ~PackageTag.VersionLocked;
         }
@@ -172,34 +190,29 @@ namespace Coffee.UpmGitExtension
         internal static void UpdatePackageCollection()
         {
             var empty = Enumerable.Empty<IPackage>();
-            var updated = GetAllPackages()
-                .Where(x => x != null && x.installedVersion != null && x.installedVersion.HasTag(PackageTag.Git));
-
-            (PageManager.instance.GetCurrentPage() as Page).OnPackagesChanged(empty, empty, empty, updated);
+            (PageManager.instance.GetCurrentPage() as Page).OnPackagesChanged(empty, empty, empty, GetGitPackages());
         }
 
         internal static UpmPackageVersion ToPackageVersion(this AvailableVersion self, UpmPackageVersion baseInfo)
         {
-            var splited = ver.Split(',');
-            var semver = SemVersion.Parse(self.refNameText);
+            var semver = SemVersion.Parse(self.refNameVersion);
 
-            var newPInfo = JsonUtility.FromJson<PackageInfo>(JsonUtility.ToJson(baseInfo));
+            var newPInfo = JsonUtility.FromJson<UnityEditor.PackageManager.PackageInfo>(JsonUtility.ToJson(baseInfo.packageInfo));
             newPInfo.m_Version = self.version;
             newPInfo.m_Git = new GitInfo("", self.refName);
 
-            var p = new UpmPackageVersion(newPInfo, false, semver, pInfo.displayName);
+            var p = new UpmPackageVersion(newPInfo, false, semver, newPInfo.displayName);
 
             // Update tag.
             PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
-            if ((semver.Major == 0 && string.IsNullOrEmpty(semver.Prerelease)) ||
-                PackageTag.Preview.ToString().Equals(semver.Prerelease.Split('.')[0], StringComparison.InvariantCultureIgnoreCase))
+            if (semver.Major == 0 || string.IsNullOrEmpty(semver.Prerelease))
                 tag |= PackageTag.Preview;
             else if (semver.IsRelease())
                 tag |= PackageTag.Release;
 
             p.m_Tag = tag;
             p.m_IsFullyFetched = true;
-            p.m_PackageId = string.Format("{0}@{1}#{2}", packageName, repoUrl, self.refName);
+            p.m_PackageId = string.Format("{0}@{1}#{2}", self.packageName, self.repoUrl, self.refName);
             return p;
         }
 #else
@@ -235,6 +248,21 @@ namespace Coffee.UpmGitExtension
             return self.Version;
         }
 
+        internal static UnityEditor.PackageManager.PackageInfo GetPackageInfo(this PackageInfo self)
+        {
+            return self.Info;
+        }
+
+        internal static string GetName(this Package self)
+        {
+            return self.Name;
+        }
+
+        internal static int GetVersionCount(this Package self)
+        {
+            return self.source.Count();
+        }
+
         internal static void UpdateVersions(this Package self, IEnumerable<PackageInfo> versions)
         {
             var latest = versions.OrderBy(v => v.GetVersion()).Last();
@@ -245,7 +273,7 @@ namespace Coffee.UpmGitExtension
                 return v;
             });
 
-            self.Set("source", versions);
+            self.versionList = new UpmVersionList(versions);
         }
 
         internal static void UpdatePackageCollection()
