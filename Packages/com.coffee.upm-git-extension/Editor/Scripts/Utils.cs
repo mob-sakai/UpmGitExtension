@@ -172,7 +172,7 @@ namespace Coffee.UpmGitExtension
             actionForDependencies(manifest["dependencies"] as Dictionary<string, object>);
 
             // Save manifest.json.
-            File.WriteAllText(manifestPath, Json.Serialize(manifest));
+            File.WriteAllText(manifestPath, Json.Serialize(manifest, true));
             EditorApplication.delayCall += () => AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
         }
 
