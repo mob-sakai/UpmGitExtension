@@ -233,7 +233,14 @@ namespace Coffee.UpmGitExtension
 
         internal static void UpdateVersions(this Package self, IEnumerable<PackageInfo> versions)
         {
-            versions.OrderBy(v => v.GetVersion()).Last().IsLatest = true;
+            var latest = versions.OrderBy(v => v.GetVersion()).Last();
+            versions = versions.Select(v =>
+            {
+                v.IsLatest = v == latest;
+                v.State = v == latest ? PackageState.UpToDate : PackageState.Outdated;
+                return v;
+            });
+
             self.Set("source", versions);
         }
 
