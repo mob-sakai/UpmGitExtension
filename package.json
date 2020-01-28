@@ -10,7 +10,7 @@
     "semantic-release": "^17.0.0"
   },
   "scripts": {
-    "release": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release --debug",
+    "release": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release",
     "release:debug": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release --dry-run --no-ci --debug"
   }
 }

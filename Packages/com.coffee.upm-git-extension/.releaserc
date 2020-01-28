@@ -13,6 +13,14 @@
     "@semantic-release/changelog",
     "@semantic-release/git",
     [
+      "@semantic-release/github",
+      {
+        "assets": [
+          "*.tgz"
+        ]
+      }
+    ],
+    [
       "@semantic-release/npm",
       {
         "npmPublish": false,
