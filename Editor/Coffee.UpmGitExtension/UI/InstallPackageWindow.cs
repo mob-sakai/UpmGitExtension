@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEditor.PackageManager;
-using UnityEditor.PackageManager.UI.InternalBridge;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 using UnityEngine.Experimental.UIElements;
 #endif
 
-namespace Coffee.PackageManager
+namespace Coffee.UpmGitExtension
 {
     internal class InstallPackageWindow : VisualElement
     {
@@ -32,7 +32,6 @@ namespace Coffee.PackageManager
         //################################
         public InstallPackageWindow()
         {
-            UIUtils.SetElementDisplay(this, false);
             VisualTreeAsset asset = EditorGUIUtility.Load(TemplatePath) as VisualTreeAsset;
 
 #if UNITY_2019_1_OR_NEWER
@@ -81,13 +80,12 @@ namespace Coffee.PackageManager
             // Controll container
             closeButton.clickable.clicked += onClick_Close;
 
-            SetPhase(Phase.InputRepoUrl);
+            onClick_Close();
         }
 
         public void Open()
         {
             UIUtils.SetElementDisplay(this, true);
-            SetPhase(Phase.InputRepoUrl);
         }
 
         //################################
@@ -104,100 +102,78 @@ namespace Coffee.PackageManager
         readonly Button versionSelectButton;
         readonly Label packageNameLabel;
         readonly TextField repoUrlText;
-        IEnumerable<string> versions = new string[0];
-        string refName = "";
+        IEnumerable<AvailableVersion> versions = new AvailableVersion[0];
+        AvailableVersion currentVersion = null;
 
-        enum Phase
+        void EnableVersionContainer(bool flag)
         {
-            InputRepoUrl,
-            FindVersions,
-            SelectVersion,
-            FindPackage,
-            InstallPackage,
+            versionContainer.SetEnabled(flag);
+            versionSelectButton.SetEnabled(flag);
+            versionSelectButton.text = "-- Select package version --";
         }
 
-        void SetPhase(Phase phase)
+        void EnablePackageContainer(bool flag, string name = "")
         {
-            bool canFindVersions = Phase.FindVersions <= phase;
-            repoUrlText.value = canFindVersions ? repoUrlText.value : "";
-            findVersionsButton.SetEnabled(canFindVersions);
-            if (phase == Phase.FindVersions)
-                repoUrlText.Focus();
-
-            bool canSelectVersion = Phase.SelectVersion <= phase;
-            versionContainer.SetEnabled(canSelectVersion);
-            versionSelectButton.SetEnabled(canSelectVersion);
-            versionSelectButton.text = canSelectVersion ? versionSelectButton.text : "-- Select package version --";
-            if (canSelectVersion)
-            {
-                findVersionsError.visible = false;
-            }
-
-
-            bool canInstallPackage = Phase.InstallPackage <= phase;
-            packageContainer.SetEnabled(canInstallPackage);
-            packageNameLabel.text = canInstallPackage ? packageNameLabel.text : "";
-            if (canInstallPackage || phase == Phase.InputRepoUrl)
-            {
-                findVersionsError.visible = false;
-            }
+            packageContainer.SetEnabled(flag);
+            installPackageButton.SetEnabled(flag);
+            packageNameLabel.text = name;
         }
 
         void onClick_Close()
         {
             UIUtils.SetElementDisplay(this, false);
+
+            repoUrlText.value = "";
+            findVersionsButton.SetEnabled(false);
+
+            EnableVersionContainer(false);
+            EnablePackageContainer(false);
         }
 
         void onChange_RepoUrl(string url)
         {
-            SetPhase(string.IsNullOrEmpty(url) ? Phase.InputRepoUrl : Phase.FindVersions);
+            var valid = !string.IsNullOrEmpty(url);
+            findVersionsButton.SetEnabled(valid);
+
+            EnableVersionContainer(false);
+            EnablePackageContainer(false);
+
+            findVersionsError.visible = false;
+            currentVersion = null;
         }
 
         void onClick_FindVersions()
         {
-            SetPhase(Phase.FindVersions);
             root.SetEnabled(false);
-            GitUtils.GetRefs("", repoUrlText.value, refs =>
-           {
-               root.SetEnabled(true);
-               bool hasError = !refs.Any();
-               findVersionsError.visible = hasError;
-               if (!hasError)
-               {
-                   versions = refs;
-                   SetPhase(Phase.SelectVersion);
-               }
-           });
+            EnableVersionContainer(false);
+
+            var repoUrl = GetRepoUrl(repoUrlText.value);
+            AvailableVersions.Clear(repoUrl: repoUrl);
+            AvailableVersionExtensions.UpdateAvailableVersions(repoUrl: repoUrl, callback: exitCode =>
+            {
+                bool success = exitCode == 0;
+                root.SetEnabled(true);
+                EnableVersionContainer(success);
+                findVersionsError.visible = !success;
+            });
         }
 
         void onClick_SelectVersions()
         {
-            SetPhase(Phase.SelectVersion);
-
             var menu = new GenericMenu();
-            var currentRefName = versionSelectButton.text;
-
-            GenericMenu.MenuFunction2 callback = (x) =>
+            GenericMenu.MenuFunction2 callback = (v) =>
             {
-                var splited = x as string[];
-                versionSelectButton.text = splited[0];
-                packageNameLabel.text = splited[1];
-                refName = splited[2];
-                SetPhase(Phase.InstallPackage);
+                var version = v as AvailableVersion;
+                currentVersion = version;
+                versionSelectButton.text = version.refNameText;
+                EnablePackageContainer(true, version.packageName);
             };
 
-            var orderdVers = versions
-                .OrderByDescending(x => x.Split(',')[1]).ToArray();
-
-            foreach (var t in orderdVers)
+            var repoUrl = GetRepoUrl(repoUrlText.value);
+            foreach (var version in AvailableVersions.GetVersions(repoUrl: repoUrl).OrderByDescending(v => v.version))
             {
-                var splited = t.Split(',');
-                var refName = splited[0];
-                var version = splited[1];
-                var packageName = splited[2];
-                var text = version == refName ? version : version + " - " + refName;
-                var packageId = string.Format("{0}@{1}#{2}", packageName, PackageUtils.GetRepoUrl(repoUrlText.value), refName);
-                menu.AddItem(new GUIContent(text), currentRefName == text, callback, new[] { text, packageName, refName });
+                var text = version.refNameText;
+                menu.AddItem(new GUIContent(text), versionSelectButton.text == text, callback, version);
             }
 
             menu.DropDown(versionSelectButton.worldBound);
@@ -205,7 +181,7 @@ namespace Coffee.PackageManager
 
         void onClick_InstallPackage()
         {
-            PackageUtils.InstallPackage(packageNameLabel.text, GetRepoUrl(repoUrlText.value), refName);
+            PackageUtils.InstallPackage(currentVersion.packageName, currentVersion.repoUrl, currentVersion.refName);
             onClick_Close();
         }
 
@@ -217,3 +193,4 @@ namespace Coffee.PackageManager
         }
     }
 }
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.

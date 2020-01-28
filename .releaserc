@@ -1,0 +1,30 @@
+{
+  "branches": [
+    "+([0-9])?(.{+([0-9]),x}).x",
+    "master",
+    {
+      "name": "preview",
+      "prerelease": true
+    }
+  ],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    "@semantic-release/git",
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": false,
+        "tarballDir": "."
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "tar -xzvf *.tgz",
+        "publishCmd": "git snapshot -p package -b upm -r ${options.repositoryUrl} -t ${nextRelease.version} -m \"${nextRelease.notes}\""
+      }
+    ]
+  ]
+}

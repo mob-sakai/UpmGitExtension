@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+using UnityEditor;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
@@ -7,7 +8,7 @@ using UnityEngine.Experimental.UIElements;
 using UnityEditor.Experimental.UIElements;
 #endif
 
-namespace Coffee.PackageManager
+namespace Coffee.UpmGitExtension
 {
     internal class GitButton : ToolbarButton
     {
@@ -39,3 +40,4 @@ namespace Coffee.PackageManager
         }
     }
 }
+#endif // This line is added by Open Sesame Portable. DO NOT remov manually.
