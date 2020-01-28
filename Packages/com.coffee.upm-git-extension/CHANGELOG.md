@@ -1,3 +1,10 @@
+# [1.1.0-preview.5](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.4...v1.1.0-preview.5) (2020-01-28)
+
+
+### Bug Fixes
+
+* fix compile error ([9962277](https://github.com/mob-sakai/UpmGitExtension/commit/9962277acceacacb3e59a46b55d40997b6e4f379))
+
 # [1.1.0-preview.4](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.3...v1.1.0-preview.4) (2020-01-28)
 
 
