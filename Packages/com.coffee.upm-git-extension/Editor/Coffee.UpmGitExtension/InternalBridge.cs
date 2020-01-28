@@ -273,7 +273,7 @@ namespace Coffee.UpmGitExtension
                 return v;
             });
 
-            self.versionList = new UpmVersionList(versions);
+            self.Set("source", versions);
         }
 
         internal static void UpdatePackageCollection()
