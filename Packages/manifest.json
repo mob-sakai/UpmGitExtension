@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.coffee.softmask-for-ugui": "ssh://git@github.com/mob-sakai/SoftMaskForUGUI.git#0.8.1",
     "com.coffee.upm-git-extension-test-bitbucket": "https://bitbucket.org/mob-sakai/GitPackageTest.git#0.4.0",
     "com.coffee.upm-git-extension-test-github": "https://github.com/mob-sakai/GitPackageTest.git#0.4.0",
     "com.coffee.upm-git-extension-test-gitlab": "https://gitlab.com/mob-sakai/GitPackageTest.git#0.4.0",
@@ -48,6 +49,10 @@
     "com.coffee.upm-git-extension-test-gitlab": {
       "hash": "bd7bd7aeab432583dfbe899b85f6a4eee774a682",
       "revision": "0.4.0"
+    },
+    "com.coffee.softmask-for-ugui": {
+      "hash": "7c895725406715e9ae1882bdab60c3430efab04d",
+      "revision": "0.8.1"
     }
   }
 }
