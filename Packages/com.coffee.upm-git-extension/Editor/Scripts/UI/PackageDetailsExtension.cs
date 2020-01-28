@@ -154,6 +154,16 @@ namespace Coffee.UpmGitExtension
                 string refName = GetSelectedVersion().packageInfo.git.revision;
 #else
                 string refName = GetSelectedVersion().VersionId.Split('@')[1];
+                var originRefName = refName;
+
+                // Find correct reference (branch or tag) name.
+                while(!AvailableVersions.GetVersions(selectedPackage.name, url).Any(x=>x.refName == refName))
+                {
+                    var index = refName.IndexOf('-');
+                    if(index < 0 || refName.Length < 1)
+                        throw new Exception($"Cannot install '{packageId}'. The branch or tag is not found in repository.");
+                    refName = refName.Substring(index+1);
+                }
 #endif
                 PackageUtils.UninstallPackage(selectedPackage.name);
                 PackageUtils.InstallPackage(selectedPackage.name, url, refName);
