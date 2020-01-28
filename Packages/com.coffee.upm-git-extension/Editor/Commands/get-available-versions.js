@@ -21,11 +21,15 @@ console.log(`  unityVersion: ${unityVersion}`);
 
 if (!repoUrl || !packageName || !unityVersion) process.exit(1);
 
-const encodedUrl = encodeURIComponent(repoUrl);
-const repoDir = `Library/UpmGitExtension/packages/${packageName}@${encodedUrl}`;
-const outputFile = path.resolve(
-  `Library/UpmGitExtension/results/${packageName}@${encodedUrl}.available-versions.json`
-);
+const hashCode = str => {
+  return Array.from(str)
+    .reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0)
+}
+
+const id = hashCode(`${packageName}@${repoUrl}`);
+const repoDir = `Library/UGE/packages/${id}}`;
+const resultDir = `Library/UGE/results`;
+const outputFile = path.resolve(`${resultDir}/${id}.json`);
 const lockFile = ".lock";
 
 const mkdirSyncRecrusive = postPath => {
@@ -92,6 +96,7 @@ try {
   console.log("\n>> Make dir and change current dir ]");
   mkdirSyncRecrusive("Assets");
   mkdirSyncRecrusive(repoDir);
+  mkdirSyncRecrusive(resultDir);
   process.chdir(repoDir);
   console.log(`  cwd: ${process.cwd()}`);
 

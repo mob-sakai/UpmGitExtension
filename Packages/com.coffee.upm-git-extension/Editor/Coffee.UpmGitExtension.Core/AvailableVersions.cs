@@ -45,7 +45,7 @@ namespace Coffee.UpmGitExtension
 
     public class AvailableVersions : ScriptableSingleton<AvailableVersions>
     {
-        const string kPackageDir = "Library/UpmGitExtension/packages";
+        const string kPackageDir = "Library/UGE/packages";
 
         public AvailableVersion[] versions = new AvailableVersion[0];
         

@@ -12,7 +12,7 @@ namespace Coffee.UpmGitExtension
 {
     public class AvailableVersionExtensions
     {
-        const string kCacheDir = "Library/UpmGitExtension";
+        const string kCacheDir = "Library/UGE";
         const string kResultDir = kCacheDir + "/results";
         const string kHeader = "<b><color=#c7634c>[AvailableVersionExtensions]</color></b> ";
         const string kGetVersionsJs = "Packages/com.coffee.upm-git-extension/Editor/Commands/get-available-versions.js";
@@ -22,22 +22,22 @@ namespace Coffee.UpmGitExtension
             var unity = Application.unityVersion;
 #if UNITY_EDITOR_WIN
             var node = Path.Combine(EditorApplication.applicationContentsPath, "Tools/nodejs/node.exe").Replace('/', '\\');
+            var args = string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs.Replace('/', '\\'), packageName, repoUrl, unity);
 #else
             var node = Path.Combine(EditorApplication.applicationContentsPath, "Tools/nodejs/bin/node");
+            var args = string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs, packageName, repoUrl, unity);
 #endif
+            Debug.Log(kHeader, $"{node} {args}");
 
-            var psi = new ProcessStartInfo()
+            var p = new UnityEditorInternal.NativeProgram(node, args);
+            p.Start((_, __) => 
             {
-                FileName = node,
-                Arguments = string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs, packageName, repoUrl, unity)
-            };
-            Debug.Log(kHeader, $"{psi.FileName} {psi.Arguments}");
-
-            var p = new UnityEditor.Utils.Program(psi);
-            if (callback != null)
-                p.Start((_, __) => callback(p._process.ExitCode));
-            else
-                p.Start();
+                #if UGE_LOG
+                UnityEngine.Debug.Log(p.GetAllOutput());
+                #endif
+                if(callback != null)
+                    callback(p._process.ExitCode);
+            });
         }
 
         static void OnResultCreated(string file)
@@ -67,15 +67,17 @@ namespace Coffee.UpmGitExtension
 #if !UNITY_EDITOR_WIN
             Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
 #endif
-            if (!Directory.Exists(kResultDir))
-                Directory.CreateDirectory(kResultDir);
+            var resultDir = Path.GetFullPath(kResultDir);
+            Debug.Log(kHeader, $"Start to watch .json in {resultDir}");
+            if (!Directory.Exists(resultDir))
+                Directory.CreateDirectory(resultDir);
 
-            foreach (var file in Directory.GetFiles(kResultDir, "*.json"))
+            foreach (var file in Directory.GetFiles(resultDir, "*.json"))
                 EditorApplication.delayCall += () => OnResultCreated(file);
 
             var watcher = new FileSystemWatcher()
             {
-                Path = kResultDir,
+                Path = resultDir,
                 NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite,
                 IncludeSubdirectories = false,
                 EnableRaisingEvents = true,
