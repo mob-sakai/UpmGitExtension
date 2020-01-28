@@ -4,23 +4,28 @@ on:
   push:
     branches:
       - preview
-      - release
       - master
-    tags:
-      - '!*'
+      - v*.x
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    if: "! contains(github.event.head_commit.message, '[ci skip]')"
+    steps:
+      - run: echo "${{ github.event.head_commit.message }}"
+
   release:
     runs-on: ubuntu-latest
+    needs: prepare
     steps:
-      - uses: actions/checkout@v1.0.0
+      - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v1.2.0
+      - uses: actions/cache@v1
         with:
-          node-version: 12
+          path: ~/.npm
+          key: ${{ runner.os }}-node
 
-      - name: Release
-        run: npx upm-release --pkg-root Packages/com.coffee.upm-git-extension --debug
+      - run: npm run release
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
           GH_TOKEN: ${{secrets.GH_TOKEN}}
