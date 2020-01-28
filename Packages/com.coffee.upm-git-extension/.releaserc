@@ -11,6 +11,13 @@
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": false,
+        "tarballDir": "."
+      }
+    ],
     "@semantic-release/git",
     [
       "@semantic-release/github",
@@ -18,13 +25,6 @@
         "assets": [
           "*.tgz"
         ]
-      }
-    ],
-    [
-      "@semantic-release/npm",
-      {
-        "npmPublish": false,
-        "tarballDir": "."
       }
     ],
     [
