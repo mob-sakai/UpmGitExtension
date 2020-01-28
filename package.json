@@ -4,12 +4,13 @@
   "version": "1.0.0",
   "devDependencies": {
     "git-snapshot": "^2.2.0",
-    "@semantic-release/changelog": "^4.0.0",
-    "@semantic-release/git": "^8.0.0",
-    "@semantic-release/exec": "^4.0.0",
-    "semantic-release": "^16.0.0"
+    "@semantic-release/changelog": "^5.0.0",
+    "@semantic-release/git": "^9.0.0",
+    "@semantic-release/exec": "^5.0.0",
+    "semantic-release": "^17.0.0"
   },
   "scripts": {
-    "release": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release --dry-run --no-ci --debug"
+    "release": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release --debug",
+    "release:debug": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release --dry-run --no-ci --debug"
   }
 }
