@@ -1,3 +1,10 @@
+# [1.1.0-preview.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.1...v1.1.0-preview.2) (2020-01-28)
+
+
+### Bug Fixes
+
+* fix release script ([162bb91](https://github.com/mob-sakai/UpmGitExtension/commit/162bb91a4129865bfecc9422487196625b6479e5))
+
 # [1.1.0-preview.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.0.1...v1.1.0-preview.1) (2020-01-28)
 
 
