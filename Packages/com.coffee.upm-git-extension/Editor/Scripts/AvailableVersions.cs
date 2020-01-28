@@ -152,7 +152,7 @@ namespace Coffee.UpmGitExtension
             }
             finally
             {
-                File.Delete(file);
+                EditorApplication.delayCall += () => File.Delete(file);
             }
         }
 
