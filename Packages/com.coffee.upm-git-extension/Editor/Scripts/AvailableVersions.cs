@@ -84,9 +84,6 @@ namespace Coffee.UpmGitExtension
                 .Where(x => string.IsNullOrEmpty(repoUrl) || x.repoUrl == repoUrl);
         }
 
-#if UGE_DEV
-        [MenuItem("UpmGitExtension/Dump Cached Versions")]
-#endif
         public static void Dump()
         {
             var sb = new StringBuilder("[AvailableVersions] Dump:\n");

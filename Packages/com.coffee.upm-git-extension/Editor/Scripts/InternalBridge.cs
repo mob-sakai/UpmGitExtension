@@ -73,7 +73,7 @@ namespace Coffee.UpmGitExtension
         /// <summary>
         /// Update available versions for git packages.
         /// </summary>
-        public void UpdateAvailableVersionsForGitPackages()
+        public static void UpdateAvailableVersionsForGitPackages()
         {
             // Start update task.
             foreach (var package in PackageExtensions.GetGitPackages())
@@ -127,7 +127,8 @@ namespace Coffee.UpmGitExtension
             }
             return false;
         }
-        static void UpdatePackageCollection()
+
+        public static void UpdatePackageCollection()
         {
             Debug.Log(kHeader, "[UpdatePackageCollection]");
             PackageExtensions.UpdatePackageCollection();
@@ -200,11 +201,11 @@ namespace Coffee.UpmGitExtension
 #else
         internal static IEnumerable<Package> GetGitPackages()
         {
-    #if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER
             return PackageCollection.packages.Values
-    #else
+#else
             return PackageCollection.Instance.packages.Values
-    #endif
+#endif
                 .Distinct()
                 .Where(x => x != null && x.Current != null && (x.Current.Origin == PackageSource.Git || x.Current.Origin == (PackageSource)99));
         }
@@ -245,11 +246,11 @@ namespace Coffee.UpmGitExtension
         {
             var newPInfo = JsonUtility.FromJson<PackageInfo>(JsonUtility.ToJson(baseInfo));
             newPInfo.Version = SemVersion.Parse(self.refNameVersion);
-    #if UNITY_2019_2_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
             newPInfo.IsInstalled = false;
-    #else
+#else
             newPInfo.IsCurrent = false;
-    #endif
+#endif
             newPInfo.IsVerified = false;
             newPInfo.Origin = (PackageSource)99;
             newPInfo.Info = baseInfo.Info;

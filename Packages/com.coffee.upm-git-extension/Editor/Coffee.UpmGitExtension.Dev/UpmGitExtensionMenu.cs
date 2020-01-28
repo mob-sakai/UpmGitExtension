@@ -6,10 +6,10 @@ namespace Coffee.UpmGitExtension.Dev
 {
     class UpmGitExtensionMenu
     {
-        const string kDevelopModeText = "UpmGitExtension/Develop Mode";
+        const string kDevelopModeText = "UGE/Develop Mode";
         const string kDevelopModeSymbol = "UGE_DEV";
 
-        const string kEnableLoggingText = "UpmGitExtension/Enable Logging";
+        const string kEnableLoggingText = "UGE/Enable Logging";
         const string kEnableLoggingSymbol = "UGE_LOG";
 
         [MenuItem(kDevelopModeText, false)]
@@ -38,15 +38,35 @@ namespace Coffee.UpmGitExtension.Dev
             return true;
         }
 
-        [MenuItem("UpmGitExtension/Update Git Package Versions")]
-        static void UpdateGitPackageVersions()
+        [MenuItem("UGE/Update Display Versions")]
+        static void UpdateDisplayVersions()
         {
             Type.GetType("Coffee.UpmGitExtension.Bridge, Coffee.UpmGitExtension")
                 .GetMethod("UpdateGitPackageVersions")
                 .Invoke(null, new object[0]);
+
+            Type.GetType("Coffee.UpmGitExtension.Bridge, Coffee.UpmGitExtension")
+                .GetMethod("UpdatePackageCollection")
+                .Invoke(null, new object[0]);
         }
 
-        [MenuItem("UpmGitExtension/Clear Cached Versions")]
+        [MenuItem("UGE/Update Cached Versions")]
+        static void UpdateCachedVersions()
+        {
+            Type.GetType("Coffee.UpmGitExtension.Bridge, Coffee.UpmGitExtension")
+                .GetMethod("UpdateAvailableVersionsForGitPackages")
+                .Invoke(null, new object[0]);
+        }
+
+        [MenuItem("UGE/Dump Cached Versions")]
+        static void DumpCachedVersions()
+        {
+            Type.GetType("Coffee.UpmGitExtension.AvailableVersions, Coffee.UpmGitExtension")
+                .GetMethod("Dump")
+                .Invoke(null, new object[0]);
+        }
+
+        [MenuItem("UGE/Clear Cached Versions")]
         static void ClearCachedVersions()
         {
             Type.GetType("Coffee.UpmGitExtension.AvailableVersions, Coffee.UpmGitExtension")
