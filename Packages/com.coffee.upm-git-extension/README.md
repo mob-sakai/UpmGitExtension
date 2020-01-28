@@ -47,7 +47,7 @@ This project extends the UI of Unity Package Manager for package installed using
 * Update package with a specific tag/branch
 * Remove package
 * Support Unity 2018.3 or later
-* Support .Net 4.x
+* Support `.Net 3.5`, `.Net 4.x` and `.Net Standard 2.0`
 * Version filtering
 * Support [GitDependencyResolverForUnity](https://github.com/mob-sakai/GitDependencyResolverForUnity) in Unity 2019.1 or later
 
@@ -148,7 +148,7 @@ The branching strategy when I develop a package for UPM is as follows.
 7. Tag on ump branch as new version.
 8. Release.
 
-For details, see https://www.patreon.com/posts/25070968.
+For details, see https://www.patreon.com/posts/25070968, https://www.jianshu.com/u/275cca6e5f17 (Chinese)
 
 
 
