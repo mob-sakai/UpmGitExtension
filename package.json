@@ -1,6 +1,6 @@
 {
-  "name": "release-to-upm",
-  "description": "To release upm package. do `npm run release`.",
+  "name": "release-upm",
+  "description": "Execute `npm run release` on bash to release upm package. .",
   "version": "1.0.0",
   "devDependencies": {
     "git-snapshot": "^2.2.0",
@@ -11,6 +11,44 @@
   },
   "scripts": {
     "release": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release",
-    "release:debug": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release --dry-run --no-ci --debug"
+    "release:debug": "npm run release -- --dry-run --no-ci --debug"
+  },
+  "release": {
+    "branches": [
+      "+([0-9])?(.{+([0-9]),x}).x",
+      "master",
+      {
+        "name": "preview",
+        "prerelease": true
+      }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false,
+          "tarballDir": "."
+        }
+      ],
+      "@semantic-release/git",
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            "*.tgz"
+          ]
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "tar -xzvf *.tgz",
+          "publishCmd": "git snapshot --prefix=package --branch=upm --remote=${options.repositoryUrl} --tag=${nextRelease.version} --message=\"${nextRelease.notes}\""
+        }
+      ]
+    ]
   }
 }

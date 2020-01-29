@@ -1,3 +1,22 @@
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# VS
+.vs/
+.vscode/
+obj/
+bin/
+
+# NPM
+node_modules/
+
+# package
 Editor/Coffee.UpmGitExtension.Dev/*
 Editor/Coffee.UpmGitExtension.Dev.meta
 !Editor/Coffee.UpmGitExtension.Core/*
+*.tgz
+.releaserc
