@@ -1,8 +1,0 @@
-!*~
-
-# VS
-*.sln
-.vs/
-.vscode/
-obj/
-bin/
