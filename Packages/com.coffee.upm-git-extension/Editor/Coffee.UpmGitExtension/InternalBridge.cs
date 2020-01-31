@@ -23,7 +23,6 @@ using Package = UnityEditor.PackageManager.UI.Package;
 using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
 using PackageCollection = UnityEditor.PackageManager.UI.PackageCollection;
 #endif
-using UnityEditor.Scripting.ScriptCompilation;
 
 namespace Coffee.UpmGitExtension
 {
