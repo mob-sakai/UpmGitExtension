@@ -162,7 +162,7 @@ namespace Coffee.UpmGitExtension
 
         internal static SemVersion GetVersion(this UpmPackageVersion self)
         {
-            return self.version;
+            return self.version ?? new SemVersion(0);
         }
 
         internal static UnityEditor.PackageManager.PackageInfo GetPackageInfo(this PackageInfo self)
