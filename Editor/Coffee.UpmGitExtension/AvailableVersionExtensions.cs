@@ -22,27 +22,26 @@ namespace Coffee.UpmGitExtension
             var unity = Application.unityVersion;
 #if UNITY_EDITOR_WIN
             var node = Path.Combine(EditorApplication.applicationContentsPath, "Tools/nodejs/node.exe").Replace('/', '\\');
-            var args = string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs.Replace('/', '\\'), packageName, repoUrl, unity);
 #else
             var node = Path.Combine(EditorApplication.applicationContentsPath, "Tools/nodejs/bin/node");
-            var args = string.Format("\"{0}\" {1} {2} {3}", kGetVersionsJs, packageName, repoUrl, unity);
 #endif
+            var args = string.Format("\"{0}\" {1} {2} {3}", Path.GetFullPath(kGetVersionsJs), packageName, repoUrl, unity);
             Debug.Log(kHeader, $"{node} {args}");
 
             var p = new UnityEditorInternal.NativeProgram(node, args);
-            p.Start((_, __) => 
+            p.Start((_, __) =>
             {
-                #if UGE_LOG
+#if UGE_LOG
                 UnityEngine.Debug.Log(p.GetAllOutput());
-                #endif
-                if(callback != null)
+#endif
+                if (callback != null)
                     callback(p._process.ExitCode);
             });
         }
 
         static void OnResultCreated(string file)
         {
-            if(string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
+            if (string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
                 return;
 
             var text = File.ReadAllText(file, System.Text.Encoding.UTF8);
@@ -83,7 +82,7 @@ namespace Coffee.UpmGitExtension
                 EnableRaisingEvents = true,
             };
 
-            watcher.Created += (s, e)=>
+            watcher.Created += (s, e) =>
             {
                 EditorApplication.delayCall += () => OnResultCreated(e.Name);
             };

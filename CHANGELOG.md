@@ -1,3 +1,10 @@
+# [1.1.0-preview.8](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.7...v1.1.0-preview.8) (2020-02-05)
+
+
+### Bug Fixes
+
+* js script path ([fb821ad](https://github.com/mob-sakai/UpmGitExtension/commit/fb821ada2f44b6a095dbaad5a836191ba467413f))
+
 # [1.1.0-preview.7](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.6...v1.1.0-preview.7) (2020-02-05)
 
 
