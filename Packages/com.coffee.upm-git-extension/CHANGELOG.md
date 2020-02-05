@@ -1,3 +1,16 @@
+# [1.1.0-preview.7](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.6...v1.1.0-preview.7) (2020-02-05)
+
+
+### Bug Fixes
+
+* fix release script ([95a4921](https://github.com/mob-sakai/UpmGitExtension/commit/95a4921f7df0ec06bfd95b46c2e0155d42e35bb7))
+* SemVersion is ambiguous reference ([c066389](https://github.com/mob-sakai/UpmGitExtension/commit/c06638935fd1d02b769ff7dd1bb437bb2c127e12))
+
+
+### Features
+
+* support 2020.1 (WIP) ([5d96f1f](https://github.com/mob-sakai/UpmGitExtension/commit/5d96f1fbcaf4df492c3e488afab62f6e5e900d42))
+
 # [1.1.0-preview.6](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.5...v1.1.0-preview.6) (2020-01-28)
 
 
