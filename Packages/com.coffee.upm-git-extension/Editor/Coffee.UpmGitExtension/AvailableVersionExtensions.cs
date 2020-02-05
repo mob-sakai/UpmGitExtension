@@ -29,19 +29,19 @@ namespace Coffee.UpmGitExtension
             Debug.Log(kHeader, $"{node} {args}");
 
             var p = new UnityEditorInternal.NativeProgram(node, args);
-            p.Start((_, __) => 
+            p.Start((_, __) =>
             {
-                #if UGE_LOG
+#if UGE_LOG
                 UnityEngine.Debug.Log(p.GetAllOutput());
-                #endif
-                if(callback != null)
+#endif
+                if (callback != null)
                     callback(p._process.ExitCode);
             });
         }
 
         static void OnResultCreated(string file)
         {
-            if(string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
+            if (string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
                 return;
 
             var text = File.ReadAllText(file, System.Text.Encoding.UTF8);
@@ -82,7 +82,7 @@ namespace Coffee.UpmGitExtension
                 EnableRaisingEvents = true,
             };
 
-            watcher.Created += (s, e)=>
+            watcher.Created += (s, e) =>
             {
                 EditorApplication.delayCall += () => OnResultCreated(e.Name);
             };
