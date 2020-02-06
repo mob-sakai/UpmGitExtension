@@ -1,3 +1,10 @@
+# [1.1.0-preview.9](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.8...v1.1.0-preview.9) (2020-02-06)
+
+
+### Bug Fixes
+
+* **OSC:** update osc ([2117ed7](https://github.com/mob-sakai/UpmGitExtension/commit/2117ed722054fbae34c18ec8e11ba76da0ecc0c1))
+
 # [1.1.0-preview.8](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.7...v1.1.0-preview.8) (2020-02-05)
 
 
