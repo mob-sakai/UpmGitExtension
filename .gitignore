@@ -28,3 +28,4 @@ node_modules/
 UpmGitExtension_*/
 !Coffee.UpmGitExtension.Bridge.*.csproj
 test_*/
+Packages/com.coffee.open-sesame-compiler
