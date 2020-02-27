@@ -125,14 +125,16 @@ namespace Coffee.UpmGitExtension
         public Texture2D GetHostLogo(string packageId)
         {
             const string packageDir = "Packages/com.coffee.upm-git-extension/Editor/Resources/Logos/";
-            if (packageId.Contains("github.com"))
+            if (packageId.Contains("github.com/"))
                 return EditorGUIUtility.isProSkin
                     ? AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Light.png") as Texture2D
                     : AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Dark.png") as Texture2D;
-            else if (packageId.Contains("bitbucket.org"))
+            else if (packageId.Contains("bitbucket.org/"))
                 return AssetDatabase.LoadMainAssetAtPath(packageDir + "Bitbucket-Logo.png") as Texture2D;
-            else if (packageId.Contains("gitlab."))
+            else if (packageId.Contains("gitlab.com/"))
                 return AssetDatabase.LoadMainAssetAtPath(packageDir + "GitLab-Logo.png") as Texture2D;
+            else if (packageId.Contains("azure.com/"))
+                return AssetDatabase.LoadMainAssetAtPath(packageDir + "AzureRepos-Logo.png") as Texture2D;
 
             return EditorGUIUtility.isProSkin
                 ? EditorGUIUtility.FindTexture("d_buildsettings.web.small")

@@ -205,6 +205,7 @@ namespace Coffee.UpmGitExtension
             var repoUrl = m.Groups[2].Value;
             if (asHttps)
             {
+                repoUrl = Regex.Replace(repoUrl, "^git\\+", "");
                 repoUrl = Regex.Replace(repoUrl, "(git:)?git@([^:]+):", "https://$2/");
                 repoUrl = repoUrl.Replace("ssh://", "https://");
                 repoUrl = repoUrl.Replace("git@", "");
