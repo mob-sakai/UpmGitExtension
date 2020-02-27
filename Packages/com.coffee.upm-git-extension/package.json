@@ -10,5 +10,10 @@
     "url": "https://github.com/mob-sakai/UpmGitExtension.git"
   },
   "author": "mob-sakai <sakai861104@gmail.com> (https://github.com/mob-sakai)",
+  "keywords": [
+    "upm",
+    "git",
+    "editor"
+  ],
   "dependencies": {}
 }
