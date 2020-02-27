@@ -1,13 +1,13 @@
 {
   "name": "release-upm",
-  "description": "Execute `npm run release` on bash to release upm package. .",
+  "description": "To release upm package, execute `npm run release` on bash.",
   "version": "1.0.0",
   "devDependencies": {
     "git-snapshot": "^2.2.0",
     "@semantic-release/changelog": "^5.0.0",
     "@semantic-release/git": "^9.0.0",
     "@semantic-release/exec": "^5.0.0",
-    "semantic-release": "^17.0.0"
+    "semantic-release": "^17.0.2"
   },
   "scripts": {
     "release": "npm ci && cd `find Packages/*/.releaserc -exec dirname {} +` && npx semantic-release",
@@ -45,8 +45,8 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "tar -xzvf *.tgz",
-          "publishCmd": "git snapshot --prefix=package --branch=upm --remote=${options.repositoryUrl} --tag=${nextRelease.version} --message=\"${nextRelease.notes}\""
+          "verifyReleaseCmd": "test -d Samples && mv Samples Samples~ && rm -f Samples.meta || exit 0",
+          "publishCmd": "tar -xzvf *.tgz && git snapshot --prefix=package --branch=upm --remote=${options.repositoryUrl} --tag=${nextRelease.version} --message=\"${nextRelease.version}\n\n${nextRelease.notes}\""
         }
       ]
     ]
