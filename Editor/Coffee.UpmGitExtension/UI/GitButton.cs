@@ -1,4 +1,4 @@
-#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 using UnityEditor;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
@@ -40,4 +40,4 @@ namespace Coffee.UpmGitExtension
         }
     }
 }
-#endif // This line is added by Open Sesame Portable. DO NOT remov manually.
+#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.

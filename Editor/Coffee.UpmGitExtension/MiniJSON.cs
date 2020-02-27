@@ -1,3 +1,4 @@
+#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 /*
  * Copyright (c) 2013 Calvin Rien
  *
@@ -693,3 +694,5 @@ namespace Coffee.UpmGitExtension
 		}
 	}
 }
+
+#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.

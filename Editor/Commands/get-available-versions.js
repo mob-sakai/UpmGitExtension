@@ -118,7 +118,7 @@ try {
   if (!fs.existsSync(".git")) {
     console.log(`\n>> Init git at ${repoDir}. origin is ${repoUrl}`);
     execSync("git init");
-    execSync(`git remote add origin ${repoUrl}`);
+    execSync(`git remote add origin ${repoUrl.replace(/^git\+/, "")}`);
   }
 
   // Fast fetch repo to get refs

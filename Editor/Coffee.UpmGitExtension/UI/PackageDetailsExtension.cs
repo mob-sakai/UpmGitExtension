@@ -1,4 +1,4 @@
-#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 using System;
 using System.IO;
 using System.Linq;
@@ -125,14 +125,16 @@ namespace Coffee.UpmGitExtension
         public Texture2D GetHostLogo(string packageId)
         {
             const string packageDir = "Packages/com.coffee.upm-git-extension/Editor/Resources/Logos/";
-            if (packageId.Contains("github.com"))
+            if (packageId.Contains("github.com/"))
                 return EditorGUIUtility.isProSkin
                     ? AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Light.png") as Texture2D
                     : AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Dark.png") as Texture2D;
-            else if (packageId.Contains("bitbucket.org"))
+            else if (packageId.Contains("bitbucket.org/"))
                 return AssetDatabase.LoadMainAssetAtPath(packageDir + "Bitbucket-Logo.png") as Texture2D;
-            else if (packageId.Contains("gitlab."))
+            else if (packageId.Contains("gitlab.com/"))
                 return AssetDatabase.LoadMainAssetAtPath(packageDir + "GitLab-Logo.png") as Texture2D;
+            else if (packageId.Contains("azure.com/"))
+                return AssetDatabase.LoadMainAssetAtPath(packageDir + "AzureRepos-Logo.png") as Texture2D;
 
             return EditorGUIUtility.isProSkin
                 ? EditorGUIUtility.FindTexture("d_buildsettings.web.small")
@@ -255,4 +257,4 @@ namespace Coffee.UpmGitExtension
 #endif
     }
 }
-#endif // This line is added by Open Sesame Portable. DO NOT remov manually.
+#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.

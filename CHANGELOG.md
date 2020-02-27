@@ -1,3 +1,15 @@
+# [1.1.0-preview.11](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.10...v1.1.0-preview.11) (2020-02-27)
+
+
+### Bug Fixes
+
+* **OSC:** update osc ([2ff8243](https://github.com/mob-sakai/UpmGitExtension/commit/2ff8243bf99b9a90704889cdecacdfde1efe9e4b))
+
+
+### Features
+
+* Azure Dev Ops and Branch Support in Unity 2019.1 or later ([3ed528a](https://github.com/mob-sakai/UpmGitExtension/commit/3ed528ab5ff201db7e5e9f60ee584ca8edeb9360)), closes [#80](https://github.com/mob-sakai/UpmGitExtension/issues/80)
+
 # [1.1.0-preview.10](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.9...v1.1.0-preview.10) (2020-02-10)
 
 

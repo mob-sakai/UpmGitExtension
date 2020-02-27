@@ -1,4 +1,4 @@
-#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -189,8 +189,12 @@ namespace Coffee.UpmGitExtension
         {
             Match m = Regex.Match(url, "(git@[^:]+):(.*)");
             string ret = m.Success ? string.Format("ssh://{0}/{1}", m.Groups[1].Value, m.Groups[2].Value) : url;
-            return ret.EndsWith(".git", System.StringComparison.Ordinal) ? ret : ret + ".git";
+#if UNITY_2019_1_OR_NEWER
+            return ret.EndsWith(".git") ? ret : "git+" + ret;
+#else
+            return ret.EndsWith(".git") ? ret : ret + ".git";
+#endif
         }
     }
 }
-#endif // This line is added by Open Sesame Portable. DO NOT remov manually.
+#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
