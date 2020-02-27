@@ -1,4 +1,4 @@
-#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 using System.Text.RegularExpressions;
 using System;
 using System.Collections.Generic;
@@ -241,4 +241,4 @@ namespace Coffee.UpmGitExtension
         }
     }
 }
-#endif // This line is added by Open Sesame Portable. DO NOT remov manually.
+#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.

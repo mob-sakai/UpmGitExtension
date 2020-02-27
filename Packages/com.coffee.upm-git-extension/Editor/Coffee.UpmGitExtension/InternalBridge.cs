@@ -1,4 +1,4 @@
-#if OPEN_SESAME // This line is added by Open Sesame Portable. DO NOT remov manually.
+#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 #if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
 #define UNITY_2019_1_9_OR_NEWER
 #endif
@@ -295,4 +295,4 @@ namespace Coffee.UpmGitExtension
 #endif
     }
 }
-#endif // This line is added by Open Sesame Portable. DO NOT remov manually.
+#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.

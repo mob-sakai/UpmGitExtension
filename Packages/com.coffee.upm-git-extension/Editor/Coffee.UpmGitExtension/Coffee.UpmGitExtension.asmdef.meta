@@ -2,6 +2,6 @@ fileFormatVersion: 2
 guid: 6d31ece5aaa0f4bdfa2eb458573a31af
 AssemblyDefinitionImporter:
   externalObjects: {}
-  userData: '{"OpenSesame":true,"ModifySymbols":""}'
+  userData: '{"IgnoreAccessChecks":true,"ModifySymbols":""}'
   assetBundleName: 
   assetBundleVariant: 

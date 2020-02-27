@@ -1,3 +1,4 @@
+#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -102,3 +103,4 @@ namespace Coffee.UpmGitExtension
         }
     }
 }
+#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
