@@ -1,3 +1,16 @@
+# [1.1.0-preview.12](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.11...v1.1.0-preview.12) (2020-03-07)
+
+
+### Bug Fixes
+
+* console log is a little chatty [#82](https://github.com/mob-sakai/UpmGitExtension/issues/82) ([a632d7f](https://github.com/mob-sakai/UpmGitExtension/commit/a632d7fc2f560967ca982b0f3b68334214f83ad5))
+* releases wrongly being flagged as "preview" ([a32069e](https://github.com/mob-sakai/UpmGitExtension/commit/a32069efa78c028ebc1ac3b0daa2d86f3cd7ff58)), closes [#83](https://github.com/mob-sakai/UpmGitExtension/issues/83)
+
+
+### Features
+
+* add keywords to package.json ([c0ee69e](https://github.com/mob-sakai/UpmGitExtension/commit/c0ee69ea21ec08075396a83420b8d1c8f3457ac9))
+
 # [1.1.0-preview.11](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.10...v1.1.0-preview.11) (2020-02-27)
 
 
