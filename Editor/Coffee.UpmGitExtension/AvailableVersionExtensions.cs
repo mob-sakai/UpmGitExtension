@@ -46,7 +46,6 @@ namespace Coffee.UpmGitExtension
 
             var text = File.ReadAllText(file, System.Text.Encoding.UTF8);
             File.Delete(file);
-            UnityEngine.Debug.Log($"{kHeader} OnResultCreated {file}:\n{text}");
 
             try
             {

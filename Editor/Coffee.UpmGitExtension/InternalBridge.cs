@@ -203,7 +203,7 @@ namespace Coffee.UpmGitExtension
 
             // Update tag.
             PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
-            if (semver.Major == 0 || string.IsNullOrEmpty(semver.Prerelease))
+            if (semver.Major == 0 || !string.IsNullOrEmpty(semver.Prerelease))
                 tag |= PackageTag.Preview;
             else if (semver.IsRelease())
                 tag |= PackageTag.Release;
