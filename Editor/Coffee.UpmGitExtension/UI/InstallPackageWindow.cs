@@ -13,6 +13,8 @@ using UnityEngine.Experimental.UIElements;
 
 namespace Coffee.UpmGitExtension
 {
+    using System;
+
     internal class InstallPackageWindow : VisualElement
     {
         //################################
@@ -187,8 +189,13 @@ namespace Coffee.UpmGitExtension
 
         public static string GetRepoUrl(string url)
         {
-            Match m = Regex.Match(url, "(git@[^:]+):(.*)");
-            string ret = m.Success ? string.Format("ssh://{0}/{1}", m.Groups[1].Value, m.Groups[2].Value) : url;
+            string ret = url;
+
+            if (!url.StartsWith("ssh://", StringComparison.InvariantCultureIgnoreCase))
+            {
+                Match m = Regex.Match(url, "(git@[^:]+):(.*)");
+                ret = m.Success ? string.Format("ssh://{0}/{1}", m.Groups[1].Value, m.Groups[2].Value) : url;
+            }
 #if UNITY_2019_1_OR_NEWER
             return ret.EndsWith(".git") ? ret : "git+" + ret;
 #else

@@ -1,3 +1,10 @@
+# [1.1.0-preview.13](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.12...v1.1.0-preview.13) (2020-05-27)
+
+
+### Bug Fixes
+
+* only transform if it is not already in the SSH format, close [#47](https://github.com/mob-sakai/UpmGitExtension/issues/47) ([f2e71b2](https://github.com/mob-sakai/UpmGitExtension/commit/f2e71b2860f5515cf4a9b15e7947bd9d226e50ff))
+
 # [1.1.0-preview.12](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.11...v1.1.0-preview.12) (2020-03-07)
 
 
