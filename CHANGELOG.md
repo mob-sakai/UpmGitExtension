@@ -1,3 +1,10 @@
+# [1.1.0-preview.14](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.13...v1.1.0-preview.14) (2020-07-16)
+
+
+### Bug Fixes
+
+* KeyNotFoundException is thrown for every package found when trying to install ([4720490](https://github.com/mob-sakai/UpmGitExtension/commit/4720490ec2c6c415d83c680cc539ad9d3ee3ad86)), closes [#90](https://github.com/mob-sakai/UpmGitExtension/issues/90)
+
 # [1.1.0-preview.13](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.12...v1.1.0-preview.13) (2020-05-27)
 
 

@@ -133,7 +133,7 @@ namespace Coffee.UpmGitExtension
                 dependencies?.Add(packageName, repoUrl + "#" + refName);
 
                 // Unlock git revision.
-                var locks = manifest["lock"] as Dictionary<string, object>;
+                var locks = manifest.TryGetValue("lock", out object lockValue) ? lockValue as Dictionary<string, object> : null;
                 if (locks != null && locks.ContainsKey(packageName))
                     locks.Remove(packageName);
             });
