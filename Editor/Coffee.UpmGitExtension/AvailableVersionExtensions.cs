@@ -44,12 +44,12 @@ namespace Coffee.UpmGitExtension
             if (string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
                 return;
 
-            var text = File.ReadAllText(file, System.Text.Encoding.UTF8);
-            File.Delete(file);
 
             try
             {
+                var text = File.ReadAllText(file, System.Text.Encoding.UTF8);
                 AvailableVersions.AddVersions(JsonUtility.FromJson<ResultInfo>(text).versions);
+                File.Delete(file);
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace Coffee.UpmGitExtension
                 Directory.CreateDirectory(resultDir);
 
             foreach (var file in Directory.GetFiles(resultDir, "*.json"))
-                EditorApplication.delayCall += () => OnResultCreated(file);
+                EditorApplication.delayCall += () => OnResultCreated(Path.Combine(resultDir, file));
 
             var watcher = new FileSystemWatcher()
             {
@@ -83,7 +83,7 @@ namespace Coffee.UpmGitExtension
 
             watcher.Created += (s, e) =>
             {
-                EditorApplication.delayCall += () => OnResultCreated(e.Name);
+                EditorApplication.delayCall += () => OnResultCreated(e.FullPath);
             };
         }
     }

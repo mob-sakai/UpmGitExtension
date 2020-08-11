@@ -27,7 +27,7 @@ const hashCode = str => {
 }
 
 const id = hashCode(`${packageName}@${repoUrl}`);
-const repoDir = `Library/UGE/packages/${id}}`;
+const repoDir = `Library/UGE/packages/${id}`;
 const resultDir = `Library/UGE/results`;
 const outputFile = path.resolve(`${resultDir}/${id}.json`);
 const lockFile = ".lock";
@@ -37,7 +37,11 @@ const mkdirSyncRecrusive = postPath => {
     const path = item ? (acc ? [acc, item].join("/") : item) : "";
     if (path && !fs.existsSync(path)) {
       console.log(`  Make dir: ${path}`);
-      fs.mkdirSync(path);
+      try {
+        fs.mkdirSync(path);
+      }
+      catch (e){
+      }
     }
     return path;
   }, "");
@@ -135,8 +139,8 @@ try {
     .filter(x => x);
 
   // Output valid package references to file
-  console.log(`\n>> Output valid package references to file: ${outputFile}`);
-  console.log(versions);
+  console.log(`\n>> Output valid package (${versions.length} versions) references to file: ${outputFile}`);
+  console.dir(versions);
   fs.writeFileSync(outputFile, JSON.stringify({ versions }, space = 2), "utf-8");
 
   console.log("\n######## Complete ########");

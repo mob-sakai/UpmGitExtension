@@ -2,6 +2,7 @@
 #if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
 #define UNITY_2019_1_9_OR_NEWER
 #endif
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEditor.PackageManager;
@@ -22,6 +23,9 @@ using PackageInfo = UnityEditor.PackageManager.UI.UpmPackageVersion;
 using Package = UnityEditor.PackageManager.UI.Package;
 using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
 using PackageCollection = UnityEditor.PackageManager.UI.PackageCollection;
+#endif
+#if UNITY_2020_1_OR_NEWER
+using UnityEditor.Scripting.ScriptCompilation;
 #endif
 
 namespace Coffee.UpmGitExtension
@@ -46,28 +50,8 @@ namespace Coffee.UpmGitExtension
             packageDetails = root.Q<PackageDetails>();
             Debug.Log(kHeader, $"[Setup] {packageList}, {packageDetails},");
 
-#if UNITY_2019_3_OR_NEWER
-            packageList.onPackageListLoaded -= UpdateGitPackageVersions;
-            packageList.onPackageListLoaded += UpdateGitPackageVersions;
+            packageList.RegisterLoadedAction(UpdateGitPackageVersions);
 
-            // PackageDatabase.instance.onPackagesChanged += (added, removed, _, updated) =>
-            // {
-            //     // Removed or updated.
-            //     if (removed.Concat(updated).Any(x => x?.installedVersion?.packageInfo?.source == PackageSource.Git))
-            //     {
-            //         EditorApplication.delayCall += UpdatePackageCollection;
-            //     }
-
-            //     // Installed with git
-            //     if (added.Concat(updated).Any(x => x?.installedVersion?.packageInfo?.source == PackageSource.Git))
-            //     {
-            //         EditorApplication.delayCall += UpdateGitPackages;
-            //     }
-            // };
-#else
-            packageList.OnLoaded -= UpdateGitPackageVersions;
-            packageList.OnLoaded += UpdateGitPackageVersions;
-#endif
             AvailableVersions.OnChanged += UpdateGitPackageVersions;
             UpdateGitPackageVersions();
             UpdateAvailableVersionsForGitPackages();
@@ -106,6 +90,8 @@ namespace Coffee.UpmGitExtension
 
             if (changed)
                 UpdatePackageCollection();
+            else
+                UpdateAvailableVersionsForGitPackages();
         }
 
         /// <summary>
@@ -142,7 +128,91 @@ namespace Coffee.UpmGitExtension
 
     internal static class PackageExtensions
     {
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2020_1_OR_NEWER
+        internal static void RegisterLoadedAction(this PackageList self, Action action)
+        {
+            Action<IPage> act = _ => action();
+            PageManager.instance.onListRebuild -= act;
+            PageManager.instance.onListRebuild += act;
+        }
+
+        internal static IEnumerable<UpmPackage> GetGitPackages()
+        {
+            return PackageDatabase.instance.upmPackages
+                .Cast<UpmPackage>()
+                .Where(x => x != null && x.GetInstalledVersion() != null && x.GetInstalledVersion().HasTag(PackageTag.Git));
+        }
+
+        internal static IEnumerable<UpmPackageVersion> GetGitPackageInfos()
+        {
+            return GetGitPackages().Select(x=>x.GetInstalledVersion());
+        }
+
+        internal static UpmPackageVersion GetInstalledVersion(this UpmPackage self)
+        {
+            return self.versions.installed as UpmPackageVersion;
+        }
+
+        internal static SemVersion GetVersion(this UpmPackageVersion self)
+        {
+            return self.version ?? new SemVersion(0);
+        }
+
+        internal static UnityEditor.PackageManager.PackageInfo GetPackageInfo(this UpmPackageVersion self)
+        {
+            return self.packageInfo;
+        }
+
+        internal static string GetName(this UpmPackage self)
+        {
+            return self.name;
+        }
+
+        internal static int GetVersionCount(this UpmPackage self)
+        {
+            return self.versions.Count();
+        }
+
+        internal static void UnlockVersion(this UpmPackageVersion self)
+        {
+            self.m_Tag = self.m_Tag & ~PackageTag.VersionLocked;
+        }
+
+        internal static void UpdatePackageCollection()
+        {
+            var empty = Enumerable.Empty<IPackage>();
+            (PageManager.instance.GetCurrentPage()).OnPackagesChanged(empty, empty, empty, GetGitPackages());
+        }
+
+        internal static UpmPackageVersion ToPackageVersion(this AvailableVersion self, UpmPackageVersion baseInfo)
+        {
+            var semver = SemVersionParser.Parse(self.refNameVersion);
+
+            var newPInfo = JsonUtility.FromJson<UnityEditor.PackageManager.PackageInfo>(JsonUtility.ToJson(baseInfo.packageInfo));
+            newPInfo.m_Version = self.version;
+            newPInfo.m_Git = new GitInfo("", self.refName);
+
+            var p = new UpmPackageVersion(newPInfo, false, semver, newPInfo.displayName);
+
+            // Update tag.
+            PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
+            if (semver.Major == 0 || !string.IsNullOrEmpty(semver.Prerelease))
+                tag |= PackageTag.Preview;
+            else if (semver.IsRelease())
+                tag |= PackageTag.Release;
+
+            p.m_Tag = tag;
+            p.m_IsFullyFetched = true;
+            p.m_PackageId = string.Format("{0}@{1}#{2}", self.packageName, self.repoUrl, self.refName);
+            return p;
+        }
+#elif UNITY_2019_3_OR_NEWER
+        internal static void RegisterLoadedAction(this PackageList self, Action action)
+        {
+            self.onPackageListLoaded -= action;
+            self.onPackageListLoaded += action;
+        }
+
         internal static IEnumerable<UpmPackage> GetGitPackages()
         {
             return PackageDatabase.instance.upmPackages
@@ -214,6 +284,12 @@ namespace Coffee.UpmGitExtension
             return p;
         }
 #else
+        internal static void RegisterLoadedAction(this PackageList self, Action action)
+        {
+            self.OnLoaded -= action;
+            self.OnLoaded += action;
+        }
+
         internal static IEnumerable<Package> GetGitPackages()
         {
 #if UNITY_2019_1_OR_NEWER

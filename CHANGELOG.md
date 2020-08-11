@@ -1,3 +1,15 @@
+# [1.1.0-preview.15](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.14...v1.1.0-preview.15) (2020-08-11)
+
+
+### Bug Fixes
+
+* the package version list is not updated (javascript) ([e496c62](https://github.com/mob-sakai/UpmGitExtension/commit/e496c62edbbe6e580f70d17c1395c563160778e5))
+
+
+### Features
+
+* support Unity 2020.1 ([c879375](https://github.com/mob-sakai/UpmGitExtension/commit/c879375d1af0daf114c1be0224512671a75f9e65)), closes [#76](https://github.com/mob-sakai/UpmGitExtension/issues/76)
+
 # [1.1.0-preview.14](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.0-preview.13...v1.1.0-preview.14) (2020-07-16)
 
 
