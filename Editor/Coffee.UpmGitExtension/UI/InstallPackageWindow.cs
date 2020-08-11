@@ -74,7 +74,7 @@ namespace Coffee.UpmGitExtension
             repoUrlText.OnValueChanged ((evt) => onChange_RepoUrl(evt.newValue));
 #endif
 
-#if UNITY_2020_1_OR_NEWER
+#if UNITY_2019_3_OR_NEWER
             subDirText.RegisterValueChangedCallback ((evt) => onChange_RepoUrl (repoUrlText.value));
             UIUtils.SetElementDisplay(root.Q("subDirContainer"), true);
 #else

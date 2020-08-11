@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.2...v1.2.3) (2020-08-11)
+
+
+### Bug Fixes
+
+* path query parameter is supported in Unity 2019.3.4 or later ([70b169f](https://github.com/mob-sakai/UpmGitExtension/commit/70b169f5a12d7694ef7f228463a3d976885f3f17))
+
 ## [1.2.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.1...v1.2.2) (2020-08-11)
 
 
