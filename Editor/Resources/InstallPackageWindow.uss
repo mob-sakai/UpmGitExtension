@@ -23,7 +23,7 @@
 .installPackageWindow .horizontal {
   flex-direction: row;
   position: relative;
-  width: 550px;
+  width: 650px;
   align-items: center;
   justify-content: center;
   margin-bottom: 4px;

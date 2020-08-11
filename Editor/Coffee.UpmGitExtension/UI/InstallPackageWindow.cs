@@ -43,6 +43,7 @@ namespace Coffee.UpmGitExtension
             root = asset.CloneTree(null);
             AddStyleSheetPath(StylePath);
 #endif
+
             // Add ui elements and class (for miximize).
             AddToClassList("maximized");
             root.AddToClassList("maximized");
@@ -52,6 +53,7 @@ namespace Coffee.UpmGitExtension
 
             // Find ui elements.
             repoUrlText = root.Q<TextField>("repoUrlText");
+            subDirText = root.Q<TextField>("subDirText");
             findVersionsButton = root.Q<Button>("findVersionsButton");
             findVersionsError = root.Q("findVersionsError");
 
@@ -69,8 +71,16 @@ namespace Coffee.UpmGitExtension
 #if UNITY_2019_1_OR_NEWER
 			repoUrlText.RegisterValueChangedCallback ((evt) => onChange_RepoUrl (evt.newValue));
 #else
-            repoUrlText.OnValueChanged((evt) => onChange_RepoUrl(evt.newValue));
+            repoUrlText.OnValueChanged ((evt) => onChange_RepoUrl(evt.newValue));
 #endif
+
+#if UNITY_2020_1_OR_NEWER
+            subDirText.RegisterValueChangedCallback ((evt) => onChange_RepoUrl (repoUrlText.value));
+            UIUtils.SetElementDisplay(root.Q("subDirContainer"), true);
+#else
+            UIUtils.SetElementDisplay(root.Q("subDirContainer"), false);
+#endif
+
             findVersionsButton.clickable.clicked += onClick_FindVersions;
 
             // Version container
@@ -104,6 +114,7 @@ namespace Coffee.UpmGitExtension
         readonly Button versionSelectButton;
         readonly Label packageNameLabel;
         readonly TextField repoUrlText;
+        readonly TextField subDirText;
         IEnumerable<AvailableVersion> versions = new AvailableVersion[0];
         AvailableVersion currentVersion = null;
 
@@ -126,6 +137,7 @@ namespace Coffee.UpmGitExtension
             UIUtils.SetElementDisplay(this, false);
 
             repoUrlText.value = "";
+            subDirText.value = "";
             findVersionsButton.SetEnabled(false);
 
             EnableVersionContainer(false);
@@ -149,7 +161,7 @@ namespace Coffee.UpmGitExtension
             root.SetEnabled(false);
             EnableVersionContainer(false);
 
-            var repoUrl = GetRepoUrl(repoUrlText.value);
+            var repoUrl = GetRepoUrl(repoUrlText.value, subDirText.value);
             AvailableVersions.Clear(repoUrl: repoUrl);
             AvailableVersionExtensions.UpdateAvailableVersions(repoUrl: repoUrl, callback: exitCode =>
             {
@@ -171,7 +183,7 @@ namespace Coffee.UpmGitExtension
                 EnablePackageContainer(true, version.packageName);
             };
 
-            var repoUrl = GetRepoUrl(repoUrlText.value);
+            var repoUrl = GetRepoUrl(repoUrlText.value, subDirText.value);
             foreach (var version in AvailableVersions.GetVersions(repoUrl: repoUrl).OrderByDescending(v => v.version))
             {
                 var text = version.refNameText;
@@ -187,7 +199,7 @@ namespace Coffee.UpmGitExtension
             onClick_Close();
         }
 
-        public static string GetRepoUrl(string url)
+        public static string GetRepoUrl(string url, string path)
         {
             string ret = url;
 
@@ -196,11 +208,20 @@ namespace Coffee.UpmGitExtension
                 Match m = Regex.Match(url, "(git@[^:]+):(.*)");
                 ret = m.Success ? string.Format("ssh://{0}/{1}", m.Groups[1].Value, m.Groups[2].Value) : url;
             }
+
 #if UNITY_2019_1_OR_NEWER
-            return ret.EndsWith(".git") ? ret : "git+" + ret;
+            ret = ret.EndsWith(".git") ? ret : "git+" + ret;
 #else
-            return ret.EndsWith(".git") ? ret : ret + ".git";
+            ret = ret.EndsWith(".git") ? ret : ret + ".git";
 #endif
+
+
+#if UNITY_2020_1_OR_NEWER
+            // Support path query.
+            path = path.Trim('/');
+            ret = 0 < path.Length ? ret + "?path=" + path : ret;
+#endif
+            return ret;
         }
     }
 }

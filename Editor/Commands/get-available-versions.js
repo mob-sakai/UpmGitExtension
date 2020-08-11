@@ -12,11 +12,16 @@ const path = require("path");
 // Input
 console.log("\nInput");
 const packageName = process.argv[2];
-const repoUrl = process.argv[3];
 const unityVersion = process.argv[4];
+const rawRepoUrl = process.argv[3];
+const matchUrl = rawRepoUrl.match(/^(.*?)(\?path=(.*))?$/);
+const repoUrl = matchUrl[1]
+const subDir = (matchUrl[3] || '.') + '/'
 
-console.log(`  repoUrl: ${repoUrl}`);
 console.log(`  packageName: ${packageName}`);
+console.log(`  rawRepoUrl: ${rawRepoUrl}`);
+console.log(`  repoUrl: ${repoUrl}`);
+console.log(`  subDir: ${subDir}`);
 console.log(`  unityVersion: ${unityVersion}`);
 
 if (!repoUrl || !packageName || !unityVersion) process.exit(1);
@@ -49,8 +54,7 @@ const mkdirSyncRecrusive = postPath => {
       console.log(`  Make dir: ${path}`);
       try {
         fs.mkdirSync(path);
-      }
-      catch (e) {
+      } catch (e) {
       }
     }
     return path;
@@ -75,8 +79,8 @@ const parseRef = text => {
     const refName = ref.match(regRefName)[2];
 
     console.log(`  checkout: ${ref}`);
-    execSync(`git checkout -q ${ref} -- package.json package.json.meta`);
-    const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
+    execSync(`git checkout -q ${ref} -- ${subDir}package.json ${subDir}package.json.meta`);
+    const p = JSON.parse(fs.readFileSync(`${subDir}package.json`, "utf8"));
 
     // Check package name.
     if (packageName != "all" && p.name != packageName) {
@@ -101,7 +105,7 @@ const parseRef = text => {
     const id = refName.replace(regId, "");
 
     //
-    return { packageName: p.name, repoUrl, version: p.version, refName, hash, id };
+    return { packageName: p.name, repoUrl: rawRepoUrl, version: p.version, refName, hash, id };
   } catch (e) {
     return undefined;
   }
