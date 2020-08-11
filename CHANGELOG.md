@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.0...v1.2.1) (2020-08-11)
+
+
+### Bug Fixes
+
+* Not recompiling on first launch ([57c3023](https://github.com/mob-sakai/UpmGitExtension/commit/57c3023d0bfd6906283b0d5931cccbc1c6868e67))
+
 # [1.2.0](https://github.com/mob-sakai/UpmGitExtension/compare/v1.1.2...v1.2.0) (2020-08-11)
 
 

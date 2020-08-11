@@ -502,7 +502,7 @@ namespace __GENARATED_ASMDEF__.Coffee.UpmGitExtension
             if (Core.LogEnabled)
                 UnityEngine.Debug.LogFormat("<b>Request to recompile: {0} ({1})</b>", assemblyName, asmdefPath);
 
-            AssetDatabase.ImportAsset(asmdefPath);
+            EditorApplication.delayCall += () => AssetDatabase.ImportAsset(asmdefPath);
         }
     }
 #endif
