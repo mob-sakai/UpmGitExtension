@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.1...v1.2.2) (2020-08-11)
+
+
+### Bug Fixes
+
+* update readme ([28600fd](https://github.com/mob-sakai/UpmGitExtension/commit/28600fdc23479c99e10a2c5789314bf671c6ac1d))
+
 ## [1.2.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.0...v1.2.1) (2020-08-11)
 
 

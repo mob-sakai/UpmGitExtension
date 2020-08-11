@@ -49,19 +49,13 @@ This project extends the UI of Unity Package Manager for package installed using
 - Support Unity 2018.3 or later
 - Support `.Net 3.5`, `.Net 4.x` and `.Net Standard 2.0`
 - Version filtering
-- Support [GitDependencyResolverForUnity](https://github.com/mob-sakai/GitDependencyResolverForUnity) in Unity 2019.1 or later
-
-### Future plans
-
-- Display license
-- [Support git dependency in the package](https://github.com/mob-sakai/GitDependencyResolverForUnity)
-- Custom package list
+- Support path query parameter (for Unity 2019.3.4f or later)
 
 <br><br><br><br>
 
 ## Installation
 
-#### For Unity 2018.3 or later (Using OpenUPM)
+#### Using OpenUPM (For Unity 2018.3 or later)
 
 This package is available on [OpenUPM](https://openupm.com).  
 You can install it via [openupm-cli](https://github.com/openupm/openupm-cli).
@@ -70,11 +64,11 @@ You can install it via [openupm-cli](https://github.com/openupm/openupm-cli).
 openupm add com.coffee.upm-git-extension
 ```
 
-#### For Unity 2018.3 or later (Using Unity Package Manager)
+#### Using Unity Package Manager (For Unity 2018.3 or later)
 
 Find the manifest.json file in the Packages folder of your project and edit it to look like this:
 
-```js
+```
 {
   "dependencies": {
     "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
@@ -94,15 +88,16 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 
 ### Install a package from git repository
 
-1. Click ![giticon](https://user-images.githubusercontent.com/12690315/60764763-7fd4c800-a0ca-11e9-957b-ca68e3ca6123.png) button in package manager UI to open `Install Package Window`  
+1. Click ![giticon](https://user-images.githubusercontent.com/12690315/60764763-7fd4c800-a0ca-11e9-957b-ca68e3ca6123.png) button in package manager UI to open `Install Package Window`.  
    ![](https://user-images.githubusercontent.com/12690315/60766233-dbf71680-a0e1-11e9-8303-fbd790e9e35b.png)  
    ![](https://user-images.githubusercontent.com/12690315/60764768-91b66b00-a0ca-11e9-9ccd-9fef88c77d5e.png)
-1. Input a git repository url and click `Find Versions` button  
+1. Input a git repository url and click `Find Versions` button.  
+In Unity 2019.3.4 or later, you can specify a subdirectory.  
    ![](https://user-images.githubusercontent.com/12690315/60766258-4314cb00-a0e2-11e9-91f8-3aad514450bc.png)
-1. Select a tag or branch and click `Find Package` button  
+2. Select a tag or branch and click `Find Package` button.  
    ![](https://user-images.githubusercontent.com/12690315/60766257-4314cb00-a0e2-11e9-8b2e-23efc50ded72.png)
-1. Wait a few seconds for validation
-1. Click `Add Package` button to install the package  
+3. Wait a few seconds for validation.
+4. Click `Add Package` button to install the package.  
    ![](https://user-images.githubusercontent.com/12690315/60766259-4314cb00-a0e2-11e9-9b89-0bc0d4f71517.png)
 
 ### Update package with a specific tag or branch as version
@@ -138,25 +133,40 @@ See https://www.patreon.com/posts/25070968, https://www.jianshu.com/u/275cca6e5f
 
 <br><br><br><br>
 
-## License
+## Contributing
 
-- MIT
+### Issues
+
+Issues are very valuable to this project.
+
+- Ideas are a valuable source of contributions others can make
+- Problems show where this project is lacking
+- With a question you show where contributors can improve the user experience
+
+### Pull Requests
+
+Pull requests are, a great way to get your ideas into this repository.  
+See [CONTRIBUTING.md](/../../blob/upm/CONTRIBUTING.md).
+
+### Support
+
+This is an open source project that I am developing in my spare time.  
+If you like it, please support me.  
+With your support, I can spend more time on development. :)
+
+[![](https://user-images.githubusercontent.com/12690315/50731629-3b18b480-11ad-11e9-8fad-4b13f27969c1.png)](https://www.patreon.com/join/mob_sakai?)  
+[![](https://user-images.githubusercontent.com/12690315/66942881-03686280-f085-11e9-9586-fc0b6011029f.png)](https://github.com/users/mob-sakai/sponsorship)
 
 <br><br><br><br>
+## License
 
-## Support
-
-This is an open-source project that I am developing in my free time.  
-If you like it, you can support me.  
-By supporting, you let me spend more time working on better tools that you can use for free. :)
-
-[![become_a_patron_on_patreon](https://user-images.githubusercontent.com/12690315/50731629-3b18b480-11ad-11e9-8fad-4b13f27969c1.png)](https://www.patreon.com/join/2343451?)  
-[![become_a_sponsor_on_github](https://user-images.githubusercontent.com/12690315/66942881-03686280-f085-11e9-9586-fc0b6011029f.png)](https://github.com/users/mob-sakai/sponsorship)
+* MIT
 
 ## Author
 
-[mob-sakai](https://github.com/mob-sakai)
-[![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)
+[REPO_OWNER](https://github.com/REPO_OWNER)
+[![](https://img.shields.io/twitter/follow/TWITTER_ID.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai) 
+
 
 ## See Also
 
