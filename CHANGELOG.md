@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.3...v1.3.0) (2020-08-13)
+
+
+### Features
+
+* support Unity 2020.2 ([8f8e258](https://github.com/mob-sakai/UpmGitExtension/commit/8f8e2585399ccdfefcef7a0621faf94f3bbdc024)), closes [#92](https://github.com/mob-sakai/UpmGitExtension/issues/92)
+
 ## [1.2.3](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.2...v1.2.3) (2020-08-11)
 
 

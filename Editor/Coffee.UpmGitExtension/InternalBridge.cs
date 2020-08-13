@@ -129,11 +129,19 @@ namespace Coffee.UpmGitExtension
     internal static class PackageExtensions
     {
 #if UNITY_2020_1_OR_NEWER
+
+        internal static PageManager PageManagerInstance =>
+#if UNITY_2020_2_OR_NEWER
+            ServicesContainer.instance.Resolve<PageManager>();
+#else
+            PageManager.instance;
+#endif
+
         internal static void RegisterLoadedAction(this PackageList self, Action action)
         {
             Action<IPage> act = _ => action();
-            PageManager.instance.onListRebuild -= act;
-            PageManager.instance.onListRebuild += act;
+            PageManagerInstance.onListRebuild -= act;
+            PageManagerInstance.onListRebuild += act;
         }
 
         internal static IEnumerable<UpmPackage> GetGitPackages()
@@ -181,7 +189,7 @@ namespace Coffee.UpmGitExtension
         internal static void UpdatePackageCollection()
         {
             var empty = Enumerable.Empty<IPackage>();
-            (PageManager.instance.GetCurrentPage()).OnPackagesChanged(empty, empty, empty, GetGitPackages());
+            (PageManagerInstance.GetCurrentPage()).OnPackagesChanged(empty, empty, empty, GetGitPackages());
         }
 
         internal static UpmPackageVersion ToPackageVersion(this AvailableVersion self, UpmPackageVersion baseInfo)
