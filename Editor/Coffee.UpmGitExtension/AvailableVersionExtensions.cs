@@ -81,10 +81,7 @@ namespace Coffee.UpmGitExtension
                 EnableRaisingEvents = true,
             };
 
-            watcher.Created += (s, e) =>
-            {
-                EditorApplication.delayCall += () => OnResultCreated(e.FullPath);
-            };
+            watcher.Created += (s, e) => { EditorApplication.delayCall += () => OnResultCreated(e.FullPath); };
         }
     }
 }

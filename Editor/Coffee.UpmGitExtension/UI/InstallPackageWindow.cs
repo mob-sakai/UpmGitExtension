@@ -7,6 +7,7 @@ using UnityEditor.PackageManager.UI;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
+
 #else
 using UnityEngine.Experimental.UIElements;
 #endif
@@ -37,8 +38,8 @@ namespace Coffee.UpmGitExtension
             VisualTreeAsset asset = EditorGUIUtility.Load(TemplatePath) as VisualTreeAsset;
 
 #if UNITY_2019_1_OR_NEWER
-			root = asset.CloneTree ();
-			styleSheets.Add (AssetDatabase.LoadAssetAtPath<StyleSheet> (StylePath));
+            root = asset.CloneTree();
+            styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
 #else
             root = asset.CloneTree(null);
             AddStyleSheetPath(StylePath);
@@ -69,13 +70,13 @@ namespace Coffee.UpmGitExtension
 
             // Url container
 #if UNITY_2019_1_OR_NEWER
-			repoUrlText.RegisterValueChangedCallback ((evt) => onChange_RepoUrl (evt.newValue));
+            repoUrlText.RegisterValueChangedCallback((evt) => onChange_RepoUrl(evt.newValue));
 #else
             repoUrlText.OnValueChanged ((evt) => onChange_RepoUrl(evt.newValue));
 #endif
 
 #if UNITY_2019_3_OR_NEWER
-            subDirText.RegisterValueChangedCallback ((evt) => onChange_RepoUrl (repoUrlText.value));
+            subDirText.RegisterValueChangedCallback((evt) => onChange_RepoUrl(repoUrlText.value));
             UIUtils.SetElementDisplay(root.Q("subDirContainer"), true);
 #else
             UIUtils.SetElementDisplay(root.Q("subDirContainer"), false);

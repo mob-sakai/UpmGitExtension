@@ -34,7 +34,7 @@ namespace Coffee.UpmGitExtension
             var hostButton = packageDetails.Q<Button>("hostButton");
             if (hostButton == null)
             {
-                hostButton = new Button(ViewRepoClick) { name = "hostButton", tooltip = "View on browser" };
+                hostButton = new Button(ViewRepoClick) {name = "hostButton", tooltip = "View on browser"};
                 hostButton.RemoveFromClassList("unity-button");
                 hostButton.RemoveFromClassList("button");
                 hostButton.AddToClassList("link");
@@ -109,8 +109,15 @@ namespace Coffee.UpmGitExtension
         PackageDetails packageDetails;
 
 #if UNITY_2019_3_OR_NEWER
-        PackageInfo GetSelectedPackage() { return GetSelectedVersion().packageInfo; }
-        UpmPackageVersion GetSelectedVersion() { return packageDetails.targetVersion as UpmPackageVersion; }
+        PackageInfo GetSelectedPackage()
+        {
+            return GetSelectedVersion().packageInfo;
+        }
+
+        UpmPackageVersion GetSelectedVersion()
+        {
+            return packageDetails.targetVersion as UpmPackageVersion;
+        }
 #elif UNITY_2019_1_OR_NEWER
         PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
         UnityEditor.PackageManager.UI.PackageInfo GetSelectedVersion() { return packageDetails.TargetVersion; }

@@ -1,3 +1,12 @@
+## [1.3.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.3.0...v1.3.1) (2020-08-14)
+
+
+### Bug Fixes
+
+* Cannot implicitly convert type 'UnityEditor.PackageManager.UI.IPageManager' ([4122c94](https://github.com/mob-sakai/UpmGitExtension/commit/4122c948e50c7fe45490574859e65a7604e31339)), closes [#93](https://github.com/mob-sakai/UpmGitExtension/issues/93)
+* Package resolver is not working in Unity 2020.2 ([a3d6140](https://github.com/mob-sakai/UpmGitExtension/commit/a3d61400e1cb17074d3bbbbe780a392202661057))
+* uninstall package from lock file ([ab696d8](https://github.com/mob-sakai/UpmGitExtension/commit/ab696d865abf48be48fa5a3725f29db0626d0a6d))
+
 # [1.3.0](https://github.com/mob-sakai/UpmGitExtension/compare/v1.2.3...v1.3.0) (2020-08-13)
 
 

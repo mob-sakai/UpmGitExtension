@@ -17,24 +17,25 @@ namespace Coffee.UpmGitExtension
         public string refName = "";
         public string repoUrl = "";
 
-        public string refNameText { get { return version == refName ? version : version + " - " + refName; } }
-        public string refNameVersion { get { return version == refName ? version : version + "-" + refName; } }
+        public string refNameText => version == refName ? version : version + " - " + refName;
+
+        public string refNameVersion => version == refName ? version : version + "-" + refName;
 
         bool IEquatable<AvailableVersion>.Equals(AvailableVersion other)
         {
             return other != null
-                && packageName == other.packageName
-                && version == other.version
-                && repoUrl == other.repoUrl
-                && refName == other.refName;
+                   && packageName == other.packageName
+                   && version == other.version
+                   && repoUrl == other.repoUrl
+                   && refName == other.refName;
         }
 
         public override int GetHashCode()
         {
             return packageName.GetHashCode()
-                + version.GetHashCode()
-                + repoUrl.GetHashCode()
-                + refName.GetHashCode();
+                   + version.GetHashCode()
+                   + repoUrl.GetHashCode()
+                   + refName.GetHashCode();
         }
     }
 
@@ -49,7 +50,7 @@ namespace Coffee.UpmGitExtension
         const string kPackageDir = "Library/UGE/packages";
 
         public AvailableVersion[] versions = new AvailableVersion[0];
-        
+
         public static event Action OnChanged = () => { };
 
         public static void ClearAll()
@@ -78,28 +79,27 @@ namespace Coffee.UpmGitExtension
         public static void Dump()
         {
             var sb = new StringBuilder("[AvailableVersions] Dump:\n");
-            foreach(var v in instance.versions.OrderBy(x=>x.packageName).ThenBy(x=>x.version))
+            foreach (var v in instance.versions.OrderBy(x => x.packageName).ThenBy(x => x.version))
             {
                 sb.AppendLine(JsonUtility.ToJson(v));
             }
+
             UnityEngine.Debug.Log(sb);
         }
 
         public static void AddVersions(IEnumerable<AvailableVersion> add)
         {
-            if (add == null || !add.Any())
-                return;
+            if (add == null || !add.Any()) return;
 
             var length = instance.versions.Length;
             var versions = instance.versions
                 .Union(add)
                 .ToArray();
 
-            if (versions.Length != length)
-            {
-                instance.versions = versions;
-                OnChanged();
-            }
+            if (versions.Length == length) return;
+
+            instance.versions = versions;
+            OnChanged();
         }
     }
 }

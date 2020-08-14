@@ -3,6 +3,7 @@ using UnityEditor;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+
 #else
 using UnityEngine.Experimental.UIElements;
 using UnityEditor.Experimental.UIElements;
@@ -26,7 +27,7 @@ namespace Coffee.UpmGitExtension
         public GitButton(System.Action action) : base(action)
         {
 #if UNITY_2019_1_OR_NEWER
-			styleSheets.Add (UnityEditor.AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
+            styleSheets.Add(UnityEditor.AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
 #else
             AddStyleSheetPath(StylePath);
 #endif

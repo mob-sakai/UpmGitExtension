@@ -4,6 +4,7 @@ using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
+
 #else
 using UnityEngine.Experimental.UIElements;
 #endif
@@ -17,6 +18,7 @@ namespace Coffee.UpmGitExtension
         // Constant or Static Members.
         //################################
         const string kHeader = "<b><color=#c7634c>[UpmGitExtension]</color></b> ";
+
         static UpmGitExtension()
         {
             PackageManagerExtensions.RegisterExtension(new UpmGitExtension());
@@ -109,7 +111,6 @@ namespace Coffee.UpmGitExtension
             space.style.flexGrow = 1;
             addButton.parent.Insert(addButton.parent.IndexOf(addButton), space);
 #endif
-
         }
     }
 }

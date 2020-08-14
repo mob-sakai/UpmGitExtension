@@ -60,6 +60,7 @@ namespace Coffee.UpmGitExtension
     public static class ReflectionExtensions
     {
         const BindingFlags FLAGS = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
         static object Inst(this object self)
         {
             return (self is Type) ? null : self;
@@ -123,19 +124,11 @@ namespace Coffee.UpmGitExtension
         public static void InstallPackage(string packageName, string repoUrl, string refName)
         {
             Debug.Log(kHeader, $"[PackageUtils.InstallPackage] packageName = {packageName}, repoUrl = {repoUrl}, refName = {refName}");
-            UpdateManifestJson(manifest =>
+            UpdateJson("Packages/manifest.json", jsonDic =>
             {
-                var dependencies = manifest["dependencies"] as Dictionary<string, object>;
-                // Remove from dependencies.
-                dependencies?.Remove(packageName);
-
                 // Add to dependencies.
+                var dependencies = jsonDic["dependencies"] as Dictionary<string, object>;
                 dependencies?.Add(packageName, repoUrl + "#" + refName);
-
-                // Unlock git revision.
-                var locks = manifest.TryGetValue("lock", out object lockValue) ? lockValue as Dictionary<string, object> : null;
-                if (locks != null && locks.ContainsKey(packageName))
-                    locks.Remove(packageName);
             });
         }
 
@@ -146,29 +139,58 @@ namespace Coffee.UpmGitExtension
         public static void UninstallPackage(string packageName)
         {
             Debug.Log(kHeader, $"[PackageUtils.UninstallPackage] packageName = {packageName}");
-            UpdateManifestJson(manifest => 
+            UpdateJson("Packages/manifest.json", jsonDic =>
             {
-                var dependencies = manifest["dependencies"] as Dictionary<string, object>;
+                // Remove from dependencies.
+                var dependencies = jsonDic["dependencies"] as Dictionary<string, object>;
+                dependencies?.Remove(packageName);
+
+                // Unlock git revision.
+                if (jsonDic.TryGetValue("lock", out var locks))
+                    (locks as Dictionary<string, object>)?.Remove(packageName);
+            });
+
+            UpdateJson("Packages/packages-lock.json", jsonDic =>
+            {
+                // Unlock git revision.
+                var dependencies = jsonDic["dependencies"] as Dictionary<string, object>;
                 dependencies?.Remove(packageName);
             });
         }
 
         /// <summary>
-        /// Update manifest.json
+        /// Update json file
         /// </summary>
-        /// <param name="action">Action for manifest</param>
-        static void UpdateManifestJson(Action<Dictionary<string, object>> action)
+        /// <param name="path">Json file path</param>
+        /// <param name="action">Action for json dictionary.</param>
+        static void UpdateJson(string path, Action<Dictionary<string, object>> action)
         {
-            Debug.Log(kHeader, "[PackageUtils.UpdateManifestJson]");
-            const string manifestPath = "Packages/manifest.json";
-            var manifest = Json.Deserialize(File.ReadAllText(manifestPath)) as Dictionary<string, object>;
-            
-            if(manifest != null && action != null)
-                action(manifest);
+            Debug.Log(kHeader, "[PackageUtils.UpdateJson] : " + path);
+            if (!File.Exists(path)) return;
 
-            // Save manifest.json.
-            File.WriteAllText(manifestPath, Json.Serialize(manifest, true));
-            EditorApplication.delayCall += () => AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+            try
+            {
+                var jsonDic = Json.Deserialize(File.ReadAllText(path)) as Dictionary<string, object>;
+
+                if (jsonDic != null && action != null)
+                    action(jsonDic);
+
+                // Save manifest.json.
+                File.WriteAllText(path, Json.Serialize(jsonDic, true));
+
+                EditorApplication.delayCall += () =>
+                {
+#if UNITY_2020_2_OR_NEWER
+                    UnityEditor.PackageManager.Client.Resolve();
+#else
+                    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+#endif
+                };
+            }
+            catch (Exception e)
+            {
+                Debug.Exception(kHeader, e);
+            }
         }
 
         /// <summary>
@@ -183,8 +205,8 @@ namespace Coffee.UpmGitExtension
                 return "";
 
             return Directory.GetFiles(dir, pattern)
-                .FirstOrDefault(path => !path.EndsWith(".meta", StringComparison.Ordinal))
-                ?? "";
+                       .FirstOrDefault(path => !path.EndsWith(".meta", StringComparison.Ordinal))
+                   ?? "";
         }
 
         /// <summary>
@@ -211,6 +233,7 @@ namespace Coffee.UpmGitExtension
                 repoUrl = repoUrl.Replace("git@", "");
                 repoUrl = Regex.Replace(repoUrl, "\\.git$", "");
             }
+
             return repoUrl;
         }
 
@@ -238,6 +261,7 @@ namespace Coffee.UpmGitExtension
             {
                 element = element.parent;
             }
+
             return element;
         }
     }
