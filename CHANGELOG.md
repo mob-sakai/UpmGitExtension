@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.3.1...v1.3.2) (2020-09-11)
+
+
+### Bug Fixes
+
+* support 2019.4.10 & 2020.1.5 ([502ddd2](https://github.com/mob-sakai/UpmGitExtension/commit/502ddd285ee455a18a76c7a84c2f9d24ebe160a7)), closes [#97](https://github.com/mob-sakai/UpmGitExtension/issues/97)
+
 ## [1.3.1](https://github.com/mob-sakai/UpmGitExtension/compare/v1.3.0...v1.3.1) (2020-08-14)
 
 

@@ -2,6 +2,12 @@
 #if UNITY_2019_1_9 || UNITY_2019_1_10 || UNITY_2019_1_11 || UNITY_2019_1_12 || UNITY_2019_1_13 || UNITY_2019_1_14 || UNITY_2019_2_OR_NEWER
 #define UNITY_2019_1_9_OR_NEWER
 #endif
+#if UNITY_2019_4_OR_NEWER && !UNITY_2019_4_1 && !UNITY_2019_4_2 && !UNITY_2019_4_3 && !UNITY_2019_4_4 && !UNITY_2019_4_5 && !UNITY_2019_4_6 && !UNITY_2019_4_7 && !UNITY_2019_4_8 && !UNITY_2019_4_9
+#define UNITY_2019_4_10_OR_NEWER
+#endif
+#if UNITY_2020_1_OR_NEWER && !UNITY_2020_1_1 && !UNITY_2020_1_2 && !UNITY_2020_1_3 && !UNITY_2020_1_4
+#define UNITY_2020_1_5_OR_NEWER
+#endif
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -19,6 +25,7 @@ using Semver;
 #if UNITY_2019_3_OR_NEWER
 using Package = UnityEditor.PackageManager.UI.UpmPackage;
 using PackageInfo = UnityEditor.PackageManager.UI.UpmPackageVersion;
+
 #else
 using Package = UnityEditor.PackageManager.UI.Package;
 using PackageInfo = UnityEditor.PackageManager.UI.PackageInfo;
@@ -137,7 +144,6 @@ namespace Coffee.UpmGitExtension
     internal static class PackageExtensions
     {
 #if UNITY_2020_1_OR_NEWER
-
 #if UNITY_2020_2_OR_NEWER
         internal static PageManager PageManagerInstance => ServicesContainer.instance.Resolve<PageManager>();
 #else
@@ -207,7 +213,11 @@ namespace Coffee.UpmGitExtension
             newPInfo.m_Version = self.version;
             newPInfo.m_Git = new GitInfo("", self.refName);
 
+#if UNITY_2020_1_5_OR_NEWER
+            var p = new UpmPackageVersion(newPInfo, false, semver, newPInfo.displayName, false);
+#else
             var p = new UpmPackageVersion(newPInfo, false, semver, newPInfo.displayName);
+#endif
 
             // Update tag.
             PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
@@ -237,7 +247,7 @@ namespace Coffee.UpmGitExtension
 
         internal static IEnumerable<UpmPackageVersion> GetGitPackageInfos()
         {
-            return GetGitPackages().Select(x=>x.installedVersion).Cast<UpmPackageVersion>();
+            return GetGitPackages().Select(x => x.installedVersion).Cast<UpmPackageVersion>();
         }
 
         internal static UpmPackageVersion GetInstalledVersion(this UpmPackage self)
@@ -284,7 +294,11 @@ namespace Coffee.UpmGitExtension
             newPInfo.m_Version = self.version;
             newPInfo.m_Git = new GitInfo("", self.refName);
 
+#if UNITY_2019_4_10_OR_NEWER
+            var p = new UpmPackageVersion(newPInfo, false, semver, newPInfo.displayName, false);
+#else
             var p = new UpmPackageVersion(newPInfo, false, semver, newPInfo.displayName);
+#endif
 
             // Update tag.
             PackageTag tag = PackageTag.Git | PackageTag.Installable | PackageTag.Removable;
