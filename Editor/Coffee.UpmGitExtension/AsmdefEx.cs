@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -15,7 +16,7 @@ namespace __GENARATED_ASMDEF__.Coffee.UpmGitExtension
 {
     internal static class PackageSettings
     {
-        public const string PackageId = "OpenSesame.Net.Compilers.3.4.0-beta.1";
+        public const string PackageId = "OpenSesame.Net.Compilers.3.4.0";
     }
 
     internal static class ReflectionExtensions
@@ -209,17 +210,34 @@ namespace __GENARATED_ASMDEF__.Coffee.UpmGitExtension
                     UnityEngine.Debug.LogFormat(k_LogHeader + "Download {0} from nuget: {1}", packageId, url);
                     EditorUtility.DisplayProgressBar("Custom Compiler Installer", string.Format("Download {0} from nuget", packageId), 0.2f);
 
-                    switch (Application.platform)
+                    var cb = ServicePointManager.ServerCertificateValidationCallback;
+                    try
                     {
-                        case RuntimePlatform.WindowsEditor:
-                            ExecuteCommand("PowerShell.exe", string.Format("curl -O {0} {1}", downloadPath, url));
-                            break;
-                        case RuntimePlatform.OSXEditor:
-                            ExecuteCommand("curl", string.Format("-o {0} -L {1}", downloadPath, url));
-                            break;
-                        case RuntimePlatform.LinuxEditor:
-                            ExecuteCommand("wget", string.Format("-O {0} {1}", downloadPath, url));
-                            break;
+                        ServicePointManager.ServerCertificateValidationCallback = (_, __, ___, ____) => true;
+                        using (var client = new WebClient())
+                        {
+                            client.DownloadFile(url, downloadPath);
+                        }
+                    }
+                    catch
+                    {
+                        UnityEngine.Debug.LogFormat(k_LogHeader + "Download {0} from nuget (alternative): {1}", packageId, url);
+                        switch (Application.platform)
+                        {
+                            case RuntimePlatform.WindowsEditor:
+                                ExecuteCommand("PowerShell.exe", string.Format("curl -O {0} {1}", downloadPath, url));
+                                break;
+                            case RuntimePlatform.OSXEditor:
+                                ExecuteCommand("curl", string.Format("-o {0} -L {1}", downloadPath, url));
+                                break;
+                            case RuntimePlatform.LinuxEditor:
+                                ExecuteCommand("wget", string.Format("-O {0} {1}", downloadPath, url));
+                                break;
+                        }
+                    }
+                    finally
+                    {
+                        ServicePointManager.ServerCertificateValidationCallback = cb;
                     }
                 }
 

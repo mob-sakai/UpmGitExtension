@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/mob-sakai/UpmGitExtension/compare/v1.3.2...v1.3.3) (2020-09-13)
+
+
+### Bug Fixes
+
+* custom compiler installation failed ([5769fa3](https://github.com/mob-sakai/UpmGitExtension/commit/5769fa3498971aac8e6130cbb5daf036b21673be)), closes [#98](https://github.com/mob-sakai/UpmGitExtension/issues/98)
+
 ## [1.3.2](https://github.com/mob-sakai/UpmGitExtension/compare/v1.3.1...v1.3.2) (2020-09-11)
 
 
