@@ -1,0 +1,34 @@
+# Windows
+Thumbs.db
+Desktop.ini
+/*.csproj
+/*.sln
+
+# macOS
+.DS_Store
+
+# Vim
+*.swp
+
+# Unity
+/Logs
+/Library
+/Temp
+
+# VS
+.vs/
+.vscode/
+obj/
+bin/
+
+# NPM
+node_modules/
+
+# develop worktree
+UpmGitExtension_*/
+!Coffee.UpmGitExtension.Bridge.*.csproj
+test_*/
+Packages/com.coffee.open-sesame-compiler
+.idea/
+Assets/Plugins.meta
+Assets/Plugins/
