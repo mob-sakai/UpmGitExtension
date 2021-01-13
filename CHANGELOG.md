@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/mob-sakai/UpmGitExtension/compare/1.3.3...1.3.4) (2021-01-13)
+
+
+### Bug Fixes
+
+* fix preprocessor define for Unity 2020.1.0 ([be20b3e](https://github.com/mob-sakai/UpmGitExtension/commit/be20b3e4ce4017443bacfb7462d2d09127ede192)), closes [#105](https://github.com/mob-sakai/UpmGitExtension/issues/105)
+
 ## [1.3.3](https://github.com/mob-sakai/UpmGitExtension/compare/v1.3.2...v1.3.3) (2020-09-13)
 
 
