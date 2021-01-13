@@ -1,12 +1,12 @@
 {
   "dependencies": {
-    "com.coffee.open-sesame-compiler": "https://github.com/mob-sakai/OpenSesameCompilerForUnity.git#1.0.0-preview.26",
+    "com.coffee.csharp-compiler-settings": "https://github.com/mob-sakai/CSharpCompilerSettingsForUnity.git#1.4.0",
     "com.coffee.softmask-for-ugui": "https://github.com/mob-sakai/SoftMaskForUGUI.git#0.8.1",
-    "com.unity.package-manager-ui": "2.0.3",
-    "com.unity.purchasing": "2.0.3",
     "com.coffee.upm-git-extension-test-bitbucket": "https://bitbucket.org/mob-sakai/GitPackageTest.git#0.5.0",
     "com.coffee.upm-git-extension-test-github": "https://github.com/mob-sakai/GitPackageTest.git#upm",
     "com.coffee.upm-git-extension-test-gitlab": "https://gitlab.com/mob-sakai/GitPackageTest.git",
+    "com.unity.package-manager-ui": "2.0.3",
+    "com.unity.purchasing": "2.0.3",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
@@ -40,12 +40,12 @@
   },
   "lock": {
     "com.coffee.upm-git-extension-test-bitbucket": {
-      "hash": "d0f59ba80f24de526e9963ecad44b057feb38ad8",
-      "revision": "0.4.0"
+      "hash": "374e508935f4b456d3734a2fccc02828ec25eddc",
+      "revision": "0.5.0"
     },
     "com.coffee.upm-git-extension-test-github": {
-      "hash": "fdcd7a6d0ff19c4a717cfb3153ba1f4bf1004d47",
-      "revision": "0.4.0"
+      "hash": "463864febdc5b2c0714859deebdfd1a8ca8c8afe",
+      "revision": "upm"
     },
     "com.coffee.upm-git-extension-test-gitlab": {
       "hash": "bd7bd7aeab432583dfbe899b85f6a4eee774a682",
@@ -55,9 +55,9 @@
       "hash": "7c895725406715e9ae1882bdab60c3430efab04d",
       "revision": "0.8.1"
     },
-    "com.coffee.open-sesame-compiler": {
-      "hash": "cee21f564c5c3bb347c66b63315b4011955aaece",
-      "revision": "1.0.0-preview.26"
+    "com.coffee.csharp-compiler-settings": {
+      "hash": "21a65331b1cded7ad161499ee760b39be47e092a",
+      "revision": "1.4.0"
     }
   }
 }

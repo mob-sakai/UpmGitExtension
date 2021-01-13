@@ -1,0 +1,12 @@
+{
+    "m_UseDefaultCompiler": true,
+    "m_Version": 130,
+    "m_CompilerType": 0,
+    "m_PackageName": "Microsoft.Net.Compilers",
+    "m_PackageVersion": "3.5.0",
+    "m_LanguageVersion": 2147483647,
+    "m_EnableLogging": true,
+    "m_EnableNullable": false,
+    "m_Nullable": 0,
+    "m_ModifySymbols": ""
+}
