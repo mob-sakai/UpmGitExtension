@@ -2,6 +2,6 @@ fileFormatVersion: 2
 guid: 6d31ece5aaa0f4bdfa2eb458573a31af
 AssemblyDefinitionImporter:
   externalObjects: {}
-  userData: '{"IgnoreAccessChecks":true,"ModifySymbols":""}'
+  userData: '{"m_UseDefaultCompiler":false,"m_Version":130,"m_CompilerType":1,"m_PackageName":"OpenSesame.Net.Compilers","m_PackageVersion":"3.5.0","m_LanguageVersion":2147483647,"m_EnableLogging":false,"m_EnableNullable":false,"m_Nullable":0,"m_ModifySymbols":"IGNORE_ACCESS_CHECKS"}'
   assetBundleName: 
   assetBundleVariant: 
