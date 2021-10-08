@@ -1,3 +1,4 @@
 [submodule "Packages/dev"]
 	path = Packages/dev
-	url = .
+	url = https://github.com/mob-sakai/UpmGitExtension.git
+	branch = main

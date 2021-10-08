@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.coffee.csharp-compiler-settings": "https://github.com/mob-sakai/CSharpCompilerSettingsForUnity.git#1.4.0",
     "com.coffee.softmask-for-ugui": "https://github.com/mob-sakai/SoftMaskForUGUI.git#0.8.1",
     "com.coffee.upm-git-extension-test-bitbucket": "https://bitbucket.org/mob-sakai/GitPackageTest.git#0.5.0",
     "com.coffee.upm-git-extension-test-github": "https://github.com/mob-sakai/GitPackageTest.git#upm",
