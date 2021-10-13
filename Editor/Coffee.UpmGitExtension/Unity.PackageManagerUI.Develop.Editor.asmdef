@@ -1,9 +1,7 @@
 {
-    "name": "Coffee.UpmGitExtension",
-    "references": [
-        "Unity.PackageManagerUI.Editor"
-    ],
-    "optionalUnityReferences": [],
+    "name": "Unity.PackageManagerUI.Develop.Editor",
+    "rootNamespace": "",
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -12,5 +10,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": false,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

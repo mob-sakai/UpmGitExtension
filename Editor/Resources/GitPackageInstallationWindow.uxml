@@ -1,0 +1,52 @@
+<UXML xmlns="UnityEngine.UIElements" xmlns:pui="UnityEditor.PackageManager.UI">
+    <!-- Root -->
+    <VisualElement name="rootContainer">
+
+        <!-- Title -->
+        <VisualElement name="titleContainer" class="horizontal">
+            <VisualElement class="git-image"/>
+            <Label text="Install Package From Git Repository"/>
+        </VisualElement>
+
+        <!-- Url -->
+        <VisualElement name="urlContainer" class="horizontal">
+            <Label text="Repository URL" class="fixed"/>
+            <TextField name="repoUrlText" class="expandable"/>
+            <Button name="findVersionsButton" text="Find Versions" class="button h-spaced"
+                        tooltip="Fetch all tags/branches from the repository as package versions."/>
+            <Label name="findVersionsError" class="error"
+                        tooltip="No package found in repository. Make sure that the git repository url and access permissions are correct."/>
+        </VisualElement>
+
+        <!-- Path -->
+        <VisualElement name="subDirContainer" class="horizontal">
+            <Label text="Path (Optional)" class="fixed"/>
+            <TextField name="subDirText" class="expandable"/>
+            <Label class="fixed"/>
+            <Label name="findPackageError" class="error-hidden" tooltip=""/>
+        </VisualElement>
+
+        <!-- Package selector -->
+        <VisualElement name="versionContainer" class="horizontal">
+            <Label text="Package" class="fixed"/>
+            <Button name="versionSelectButton" class="expandable dropdown-button">
+                <VisualElement name="arrow" class="dropdown-arrow"/>
+            </Button>
+            <Button name="installPackageButton" text="Install Package" class="button h-spaced"
+                        tooltip="Install the package to this project."/>
+            <Label name="findPackageError" class="error-hidden" tooltip=""/>
+        </VisualElement>
+
+        <!-- Package id -->
+        <VisualElement name="packageContainer" class="horizontal">
+            <Label text="" class="fixed"/>
+            <Label name="packageNameLabel" class="expandable"/>
+        </VisualElement>
+
+        <!-- Close -->
+        <VisualElement name="controlContainer" class="horizontal v-spaced">
+            <Button name="closeButton" text="Close" class="button"/>
+        </VisualElement>
+
+    </VisualElement>
+</UXML>

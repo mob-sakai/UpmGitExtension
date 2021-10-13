@@ -1,16 +1,13 @@
-#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
-using System;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.PackageManager;
-using UnityEditor.PackageManager.UI;
-using UnityEngine;
-#if UNITY_2019_1_OR_NEWER
-using UnityEngine.UIElements;
+#if UNITY_2021_1_OR_NEWER
+using UnityEditor.PackageManager.UI.Internal;
 #else
-using UnityEngine.Experimental.UIElements;
+using UnityEditor.PackageManager.UI;
 #endif
+using UnityEngine;
+using UnityEngine.UIElements;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace Coffee.UpmGitExtension
@@ -18,23 +15,16 @@ namespace Coffee.UpmGitExtension
     internal class PackageDetailsExtension
     {
         //################################
-        // Constant or Static Members.
-        //################################
-        const string kHeader = "<b><color=#c7634c>[PackageDetailsExtension]</color></b> ";
-
-        //################################
         // Public Members.
         //################################
         public void Setup(VisualElement root)
         {
-            this.root = root;
-            packageDetails = root.Q<PackageDetails>();
+            _packageDetails = root.Q<PackageDetails>();
 
-            Debug.Log(kHeader, "[InitializeUI] Setup host button:");
-            var hostButton = packageDetails.Q<Button>("hostButton");
+            var hostButton = _packageDetails.Q<Button>("hostButton");
             if (hostButton == null)
             {
-                hostButton = new Button(ViewRepoClick) {name = "hostButton", tooltip = "View on browser"};
+                hostButton = new Button(ViewRepoOnBrowser) { name = "hostButton", tooltip = "View on browser" };
                 hostButton.RemoveFromClassList("unity-button");
                 hostButton.RemoveFromClassList("button");
                 hostButton.AddToClassList("link");
@@ -42,62 +32,96 @@ namespace Coffee.UpmGitExtension
                 hostButton.style.marginLeft = 2;
                 hostButton.style.width = 16;
                 hostButton.style.height = 16;
-                root.Q("detailVersion").parent.Add(hostButton);
 
-#if !UNITY_2019_1_OR_NEWER
-                hostButton.style.sliceBottom = 0;
-                hostButton.style.sliceTop = 0;
-                hostButton.style.sliceRight = 0;
-                hostButton.style.sliceLeft = 0;
-#endif
+                root.Q("detailVersion").parent.Add(hostButton);
             }
 
+            // Update/Install button.
+            _updateButton = _packageDetails.Q<Button>("PackageAddButton") ?? _packageDetails.Q<Button>("update");
+            if (_clickableToUpdate == null)
+            {
+                _clickableToUpdate = _updateButton.clickable;
+                _updateButton.RemoveManipulator(_updateButton.clickable);
+                _updateButton.clickable = new Clickable(UpdatePackage);
+                _updateButton.AddManipulator(_updateButton.clickable);
+            }
 
-#if UNITY_2018
-            Debug.Log(kHeader, "[InitializeUI] Setup document actions:");
-            packageDetails.Q<Button>("viewDocumentation").OverwriteCallback(ViewDocClick);
-            packageDetails.Q<Button>("viewChangelog").OverwriteCallback(ViewChangelogClick);
-            packageDetails.Q<Button>("viewLicenses").OverwriteCallback(ViewLicensesClick);
+#if !UNITY_2020_2_OR_NEWER
+            var detailSourcePathContainer = _packageDetails.Q("detailSourcePathContainer");
+            if (detailSourcePathContainer == null)
+            {
+                var upmGitExtension = _packageDetails.Q<UpmGitExtension>();
+                upmGitExtension.Add(new Label("Installed From") { name = "detailSourcePathHeader", style = { unityFontStyleAndWeight = FontStyle.Bold } });
+                upmGitExtension.Add(new Label() { name = "detailSourcePath" });
+            }
 #endif
-
-            Debug.Log(kHeader, "[InitializeUI] Setup update button:");
-            var updateButton = packageDetails.Q<Button>("update");
-            updateButton.OverwriteCallback(UpdateClick);
-
-            Debug.Log(kHeader, "[InitializeUI] Setup remove button:");
-            var removeButton = packageDetails.Q<Button>("remove");
-            removeButton.OverwriteCallback(RemoveClick);
+            // Register callbacks.
+            _versionItems = root.Query<PackageVersionItem>().Build();
+            EditorApplication.delayCall += () =>
+            {
+                _pageManager.onVisualStateChange += _ => RefleshVersionItems();
+#if UNITY_2020
+                _pageManager.onListUpdate += (_, __, ___, ____) => RefleshVersionItems();
+#else
+                _pageManager.onListUpdate += _ => RefleshVersionItems();
+#endif
+            };
         }
 
-
-        /// <summary>
-        /// Called by the Package Manager UI when the package selection changed.
-        /// </summary>
-        /// <param name="packageInfo">The newly selected package information (can be null)</param>
         public void OnPackageSelectionChange(PackageInfo packageInfo)
         {
-            if (packageInfo == null)
-                return;
+            if (packageInfo == null) return;
 
-            Debug.Log(kHeader, $"OnPackageSelectionChange {packageInfo.packageId}");
-            if (packageInfo.source == PackageSource.Git)
-            {
-                // Show remove button for git package.
-                var removeButton = root.Q<Button>("remove");
-                UIUtils.SetElementDisplay(removeButton, true);
-                removeButton.SetEnabled(true);
+            // var _current = packageInfo;
+            bool isGit = packageInfo.source == PackageSource.Git;
 
-                // Show git tag.
-                var tagGit = root.Q("tag-git");
-                UIUtils.SetElementDisplay(tagGit, true);
-            }
-
-            // Show hosting service logo.
-            var hostButton = root.Q<Button>("hostButton");
+            // Show/hide hosting service logo.
+            var hostButton = _packageDetails.Q<Button>("hostButton");
             if (hostButton != null)
             {
                 hostButton.style.backgroundImage = GetHostLogo(packageInfo.packageId);
-                hostButton.visible = packageInfo.source == PackageSource.Git;
+                UIUtils.SetElementDisplay(hostButton, isGit);
+            }
+
+#if !UNITY_2020_2_OR_NEWER
+            // Show/hide source path.
+            var detailSourcePath = _packageDetails.Q<Label>("detailSourcePath");
+            if (detailSourcePath != null)
+            {
+                detailSourcePath.text = packageInfo.GetSourceUrl();
+                UIUtils.SetElementDisplay(_packageDetails.Q<UpmGitExtension>(), isGit);
+            }
+#endif
+
+            if (isGit)
+            {
+                var button = new Button(ViewRepoOnBrowser) { text = "View repository" };
+                button.AddClasses("link");
+
+#if UNITY_2021_2_OR_NEWER
+                var links = _packageDetails.Q<PackageDetailsLinks>();
+                var left = links.Q(classes: new[] { "left" });
+                links.Call("AddToLinks", left, button, true);
+#else
+                _packageDetails.Call("AddToLinks", button);
+#endif
+
+                _targetVersion = null;
+                var packageVersion = GitPackageDatabase.GetAvailablePackageVersions(preRelease: true).FirstOrDefault(v => v.packageInfo.packageId == packageInfo.packageId);
+                if (packageVersion != null)
+                {
+                    var package = GitPackageDatabase.GetPackage(packageVersion);
+                    _targetVersion = package.versions.installed?.uniqueId == packageInfo.packageId ? package.versions.recommended : packageVersion;
+                    if (_targetVersion != null)
+                    {
+                        _updateButton.text = _updateButton.text.Replace(_targetVersion.version.ToString(), _targetVersion.versionString);
+                    }
+                }
+                else
+                {
+                    var package = GitPackageDatabase.GetPackage(packageInfo.name);
+                    _targetVersion = package.versions.installed != null ? package.versions.recommended : package.versions.primary;
+                }
             }
         }
 
@@ -105,43 +129,41 @@ namespace Coffee.UpmGitExtension
         //################################
         // Private Members.
         //################################
-        VisualElement root;
-        PackageDetails packageDetails;
-
-#if UNITY_2019_3_OR_NEWER
-        PackageInfo GetSelectedPackage()
-        {
-            return GetSelectedVersion().packageInfo;
-        }
-
-        UpmPackageVersion GetSelectedVersion()
-        {
-            return packageDetails.targetVersion as UpmPackageVersion;
-        }
-#elif UNITY_2019_1_OR_NEWER
-        PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
-        UnityEditor.PackageManager.UI.PackageInfo GetSelectedVersion() { return packageDetails.TargetVersion; }
+        private PackageDetails _packageDetails;
+        private IPackageVersion _targetVersion;
+        private Clickable _clickableToUpdate;
+        private Button _updateButton;
+        private UQueryState<PackageVersionItem> _versionItems;
+#if UNITY_2020_2_OR_NEWER
+        private static PageManager _pageManager => ScriptableSingleton<ServicesContainer>.instance.Resolve<PageManager>();
 #else
-        PackageInfo GetSelectedPackage() { return GetSelectedVersion().Info; }
-        UnityEditor.PackageManager.UI.PackageInfo GetSelectedVersion() { return packageDetails.SelectedPackage; }
+        private static IPageManager _pageManager => PageManager.instance;
 #endif
 
         /// <summary>
-        /// Get host logo.
+        /// Get hosting service logo.
         /// </summary>
-        public Texture2D GetHostLogo(string packageId)
+        private Texture2D GetHostLogo(string packageId)
         {
             const string packageDir = "Packages/com.coffee.upm-git-extension/Editor/Resources/Logos/";
             if (packageId.Contains("github.com/"))
+            {
                 return EditorGUIUtility.isProSkin
                     ? AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Light.png") as Texture2D
                     : AssetDatabase.LoadMainAssetAtPath(packageDir + "GitHub-Logo-Dark.png") as Texture2D;
+            }
             else if (packageId.Contains("bitbucket.org/"))
+            {
                 return AssetDatabase.LoadMainAssetAtPath(packageDir + "Bitbucket-Logo.png") as Texture2D;
+            }
             else if (packageId.Contains("gitlab.com/"))
+            {
                 return AssetDatabase.LoadMainAssetAtPath(packageDir + "GitLab-Logo.png") as Texture2D;
+            }
             else if (packageId.Contains("azure.com/"))
+            {
                 return AssetDatabase.LoadMainAssetAtPath(packageDir + "AzureRepos-Logo.png") as Texture2D;
+            }
 
             return EditorGUIUtility.isProSkin
                 ? EditorGUIUtility.FindTexture("d_buildsettings.web.small")
@@ -149,119 +171,34 @@ namespace Coffee.UpmGitExtension
         }
 
         /// <summary>
-        /// On click 'Update package' callback.
-        /// </summary>
-        public void UpdateClick()
-        {
-            Debug.Log(kHeader, "[UpdateClick]");
-            var selectedPackage = GetSelectedPackage();
-            if (selectedPackage.source == PackageSource.Git)
-            {
-                string packageId = selectedPackage.packageId;
-                string url = PackageUtils.GetRepoUrl(packageId);
-#if UNITY_2019_3_OR_NEWER
-                string refName = GetSelectedVersion().packageInfo.git.revision;
-#else
-                string refName = GetSelectedVersion().VersionId.Split('@')[1];
-                var originRefName = refName;
-
-                // Find correct reference (branch or tag) name.
-                while(!AvailableVersions.GetVersions(selectedPackage.name, url).Any(x=>x.refName == refName))
-                {
-                    var index = refName.IndexOf('-');
-                    if(index < 0 || refName.Length < 1)
-                        throw new Exception($"Cannot install '{packageId}'. The branch or tag is not found in repository.");
-                    refName = refName.Substring(index+1);
-                }
-#endif
-                PackageUtils.UninstallPackage(selectedPackage.name);
-                PackageUtils.InstallPackage(selectedPackage.name, url, refName);
-            }
-            else
-            {
-                packageDetails.UpdateClick();
-            }
-        }
-
-        /// <summary>
-        /// On click 'Remove package' callback.
-        /// </summary>
-        public void RemoveClick()
-        {
-            Debug.Log(kHeader, "[RemoveClick]");
-            var selectedPackage = GetSelectedPackage();
-            if (selectedPackage.source == PackageSource.Git)
-            {
-                PackageUtils.UninstallPackage(selectedPackage.name);
-            }
-            else
-            {
-                packageDetails.RemoveClick();
-            }
-        }
-
-        /// <summary>
         /// On click 'View repository' callback.
         /// </summary>
-        public void ViewRepoClick()
+        private void ViewRepoOnBrowser()
         {
-            Application.OpenURL(PackageUtils.GetRepoUrl(GetSelectedPackage().packageId, true));
+            if (_targetVersion != null)
+            {
+                Application.OpenURL(_targetVersion.packageInfo.GetRepositoryUrlForBrowser());
+            }
         }
 
-#if UNITY_2018
-        public void ViewDocClick()
+        private void UpdatePackage()
         {
-            var packageInfo = GetSelectedPackage();
-            if (packageInfo.source == PackageSource.Git)
-            {
-                var docsFolder = Path.Combine(packageInfo.resolvedPath, "Documentation~");
-                if (!Directory.Exists(docsFolder))
-                    docsFolder = Path.Combine(packageInfo.resolvedPath, "Documentation");
-                if (Directory.Exists(docsFolder))
-                {
-                    var mdFiles = Directory.GetFiles(docsFolder, "*.md", SearchOption.TopDirectoryOnly);
-                    var docsMd = mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "index.md")
-                        ?? mdFiles.FirstOrDefault(d => Path.GetFileName(d).ToLower() == "tableofcontents.md") ?? mdFiles.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(docsMd))
-                    {
-                        Application.OpenURL(new Uri(docsMd).AbsoluteUri);
-                        return;
-                    }
-                }
-            }
-            packageDetails.ViewDocClick();
+            if (_targetVersion?.packageInfo?.source == PackageSource.Git)
+                GitPackageDatabase.Install(_targetVersion.packageInfo.packageId);
+            else
+                _clickableToUpdate?.Call("Invoke", new MouseDownEvent());
         }
 
-        public void ViewChangelogClick()
+        private void RefleshVersionItems()
         {
-            var packageInfo = GetSelectedPackage();
-            if (packageInfo.source == PackageSource.Git)
+            _versionItems.ForEach(item =>
             {
-                var changelogFile = Path.Combine(packageInfo.resolvedPath, "CHANGELOG.md");
-                if (File.Exists(changelogFile))
+                var text = item.Q<Label>("versionLabel");
+                if (text != null && item.version.HasTag(PackageTag.Git))
                 {
-                    Application.OpenURL(new Uri(changelogFile).AbsoluteUri);
-                    return;
+                    text.text = item.version.versionString;
                 }
-            }
-            packageDetails.ViewChangelogClick();
+            });
         }
-
-        public void ViewLicensesClick()
-        {
-            var packageInfo = GetSelectedPackage();
-            if (packageInfo.source == PackageSource.Git)
-            {
-                var licenseFile = Path.Combine(packageInfo.resolvedPath, "LICENSE.md");
-                if (File.Exists(licenseFile))
-                {
-                    Application.OpenURL(new Uri(licenseFile).AbsoluteUri);
-                    return;
-                }
-            }
-            packageDetails.ViewLicensesClick();
-        }
-#endif
     }
 }
-#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.

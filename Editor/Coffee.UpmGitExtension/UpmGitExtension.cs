@@ -1,117 +1,77 @@
-#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
+using System.Runtime.CompilerServices;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 
-#else
-using UnityEngine.Experimental.UIElements;
-#endif
+[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("Unity.InternalAPIEngineBridgeDev.001")]
 
 namespace Coffee.UpmGitExtension
 {
-    [InitializeOnLoad]
     internal class UpmGitExtension : VisualElement, IPackageManagerExtension
     {
-        //################################
-        // Constant or Static Members.
-        //################################
-        const string kHeader = "<b><color=#c7634c>[UpmGitExtension]</color></b> ";
-
-        static UpmGitExtension()
+        [InitializeOnLoadMethod]
+        private static void InitializeOnLoadMethod()
         {
-            PackageManagerExtensions.RegisterExtension(new UpmGitExtension());
+            var ext = new UpmGitExtension();
+            PackageManagerExtensions.RegisterExtension(ext as IPackageManagerExtension);
         }
 
         //################################
-        // Public Members.
+        // IPackageManagerExtension Members.
         //################################
-        /// <summary>
-        /// Creates the extension UI visual element.
-        /// </summary>
-        /// <returns>A visual element that represents the UI or null if none</returns>
-        public VisualElement CreateExtensionUI()
+        VisualElement IPackageManagerExtension.CreateExtensionUI()
         {
-            initialized = false;
+            _initialized = false;
             return this;
         }
 
-        /// <summary>
-        /// Called by the Package Manager UI when a package is added or updated.
-        /// </summary>
-        /// <param name="packageInfo">The package information</param>
-        public void OnPackageAddedOrUpdated(PackageInfo packageInfo)
+        void IPackageManagerExtension.OnPackageAddedOrUpdated(PackageInfo packageInfo)
         {
         }
 
-        /// <summary>
-        /// Called by the Package Manager UI when a package is removed.
-        /// </summary>
-        /// <param name="packageInfo">The package information</param>
-        public void OnPackageRemoved(PackageInfo packageInfo)
+        void IPackageManagerExtension.OnPackageRemoved(PackageInfo packageInfo)
         {
         }
 
-        /// <summary>
-        /// Called by the Package Manager UI when the package selection changed.
-        /// </summary>
-        /// <param name="packageInfo">The newly selected package information (can be null)</param>
-        public void OnPackageSelectionChange(PackageInfo packageInfo)
+        void IPackageManagerExtension.OnPackageSelectionChange(PackageInfo packageInfo)
         {
-            if (packageInfo == null)
-                return;
+            if (packageInfo == null) return;
 
-            InitializeUI();
-            packageDetailsExtension?.OnPackageSelectionChange(packageInfo);
+            Initialize();
+            _packageDetailsExtension?.OnPackageSelectionChange(packageInfo);
         }
 
         //################################
         // Private Members.
         //################################
-        VisualElement root;
-        bool initialized;
-        PackageDetailsExtension packageDetailsExtension;
+        private bool _initialized;
+        private PackageDetailsExtension _packageDetailsExtension;
+        private GitPackageInstallationWindow _installationWindow;
 
-        /// <summary>
-        /// Initializes UI.
-        /// </summary>
-        void InitializeUI()
+        private void Initialize()
         {
-            if (initialized || !InstallPackageWindow.IsResourceReady() || !GitButton.IsResourceReady())
-                return;
+            if (_initialized || !GitPackageInstallationWindow.IsResourceReady() || !GitButton.IsResourceReady()) return;
 
-            initialized = true;
+            _initialized = true;
 
-            Debug.Log(kHeader, "[InitializeUI]");
-            root = this.GetRoot().Q<TemplateContainer>("");
+            // Find root element.
+            var root = this.GetRoot().Q<TemplateContainer>();
 
-            Debug.Log(kHeader, "[InitializeUI] Setup internal bridge:");
-            var internalBridge = Bridge.Instance;
-            internalBridge.Setup(root);
+            // Setup PackageDetails extension.
+            _packageDetailsExtension = new PackageDetailsExtension();
+            _packageDetailsExtension.Setup(root);
 
-            Debug.Log(kHeader, "[InitializeUI] Setup PackageDetails extension:");
-            packageDetailsExtension = new PackageDetailsExtension();
-            packageDetailsExtension.Setup(root);
+            // Setup GitPackageInstallationWindow.
+            _installationWindow = new GitPackageInstallationWindow();
+            root.Add(_installationWindow);
 
-            // Install package window.
-            Debug.Log(kHeader, "[InitializeUI] Setup install window:");
-            var installPackageWindow = new InstallPackageWindow();
-            root.Add(installPackageWindow);
-
-            // Add button to open InstallPackageWindow
-            Debug.Log(kHeader, "[InitializeUI] Add button to open install window:");
-            var addButton = root.Q("toolbarAddMenu") ?? root.Q("toolbarAddButton") ?? root.Q("moreAddOptionsButton");
-            var gitButton = new GitButton(installPackageWindow.Open);
+            // Add button to open GitPackageInstallationWindow
+            var gitButton = new GitButton(_installationWindow.Open);
+            gitButton.style.borderRightWidth = 0;
+            var addButton = root.Q("toolbarAddMenu");
             addButton.parent.Insert(0, gitButton);
-            gitButton.style.borderRightWidth = 1;
-
-#if UNITY_2018
-            var space = new VisualElement();
-            space.style.flexGrow = 1;
-            addButton.parent.Insert(addButton.parent.IndexOf(addButton), space);
-#endif
         }
     }
 }
-#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.

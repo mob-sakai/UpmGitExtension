@@ -1,23 +1,16 @@
-#if IGNORE_ACCESS_CHECKS // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
 using UnityEditor;
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
-
-#else
-using UnityEngine.Experimental.UIElements;
-using UnityEditor.Experimental.UIElements;
-#endif
 
 namespace Coffee.UpmGitExtension
 {
     internal class GitButton : ToolbarButton
     {
         //################################
-        // Constant or Static Members.
+        // Constant or static members.
         //################################
-        const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
-        const string StylePath = ResourcesPath + "GitButton.uss";
+        private const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
+        private const string StylePath = ResourcesPath + "GitButton.uss";
 
         public static bool IsResourceReady()
         {
@@ -26,11 +19,7 @@ namespace Coffee.UpmGitExtension
 
         public GitButton(System.Action action) : base(action)
         {
-#if UNITY_2019_1_OR_NEWER
             styleSheets.Add(UnityEditor.AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
-#else
-            AddStyleSheetPath(StylePath);
-#endif
 
             AddToClassList("git-button");
 
@@ -41,4 +30,3 @@ namespace Coffee.UpmGitExtension
         }
     }
 }
-#endif // [ASMDEFEX] DO NOT REMOVE THIS LINE MANUALLY.
