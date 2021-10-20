@@ -1,3 +1,15 @@
+# [2.0.0-preview.1](https://github.com/mob-sakai/UpmGitExtension/compare/1.3.4...2.0.0-preview.1) (2021-10-20)
+
+
+### Features
+
+* support Unity 2020.2 or later ([557d979](https://github.com/mob-sakai/UpmGitExtension/commit/557d97937a2374d80790e849338a595252d8ce43))
+
+
+### BREAKING CHANGES
+
+* UpmGitExtension v2.x does not work in Unity 2018/2019. (Please use v1.x).
+
 ## [1.3.4](https://github.com/mob-sakai/UpmGitExtension/compare/1.3.3...1.3.4) (2021-01-13)
 
 
