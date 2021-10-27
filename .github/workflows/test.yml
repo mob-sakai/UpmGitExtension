@@ -12,6 +12,8 @@ on:
     types:
       - opened
       - synchronize
+  schedule:
+    - cron: "* * * * 0" # weekly
 
 jobs:
   setup:
