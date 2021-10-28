@@ -216,6 +216,11 @@ namespace Coffee.UpmGitExtension
 
         private static string GetRepoUrl(string url, string path)
         {
+            // Trim revision from url.
+            var sharp = url.IndexOf('#');
+            if (0 <= sharp)
+                url = url.Substring(0, sharp);
+
             path = path.Trim('/');
             return 0 < path.Length ? url + "?path=" + path : url;
         }
