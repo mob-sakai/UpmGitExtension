@@ -91,19 +91,14 @@ namespace Coffee.UpmGitExtension
             }
         }
 
-
         public static bool Has(this object self, string methodName, object[] args)
         {
             var types = args.Select(x => x.GetType()).ToArray();
-                    UnityEngine.Debug.Log($"methodName: {methodName}");
-                    UnityEngine.Debug.Log($"aTypes: {types.Dump(y => y.Name)}");
-
             return self.Type().GetMethods(FLAGS)
                 .Where(x => x.Name == methodName)
                 .Any(x =>
                 {
                     var pTypes = x.GetParameters().Select(y => y.ParameterType).ToArray();
-                    UnityEngine.Debug.Log($"pTypes: {pTypes.Dump(y => y.Name)}");
                     return pTypes.Length == types.Length
                         && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]));
                 });
