@@ -236,16 +236,14 @@ namespace Coffee.UpmGitExtension
 
                         return upmPackage;
                     }
-                    //else
-                    //{
-                    //    // Registory mode: Register as installable package.
-                    //    var upmPackage = new UpmPackage(versions.Key, true, PackageType.ScopedRegistry);
-                    //    upmPackage.UpdateVersions(versions.OrderBy(v => v.version));
-                    //    upmPackage.Set("m_Type", PackageType.MainNotUnity | PackageType.Installable);
-                    //    return upmPackage;
-                    //}
-
-                    return null;
+                    else
+                    {
+                        // Registory mode: Register as installable package.
+                        var upmPackage = new UpmPackage(versions.Key, true, PackageType.ScopedRegistry);
+                        upmPackage.UpdateVersions(versions.OrderBy(v => v.version));
+                        upmPackage.Set("m_Type", PackageType.MainNotUnity | PackageType.Installable);
+                        return upmPackage;
+                    }
                 })
                 .Where(p => p != null);
 
