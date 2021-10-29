@@ -1,3 +1,7 @@
+#if !UNITY_2021_2_OR_NEWER
+#define SUPPORT_MENU_EXTENSIONS
+#endif
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using UnityEditor;
@@ -10,12 +14,18 @@ using UnityEngine.UIElements;
 namespace Coffee.UpmGitExtension
 {
     internal class UpmGitExtension : VisualElement, IPackageManagerExtension
+#if SUPPORT_MENU_EXTENSIONS
+    , IPackageManagerMenuExtensions
+#endif
     {
         [InitializeOnLoadMethod]
         private static void InitializeOnLoadMethod()
         {
             var ext = new UpmGitExtension();
             PackageManagerExtensions.RegisterExtension(ext as IPackageManagerExtension);
+#if SUPPORT_MENU_EXTENSIONS
+            PackageManagerExtensions.RegisterExtension(ext as IPackageManagerMenuExtensions);
+#endif
         }
 
         //################################
@@ -42,6 +52,25 @@ namespace Coffee.UpmGitExtension
             Initialize();
             _packageDetailsExtension?.OnPackageSelectionChange(packageInfo);
         }
+
+#if SUPPORT_MENU_EXTENSIONS
+        void IPackageManagerMenuExtensions.OnAdvancedMenuCreate(DropdownMenu menu)
+        {
+            menu.AppendAction("Open manifest.json", _ => Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath( "Packages/manifest.json")), DropdownMenuAction.Status.Normal);
+        }
+
+        void IPackageManagerMenuExtensions.OnAddMenuCreate(DropdownMenu menu)
+        {
+        }
+
+        void IPackageManagerMenuExtensions.OnFilterMenuCreate(DropdownMenu menu)
+        {
+        }
+#else
+        void OnPackageManagerToolbarSetup(PackageManagerToolbar toolbar)
+        {
+        }
+#endif
 
         //################################
         // Private Members.
@@ -72,6 +101,11 @@ namespace Coffee.UpmGitExtension
             gitButton.style.borderRightWidth = 0;
             var addButton = root.Q("toolbarAddMenu");
             addButton.parent.Insert(0, gitButton);
+
+#if !SUPPORT_MENU_EXTENSIONS
+            // Setup toolbar menus
+            OnPackageManagerToolbarSetup(root.Q<PackageManagerToolbar>());
+#endif
         }
     }
 }
