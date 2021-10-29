@@ -60,10 +60,10 @@ namespace Coffee.UpmGitExtension
             EditorApplication.delayCall += () =>
             {
                 _pageManager.onVisualStateChange += _ => RefleshVersionItems();
-#if UNITY_2020
-                _pageManager.onListUpdate += (_, __, ___, ____) => RefleshVersionItems();
-#else
+#if UNITY_2021_2_OR_NEWER
                 _pageManager.onListUpdate += _ => RefleshVersionItems();
+#else
+                _pageManager.onListUpdate += (_, __, ___, ____) => RefleshVersionItems();
 #endif
             };
         }
