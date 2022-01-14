@@ -52,7 +52,7 @@ const shouldFetch = filePath => {
 };
 
 const touch = (filePath) => {
-  const now = Date.now();
+  const now = new Date();
   fs.utimesSync(filePath, now, now);
 }
 
