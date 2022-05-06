@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UnityEngine.UIElements;
+using UnityEditor.PackageManager.UI.Internal;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("Unity.InternalAPIEngineBridgeDev.001")]
 
