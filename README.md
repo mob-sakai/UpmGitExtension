@@ -11,7 +11,7 @@ This package extends the UI of Unity Package Manager (UPM) for the packages inst
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
 [![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai)
 
-<< [Description](#description) | [Install](#install) | [Usage](#usage) | [Development Note](#development-note) >>
+<< [Description](#description) | [Installation](#installation-for-unity-2020-or-later) | [Usage](#usage) | [Development Note](#development-note) >>
 
 ### What's new? [See changelog ![](https://img.shields.io/github/release-date/mob-sakai/UpmGitExtension.svg?label=last%20updated)](https://github.com/mob-sakai/UpmGitExtension/blob/upm/CHANGELOG.md)
 
@@ -53,9 +53,9 @@ This project extends the UI of Unity Package Manager for package installed using
 
 <br><br><br><br>
 
-## Installation
+## Installation (for Unity 2020 or later)
 
-#### Using OpenUPM (For Unity 2018.3 or later)
+### Using OpenUPM
 
 This package is available on [OpenUPM](https://openupm.com).  
 You can install it via [openupm-cli](https://github.com/openupm/openupm-cli).
@@ -64,7 +64,9 @@ You can install it via [openupm-cli](https://github.com/openupm/openupm-cli).
 openupm add com.coffee.upm-git-extension
 ```
 
-#### Using Unity Package Manager (For Unity 2018.3 or later)
+<br><br>
+
+### Using Unity Package Manager
 
 Find the manifest.json file in the Packages folder of your project and edit it to look like this:
 
@@ -77,9 +79,35 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 }
 ```
 
+<br><br>
+
+## Installation (For Unity 2018 or 2019)
+
+`v2.x` supports 2020.1 or later.  
+Please use ![GitHub package.json version (v1)](https://img.shields.io/github/package-json/v/mob-sakai/UpmGitExtension/v1?label) for Unity 2018 or 2019.
+
+Install via OpenUPM
+
+```
+openupm add com.coffee.upm-git-extension@v1
+```
+
+or install via Unity Package Manager
+
+```
+{
+  "dependencies": {
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#v1",
+    ...
+  },
+}
+```
+
 ### Requirement
 
 - Unity 2018.3 or later
+  - Unity 2018 or 2019 -> `v1.x`
+  - Unity 2020 or later -> `v2.x`
 - Git (executable on command-line)
 
 <br><br><br><br>
