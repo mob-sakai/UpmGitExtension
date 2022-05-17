@@ -58,7 +58,7 @@ jobs:
       - name: "Run tests"
         uses: game-ci/unity-test-runner@v2
         with:
-          customImage: mobsakai/unity_editor:${{ matrix.version }}
+          customImage: mobsakai/unity3d:${{ matrix.version }}
           customParameters: -nographics
           # unityVersion: ${{ matrix.version }}
           checkName: ${{ matrix.version }} Test Results
