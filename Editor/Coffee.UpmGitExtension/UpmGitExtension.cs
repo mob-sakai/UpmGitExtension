@@ -2,6 +2,7 @@
 #define SUPPORT_MENU_EXTENSIONS
 #endif
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using UnityEditor;
@@ -59,7 +60,7 @@ namespace Coffee.UpmGitExtension
 #if SUPPORT_MENU_EXTENSIONS
         void IPackageManagerMenuExtensions.OnAdvancedMenuCreate(DropdownMenu menu)
         {
-            menu.AppendAction("Open manifest.json", _ => Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath( "Packages/manifest.json")), DropdownMenuAction.Status.Normal);
+            menu.AppendAction("Open manifest.json", _ => OpenManifestJson(), DropdownMenuAction.Status.Normal);
         }
 
         void IPackageManagerMenuExtensions.OnAddMenuCreate(DropdownMenu menu)
@@ -74,9 +75,20 @@ namespace Coffee.UpmGitExtension
         {
             MenuDropdownItem menuDropdownItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
             menuDropdownItem.text = "Open manifest.json";
-            menuDropdownItem.action = () => Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath("./Packages/manifest.json"));
+            menuDropdownItem.action = OpenManifestJson;
         }
 #endif
+
+        void OpenManifestJson()
+        {
+            var extensions = EditorSettings.projectGenerationUserExtensions;
+            if (!extensions.Contains("json"))
+            {
+                EditorSettings.projectGenerationUserExtensions = extensions.Concat(new[] { "json" }).ToArray();
+                AssetDatabase.SaveAssets();
+            }
+            Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath("./Packages/manifest.json"));
+        }
 
         //################################
         // Private Members.
