@@ -22,7 +22,11 @@ jobs:
       versions: ${{ steps.setup.outputs.versions }}
     steps:
       - id: setup
-        run: echo "::set-output name=versions::`npx unity-changeset list --versions --all --latest-patch --min 2020.1 --json`"
+        run: |
+          VERSIONS=`npx unity-changeset list --versions --all --latest-patch --min 2020.1 --json`
+          echo "==== Target Unity Versions ===="
+          echo "${VERSIONS}"
+          echo "::set-output name=versions::${VERSIONS}"
 
   test:
     runs-on: ubuntu-latest
