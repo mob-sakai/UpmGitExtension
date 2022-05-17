@@ -19,6 +19,7 @@ namespace Coffee.UpmGitExtension
         //################################
         public void Setup(VisualElement root)
         {
+            _root = root;
             _packageDetails = root.Q<PackageDetails>();
 
             var hostButton = _packageDetails.Q<Button>("hostButton");
@@ -55,14 +56,16 @@ namespace Coffee.UpmGitExtension
                 upmGitExtension.Add(new Label() { name = "detailSourcePath" });
             }
 #endif
+
             // Register callbacks.
-            _versionItems = root.Query<PackageVersionItem>().Build();
             EditorApplication.delayCall += () =>
             {
+#if UNITY_2022_2_OR_NEWER
+#elif UNITY_2021_2_OR_NEWER || UNITY_2021_1_20 || UNITY_2021_1_21 || UNITY_2021_1_22 || UNITY_2021_1_23 || UNITY_2021_1_24 || UNITY_2021_1_25 || UNITY_2021_1_26 || UNITY_2021_1_27 || UNITY_2021_1_28
                 _pageManager.onVisualStateChange += _ => RefleshVersionItems();
-#if UNITY_2021_2_OR_NEWER || UNITY_2021_1_20 || UNITY_2021_1_21 || UNITY_2021_1_22 || UNITY_2021_1_23 || UNITY_2021_1_24 || UNITY_2021_1_25 || UNITY_2021_1_26 || UNITY_2021_1_27 || UNITY_2021_1_28
                 _pageManager.onListUpdate += _ => RefleshVersionItems();
 #else
+                _pageManager.onVisualStateChange += _ => RefleshVersionItems();
                 _pageManager.onListUpdate += (_, __, ___, ____) => RefleshVersionItems();
 #endif
             };
@@ -122,6 +125,10 @@ namespace Coffee.UpmGitExtension
                     var package = GitPackageDatabase.GetPackage(packageInfo.name);
                     _targetVersion = package.versions.installed != null ? package.versions.recommended : package.versions.primary;
                 }
+
+#if UNITY_2022_2_OR_NEWER
+                RefleshVersionItems();
+#endif
             }
         }
 
@@ -133,7 +140,7 @@ namespace Coffee.UpmGitExtension
         private IPackageVersion _targetVersion;
         private Clickable _clickableToUpdate;
         private Button _updateButton;
-        private UQueryState<PackageVersionItem> _versionItems;
+        private VisualElement _root;
 #if UNITY_2020_2_OR_NEWER
         private static PageManager _pageManager => ScriptableSingleton<ServicesContainer>.instance.Resolve<PageManager>();
 #else
@@ -191,14 +198,18 @@ namespace Coffee.UpmGitExtension
 
         private void RefleshVersionItems()
         {
-            _versionItems.ForEach(item =>
+#if UNITY_2022_2_OR_NEWER
+            var items = _root.Query<PackageDetailsVersionHistoryItem>().Build()
+                .Select(item => new { label = item.Q<Toggle>("versionHistoryItemToggle")?.Q<Label>(), version = item.version as UpmPackageVersionEx });
+#else
+            var items = _root.Query<PackageVersionItem>().Build().ToList()
+                .Select(item => new { label = item.Q<Label>("versionLabel"), version = item.version as UpmPackageVersionEx });
+#endif
+            foreach(var item in items)
             {
-                var text = item.Q<Label>("versionLabel");
-                if (text != null && item.version.HasTag(PackageTag.Git))
-                {
-                    text.text = item.version.versionString;
-                }
-            });
+                if (item.label != null && item.version != null)
+                    item.label.text = item.version.fullVersionString;
+            }
         }
     }
 }

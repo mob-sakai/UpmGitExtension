@@ -53,7 +53,11 @@ namespace Coffee.UpmGitExtension
 
             makeItem = () => new Label();
             bindItem = (e, i) => (e as Label).text = _searchedItems[i];
+#if UNITY_2022_2_OR_NEWER
+            selectionChanged += o =>
+#else
             onSelectionChange += o =>
+#endif
             {
                 textField.value = o.FirstOrDefault() as string ?? "";
                 UIUtils.SetElementDisplay(this, false);

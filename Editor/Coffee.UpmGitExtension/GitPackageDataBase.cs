@@ -227,6 +227,10 @@ namespace Coffee.UpmGitExtension
                         // Git mode: Register all installable package versions.
                         var upmPackage = _packageDatabase.GetPackage(versions.Key) as UpmPackage;
                         var installedVersion = upmPackage.versions.installed as UpmPackageVersion;
+                        if (installedVersion.packageInfo.source == UnityEditor.PackageManager.PackageSource.Embedded)
+                            return upmPackage;
+
+                        // Unlock.
                         installedVersion.UnlockVersion();
 
                         var newVersions = new[] { new UpmPackageVersionEx(installedVersion) }

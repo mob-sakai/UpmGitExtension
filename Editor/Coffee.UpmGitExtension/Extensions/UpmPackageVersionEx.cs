@@ -35,7 +35,7 @@ namespace Coffee.UpmGitExtension
             OnAfterDeserialize();
         }
 
-        public override string versionString => m_VersionString;
+        public string fullVersionString { get; private set; }
         public SemVersion semVersion { get; private set; }
 
         [SerializeField]
@@ -77,9 +77,13 @@ namespace Coffee.UpmGitExtension
 
             semVersion = m_Version ?? new SemVersion();
             var revision = packageInfo?.git?.revision ?? "";
-            if (!revision.Contains(m_VersionString))
+            if (!revision.Contains(m_VersionString) && 0 < revision.Length)
             {
-                m_VersionString = $"{m_Version} ({revision})";
+                fullVersionString = $"{m_Version} ({revision})";
+            }
+            else
+            {
+                fullVersionString = m_Version.ToString();
             }
 
             try
