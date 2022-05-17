@@ -72,6 +72,9 @@ namespace Coffee.UpmGitExtension
 #else
         void OnPackageManagerToolbarSetup(PackageManagerToolbar toolbar)
         {
+            MenuDropdownItem menuDropdownItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
+            menuDropdownItem.text = "Open manifest.json";
+            menuDropdownItem.action = () => Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath("./Packages/manifest.json"));
         }
 #endif
 
