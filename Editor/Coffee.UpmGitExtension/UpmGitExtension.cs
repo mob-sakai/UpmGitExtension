@@ -8,7 +8,9 @@ using UnityEditor;
 using UnityEditor.PackageManager.UI;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UnityEngine.UIElements;
+#if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
+#endif
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("Unity.InternalAPIEngineBridgeDev.001")]
 
