@@ -69,7 +69,7 @@ namespace Coffee.UpmGitExtension
 
         public static IEnumerable<UpmPackage> GetUpmPackages()
         {
-            return _packageDatabase.upmPackages.Cast<UpmPackage>();
+            return _packageDatabase.allPackages.OfType<UpmPackage>();
         }
 
         public static IEnumerable<UpmPackage> GetInstalledGitPackages()
@@ -121,7 +121,10 @@ namespace Coffee.UpmGitExtension
 
         internal static IPackageVersion GetPackageVersion(string packageUniqueId, string versionUniqueId)
         {
-            return _packageDatabase.GetPackageVersion(packageUniqueId, versionUniqueId);
+            IPackage package;
+            IPackageVersion version;
+            _packageDatabase.GetPackageAndVersion(packageUniqueId, versionUniqueId, out package, out version);
+            return version;
         }
 
         /// <summary>
