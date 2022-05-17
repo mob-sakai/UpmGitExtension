@@ -1,0 +1,17 @@
+{
+    "name": "Coffee.UpmGitExtension.LegacyWarning",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "!UNITY_2020_1_OR_NEWER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
