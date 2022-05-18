@@ -76,10 +76,24 @@ namespace Coffee.UpmGitExtension
             root.Add(new SearchResultListView(_repoUrlText, () => GitPackageDatabase.GetCachedRepositoryUrls()));
 
             OnClick_Close();
+
+            // 
+            GitPackageDatabase._upmClient.onAddOperation += op => {
+                _loadingSpinner.Start();
+                _rootContainer.SetEnabled(false);
+
+                op.onOperationFinalized += _ =>
+                {
+                    _loadingSpinner.Stop();
+                    _rootContainer.SetEnabled(true);
+                    OnClick_Close();
+                };
+            };
         }
 
         public void Open()
         {
+            _loadingSpinner.Stop();
             UIUtils.SetElementDisplay(this, true);
             SetState(State.None);
 

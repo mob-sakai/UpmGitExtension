@@ -56,15 +56,14 @@ namespace Coffee.UpmGitExtension
 
         public static void Install(string packageId)
         {
+            _upmClient.AddByUrl(packageId);
+        }
+
+        public static void Uninstall(string packageId)
+        {
             var i = packageId.IndexOf('@');
             var packageName = packageId.Substring(0, i);
-            var url = packageId.Substring(i + 1);
-            UpdateJson("Packages/manifest.json", jsonDic =>
-            {
-                // Add to dependencies.
-                var dependencies = jsonDic["dependencies"] as Dictionary<string, object>;
-                dependencies[packageName] = url;
-            });
+            _upmClient.RemoveByName(packageName);
         }
 
         public static IEnumerable<UpmPackage> GetUpmPackages()
@@ -192,23 +191,6 @@ namespace Coffee.UpmGitExtension
 #else
         private static bool _enablePreReleasePackages => _settings.enablePreviewPackages;
 #endif
-
-        private static void UpdateJson(string path, Action<Dictionary<string, object>> action)
-        {
-            if (!File.Exists(path)) return;
-
-            try
-            {
-                var jsonDic = Json.Deserialize(File.ReadAllText(path)) as Dictionary<string, object>;
-                action?.Invoke(jsonDic);
-                File.WriteAllText(path, Json.Serialize(jsonDic, true));
-                EditorApplication.delayCall += () => UnityEditor.PackageManager.Client.Resolve();
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogException(e);
-            }
-        }
 
         private static void RequestUpdateGitPackageVersions()
         {
