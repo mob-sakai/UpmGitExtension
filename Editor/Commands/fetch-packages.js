@@ -10,7 +10,7 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { hashCode, mkdirSyncRecrusive, shouldFetch, lock, unlock, loadJs, touch } = require("./utils");
-const version = '2.0.0-preview.1'
+const version = '2.0.0'
 
 // Input
 console.log(`cwd: ${process.cwd()}\nInput`);
@@ -32,7 +32,7 @@ const id = (repositoryId + subDirId)
   .replace(/[:\/]/g, "~")
   .toLowerCase();
 const repoDir = `Repositories/${id}`;
-const resultDir = `Results`;
+const resultDir = `Results-${version}`;
 const outputFile = path.resolve(`${resultDir}/${id}.json`);
 
 console.log(`  rawRepositoryUrl: ${rawRepositoryUrl}`);
