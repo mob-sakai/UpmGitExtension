@@ -60,10 +60,9 @@ namespace Coffee.UpmGitExtension
             // Register callbacks.
             EditorApplication.delayCall += () =>
             {
-#if UNITY_2022_2_OR_NEWER
-#elif UNITY_2021_2_OR_NEWER || UNITY_2021_1_20 || UNITY_2021_1_21 || UNITY_2021_1_22 || UNITY_2021_1_23 || UNITY_2021_1_24 || UNITY_2021_1_25 || UNITY_2021_1_26 || UNITY_2021_1_27 || UNITY_2021_1_28
-                _pageManager.onVisualStateChange += _ => RefleshVersionItems();
-                _pageManager.onListUpdate += _ => RefleshVersionItems();
+#if UNITY_2021_2_OR_NEWER || UNITY_2021_1_20 || UNITY_2021_1_21 || UNITY_2021_1_22 || UNITY_2021_1_23 || UNITY_2021_1_24 || UNITY_2021_1_25 || UNITY_2021_1_26 || UNITY_2021_1_27 || UNITY_2021_1_28
+                _pageManager.onVisualStateChange += _ => EditorApplication.delayCall += RefleshVersionItems;
+                _pageManager.onListUpdate += _ => EditorApplication.delayCall += RefleshVersionItems;
 #else
                 _pageManager.onVisualStateChange += _ => RefleshVersionItems();
                 _pageManager.onListUpdate += (_, __, ___, ____) => RefleshVersionItems();
