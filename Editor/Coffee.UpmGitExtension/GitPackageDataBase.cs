@@ -140,6 +140,12 @@ namespace Coffee.UpmGitExtension
                 .ForEach(url => Fetch(url));
         }
 
+        public static void OpenCacheDirectory()
+        {
+            if (Directory.Exists(_workingDirectory))
+                EditorUtility.RevealInFinder(_workingDirectory);
+        }
+
         public static void ClearCache()
         {
             _resultCaches.Clear();

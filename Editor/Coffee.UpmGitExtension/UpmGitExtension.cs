@@ -61,6 +61,9 @@ namespace Coffee.UpmGitExtension
         void IPackageManagerMenuExtensions.OnAdvancedMenuCreate(DropdownMenu menu)
         {
             menu.AppendAction("Open manifest.json", _ => OpenManifestJson(), DropdownMenuAction.Status.Normal);
+            menu.AppendAction("[GitPackages]/Open cache directory", _ => GitPackageDatabase.OpenCacheDirectory(), DropdownMenuAction.Status.Normal);
+            menu.AppendAction("[GitPackages]/Clear cache", _ => GitPackageDatabase.ClearCache(), DropdownMenuAction.Status.Normal);
+            menu.AppendAction("[GitPackages]/Fetch packages", _ => GitPackageDatabase.Fetch(), DropdownMenuAction.Status.Normal);
         }
 
         void IPackageManagerMenuExtensions.OnAddMenuCreate(DropdownMenu menu)
@@ -73,9 +76,22 @@ namespace Coffee.UpmGitExtension
 #else
         void OnPackageManagerToolbarSetup(PackageManagerToolbar toolbar)
         {
-            MenuDropdownItem menuDropdownItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
+            var menuDropdownItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
             menuDropdownItem.text = "Open manifest.json";
             menuDropdownItem.action = OpenManifestJson;
+
+            var openCacheMenuItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
+            openCacheMenuItem.insertSeparatorBefore = true;
+            openCacheMenuItem.text = "[GitPackages]/Open cache directory";
+            openCacheMenuItem.action = GitPackageDatabase.OpenCacheDirectory;
+
+            var cacheClearMenuItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
+            cacheClearMenuItem.text = "[GitPackages]/Clear cache";
+            cacheClearMenuItem.action = GitPackageDatabase.ClearCache;
+
+            var fetchMenuItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
+            fetchMenuItem.text = "[GitPackages]/Fetch packages";
+            fetchMenuItem.action = GitPackageDatabase.Fetch;
         }
 #endif
 
