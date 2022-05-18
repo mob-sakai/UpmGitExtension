@@ -13,6 +13,7 @@ using UnityEngine.UIElements;
 using UnityEditor.PackageManager.UI.Internal;
 #endif
 
+// For tests
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("Unity.InternalAPIEngineBridgeDev.001")]
 
 namespace Coffee.UpmGitExtension
@@ -74,7 +75,10 @@ namespace Coffee.UpmGitExtension
         {
         }
 #else
-        void OnPackageManagerToolbarSetup(PackageManagerToolbar toolbar)
+        /// <summary>
+        /// Setup toolbar.
+        /// </summary>
+        private void OnPackageManagerToolbarSetup(PackageManagerToolbar toolbar)
         {
             var menuDropdownItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
             menuDropdownItem.text = "Open manifest.json";
@@ -85,26 +89,15 @@ namespace Coffee.UpmGitExtension
             openCacheMenuItem.text = "[GitPackages]/Open cache directory";
             openCacheMenuItem.action = GitPackageDatabase.OpenCacheDirectory;
 
-            var cacheClearMenuItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
-            cacheClearMenuItem.text = "[GitPackages]/Clear cache";
-            cacheClearMenuItem.action = GitPackageDatabase.ClearCache;
+            var clearCacheMenuItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
+            clearCacheMenuItem.text = "[GitPackages]/Clear cache";
+            clearCacheMenuItem.action = GitPackageDatabase.ClearCache;
 
-            var fetchMenuItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
-            fetchMenuItem.text = "[GitPackages]/Fetch packages";
-            fetchMenuItem.action = GitPackageDatabase.Fetch;
+            var fetchPackagesMenuItem = toolbar.toolbarSettingsMenu.AddBuiltInDropdownItem();
+            fetchPackagesMenuItem.text = "[GitPackages]/Fetch packages";
+            fetchPackagesMenuItem.action = GitPackageDatabase.Fetch;
         }
 #endif
-
-        void OpenManifestJson()
-        {
-            var extensions = EditorSettings.projectGenerationUserExtensions;
-            if (!extensions.Contains("json"))
-            {
-                EditorSettings.projectGenerationUserExtensions = extensions.Concat(new[] { "json" }).ToArray();
-                AssetDatabase.SaveAssets();
-            }
-            Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath("./Packages/manifest.json"));
-        }
 
         //################################
         // Private Members.
@@ -113,6 +106,26 @@ namespace Coffee.UpmGitExtension
         private PackageDetailsExtension _packageDetailsExtension;
         private GitPackageInstallationWindow _installationWindow;
 
+        /// <summary>
+        /// Open manifest.json in current project.
+        /// </summary>
+        private void OpenManifestJson()
+        {
+            // json files will be opend with code editor.
+            var extensions = EditorSettings.projectGenerationUserExtensions;
+            if (!extensions.Contains("json"))
+            {
+                EditorSettings.projectGenerationUserExtensions = extensions.Concat(new[] { "json" }).ToArray();
+                AssetDatabase.SaveAssets();
+            }
+
+            // Open manifest.json with current code editor.
+            Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath("./Packages/manifest.json"));
+        }
+
+        /// <summary>
+        /// Initialize.
+        /// </summary>
         private void Initialize()
         {
             if (_initialized || !GitPackageInstallationWindow.IsResourceReady() || !GitButton.IsResourceReady()) return;
