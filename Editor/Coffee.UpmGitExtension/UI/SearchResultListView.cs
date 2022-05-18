@@ -32,7 +32,7 @@ namespace Coffee.UpmGitExtension
 
         public void UpdateSearchedItems()
         {
-            itemsSource = _searchedItems = _searchFunc()
+            _searchedItems = _searchFunc()
                 .Where(repo => 0 <= repo.IndexOf(_searchText, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
@@ -41,6 +41,9 @@ namespace Coffee.UpmGitExtension
                 UIUtils.SetElementDisplay(this, false);
             else
                 style.height = Mathf.Min(count, 5) * _itemHeight;
+
+            itemsSource = _searchedItems;
+            RefreshItems();
         }
 
         public SearchResultListView(TextField textField, Func<string[]> searchFunc) : base()
