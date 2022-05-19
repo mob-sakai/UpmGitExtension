@@ -50,6 +50,16 @@ namespace Coffee.UpmGitExtension
             ClearSelection();
         }
 
+        private void Adjust(VisualElement v)
+        {
+            var r = v.worldBound;
+            style.position = Position.Absolute;
+            style.left = r.x;
+            style.top = r.y;
+            style.width = r.width;
+            style.backgroundColor = EditorGUIUtility.isProSkin ? new Color(0.098f, 0.098f, 0.098f, 0.85f) : new Color(0.541f, 0.541f, 0.541f, 0.85f);
+        }
+
         public SearchResultListView(TextField textField, Func<string[]> searchFunc) : base()
         {
             UIUtils.SetElementDisplay(this, false);
@@ -71,21 +81,16 @@ namespace Coffee.UpmGitExtension
             };
 
             textField.RegisterCallback<FocusOutEvent>(_ => UIUtils.SetElementDisplay(this, false));
-            textField.RegisterCallback<FocusInEvent>(_ => { UIUtils.SetElementDisplay(this, true); UpdateSearchedItems(); });
+            textField.RegisterCallback<FocusInEvent>(_ =>
+            {
+                Adjust(textField);
+                UIUtils.SetElementDisplay(this, true);
+                UpdateSearchedItems();
+            });
             textField.RegisterValueChangedCallback(e =>
             {
                 UpdateSearchText(e.newValue);
                 UIUtils.SetElementDisplay(this, true);
-            });
-            textField.RegisterCallback<GeometryChangedEvent>(e =>
-            {
-                var r = e.newRect;
-                var w = textField.worldBound;
-                style.position = Position.Absolute;
-                style.left = w.x;
-                style.top = w.y;
-                style.width = w.width;
-                style.backgroundColor = EditorGUIUtility.isProSkin ? new Color(0.098f, 0.098f, 0.098f, 0.85f) : new Color(0.541f, 0.541f, 0.541f, 0.85f);
             });
         }
     }
