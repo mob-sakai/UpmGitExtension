@@ -43,7 +43,11 @@ namespace Coffee.UpmGitExtension
                 style.height = Mathf.Min(count, 5) * _itemHeight;
 
             itemsSource = _searchedItems;
+
+#if UNITY_2021_2_OR_NEWER
             RefreshItems();
+#endif
+            ClearSelection();
         }
 
         public SearchResultListView(TextField textField, Func<string[]> searchFunc) : base()
