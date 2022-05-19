@@ -50,6 +50,14 @@ This project extends the UI of Unity Package Manager for package installed using
 - Support `.Net 3.5`, `.Net 4.x` and `.Net Standard 2.0`
 - Version filtering
 - Support path query parameter (for Unity 2019.3.4f or later)
+- (2.0.0) Git repositories are cached and installed/searched packages are automatically indexed
+  - Cached repositories will be shared between different projects
+  - Cached repository urls will be displayed as history in the installation window  
+![](https://user-images.githubusercontent.com/12690315/169232949-260b6fe0-b31c-4179-b9d1-3385cf1a2ac1.png)
+  - Indexed packages will be displayed in `My Registories`  
+![](https://user-images.githubusercontent.com/12690315/169231822-18dfb10f-894f-4883-9331-297f9e50a0e6.png)
+- (2.0.0) Add menu to open `manifest.json` with code editor, open cache directory, clear cache and fetch packages  
+![](https://user-images.githubusercontent.com/12690315/169232173-943ee8cf-9d18-435d-aea2-3fdd16538cf7.png)
 
 <br><br><br><br>
 
@@ -84,7 +92,7 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 ## Installation (For Unity 2018 or 2019)
 
 `v2.x` supports 2020.1 or later.  
-Please use ![GitHub package.json version (v1)](https://img.shields.io/github/package-json/v/mob-sakai/UpmGitExtension/v1?label) for Unity 2018 or 2019.
+Please use `v1.x` for Unity 2018 or 2019.
 
 Install via OpenUPM
 
@@ -192,8 +200,8 @@ With your support, I can spend more time on development. :)
 
 ## Author
 
-[REPO_OWNER](https://github.com/REPO_OWNER)
-[![](https://img.shields.io/twitter/follow/TWITTER_ID.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai) 
+[mob-sakai](https://github.com/mob-sakai)
+[![](https://img.shields.io/twitter/follow/mob_sakai.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mob_sakai) 
 
 
 ## See Also
