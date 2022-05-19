@@ -235,7 +235,7 @@ namespace Coffee.UpmGitExtension
                     else
                     {
                         // Registory mode: Register as installable package.
-                        var upmPackage = new UpmPackage(versions.Key, true, PackageType.ScopedRegistry);
+                        var upmPackage = new UpmPackage(versions.Key + " (git)", true, PackageType.ScopedRegistry);
                         upmPackage.UpdateVersions(versions.OrderBy(v => v.version));
                         upmPackage.Set("m_Type", PackageType.MainNotUnity | PackageType.Installable);
                         return upmPackage;
