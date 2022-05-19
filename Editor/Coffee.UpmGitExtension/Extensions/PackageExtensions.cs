@@ -11,10 +11,16 @@ namespace Coffee.UpmGitExtension
     internal static class PackageExtensions
     {
         static readonly Regex kRegexPackageId = new Regex("^([^@]+)@([^#]+)(#(.+))?$", RegexOptions.Compiled);
+        static readonly Regex kRegexScpToSsh = new Regex("^(git@[^/]+):", RegexOptions.Compiled);
 
         public static string GetSourceUrl(this PackageInfo self)
         {
-            return kRegexPackageId.Replace(self?.packageId, "$2$3");
+            return GetSourceUrl(kRegexPackageId.Replace(self?.packageId, "$2$3"));
+        }
+
+        public static string GetSourceUrl(string url)
+        {
+            return kRegexScpToSsh.Replace(url, "ssh://$1/");
         }
 
         public static string GetRepositoryUrlForBrowser(this PackageInfo self)

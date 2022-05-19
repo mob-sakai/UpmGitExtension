@@ -7,6 +7,7 @@ using UnityEditor.PackageManager.UI;
 #endif
 using System.Linq;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 namespace Coffee.UpmGitExtension
 {
@@ -234,6 +235,9 @@ namespace Coffee.UpmGitExtension
             var sharp = url.IndexOf('#');
             if (0 <= sharp)
                 url = url.Substring(0, sharp);
+
+            // scp to ssh
+            url = PackageExtensions.GetSourceUrl(url);
 
             path = path.Trim('/');
             return 0 < path.Length ? url + "?path=" + path : url;
