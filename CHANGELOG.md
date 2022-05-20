@@ -1,3 +1,34 @@
+# [2.0.0-preview.2](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0-preview.1...2.0.0-preview.2) (2022-05-20)
+
+
+### Bug Fixes
+
+* adjust search field ([ce6e2e3](https://github.com/mob-sakai/UpmGitExtension/commit/ce6e2e3f5a1a964969b53e2b8fc36ed9488d2a86))
+* cannot find PackageManagerToolbar on Unity 2021.3.1 ([658d2d9](https://github.com/mob-sakai/UpmGitExtension/commit/658d2d9150e2b490ebea358050921e51157136d0)), closes [#118](https://github.com/mob-sakai/UpmGitExtension/issues/118)
+* error after reopening the project on Windows ([232c6e9](https://github.com/mob-sakai/UpmGitExtension/commit/232c6e983b729da54ee33a3ccd2ced6f5715567f)), closes [#116](https://github.com/mob-sakai/UpmGitExtension/issues/116)
+* fix compile error ([76fcf88](https://github.com/mob-sakai/UpmGitExtension/commit/76fcf88d7695118292d960fb4f191126c5f8f916))
+* fix refresh items ([d92f601](https://github.com/mob-sakai/UpmGitExtension/commit/d92f601948a102f3168746783a7140907daa7b8b))
+* Install/uninstall package via UPMClient instead of updating manifest.json directly ([69c6021](https://github.com/mob-sakai/UpmGitExtension/commit/69c6021d3a43f4c38701cb3814e72d4c3afe5f21))
+* open manifest json in Unity 2021.2 ([7c359d3](https://github.com/mob-sakai/UpmGitExtension/commit/7c359d3d0b32bfd98901cf6a7ed27abfd2a13639))
+* open manifest json in Unity 2022.2 ([c157eba](https://github.com/mob-sakai/UpmGitExtension/commit/c157eba5e29fb4bfa9c4fc7beddf40e4364eec2d))
+* scp format url does not support path query and revision ([bdd9249](https://github.com/mob-sakai/UpmGitExtension/commit/bdd9249a23af46429496d48eaadc619288af91ca))
+* search field does not work properly ([52f9b95](https://github.com/mob-sakai/UpmGitExtension/commit/52f9b951d6fc1e5a19d6161be936706c998f1549))
+* separate same name packages in scoped/git registries ([a012b25](https://github.com/mob-sakai/UpmGitExtension/commit/a012b250740edfb08202d00c6d936a0eb131d13b))
+* show in console that UpmGitExtensions v2 is not available in Unity2018 or 2019 ([6658167](https://github.com/mob-sakai/UpmGitExtension/commit/6658167c884ca10c239a8ae44142f59ce92e5f4b)), closes [#117](https://github.com/mob-sakai/UpmGitExtension/issues/117)
+* support Unity 2021.1 ([6367f56](https://github.com/mob-sakai/UpmGitExtension/commit/6367f56c8f7e7f7c6dc5b63e9c02a8a186cef351))
+* support Unity 2022.1 ([47af5e8](https://github.com/mob-sakai/UpmGitExtension/commit/47af5e82674968ddd39d6cb691b5d42bc33a043a))
+* support Unity 2022.2 ([94ef69c](https://github.com/mob-sakai/UpmGitExtension/commit/94ef69c091ad6f79ee18f9a12e3803d35dc89dea))
+* The namespace name 'Internal' does not exist in the namespace 'UnityEditor.PackageManager.UI' ([a16dc0f](https://github.com/mob-sakai/UpmGitExtension/commit/a16dc0fb4a7c896e7850a74dc04bbeddb183f4b9))
+* trim revision from url in installation window ([e762ce5](https://github.com/mob-sakai/UpmGitExtension/commit/e762ce5fc436e31a7902d7d0326ea9657244dc15))
+
+
+### Features
+
+* add menu to open cache directory, clear cache and fetch packages ([b642b01](https://github.com/mob-sakai/UpmGitExtension/commit/b642b011a1f78c5ab1aab420a955e97e1e71e8e0))
+* git repository as registry ([36ce57d](https://github.com/mob-sakai/UpmGitExtension/commit/36ce57db033fa420074904ee1e44739eb218f02c))
+* open manifest.json from menu ([f8e7f63](https://github.com/mob-sakai/UpmGitExtension/commit/f8e7f639e2959588ac8410e3e9e22151d37ab3ea))
+* share git cache between projects ([be5dd7e](https://github.com/mob-sakai/UpmGitExtension/commit/be5dd7e6d402e9169e984e56a631064333e6ad27))
+
 # [2.0.0-preview.1](https://github.com/mob-sakai/UpmGitExtension/compare/1.3.4...2.0.0-preview.1) (2021-10-20)
 
 
