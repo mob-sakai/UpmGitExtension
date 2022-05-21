@@ -1,3 +1,10 @@
+# [2.0.0-preview.4](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0-preview.3...2.0.0-preview.4) (2022-05-21)
+
+
+### Bug Fixes
+
+* clear selection ([618b55d](https://github.com/mob-sakai/UpmGitExtension/commit/618b55dc3816f22501d0b09b3a1e7a1cac1ae552))
+
 # [2.0.0-preview.3](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0-preview.2...2.0.0-preview.3) (2022-05-21)
 
 
