@@ -1,3 +1,10 @@
+# [2.0.0-preview.3](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0-preview.2...2.0.0-preview.3) (2022-05-21)
+
+
+### Bug Fixes
+
+* unintentional changes to package source ([1066ce7](https://github.com/mob-sakai/UpmGitExtension/commit/1066ce773b647b099b7f0f51730068d8e3b8b1d4))
+
 # [2.0.0-preview.2](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0-preview.1...2.0.0-preview.2) (2022-05-20)
 
 
