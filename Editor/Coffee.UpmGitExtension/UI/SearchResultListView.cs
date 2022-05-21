@@ -47,7 +47,6 @@ namespace Coffee.UpmGitExtension
 #if UNITY_2021_2_OR_NEWER
             RefreshItems();
 #endif
-            ClearSelection();
         }
 
         private void Adjust(VisualElement v)
