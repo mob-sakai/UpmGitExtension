@@ -54,7 +54,7 @@ This project extends the UI of Unity Package Manager for package installed using
   - Cached repositories will be shared between different projects
   - Cached repository urls will be displayed as history in the installation window  
 ![](https://user-images.githubusercontent.com/12690315/169232949-260b6fe0-b31c-4179-b9d1-3385cf1a2ac1.png)
-  - Indexed packages will be displayed in `My Registories`  
+  - Indexed packages will be displayed in `My Registries`  
 ![](https://user-images.githubusercontent.com/12690315/169231822-18dfb10f-894f-4883-9331-297f9e50a0e6.png)
 - (2.0.0) Add menu to open `manifest.json` with code editor, open cache directory, clear cache and fetch packages  
 ![](https://user-images.githubusercontent.com/12690315/169232173-943ee8cf-9d18-435d-aea2-3fdd16538cf7.png)
