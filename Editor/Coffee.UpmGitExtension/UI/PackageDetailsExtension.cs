@@ -113,7 +113,7 @@ namespace Coffee.UpmGitExtension
                 if (packageVersion != null)
                 {
                     var package = GitPackageDatabase.GetPackage(packageVersion);
-                    _targetVersion = package.versions.installed?.uniqueId == packageInfo.packageId ? package.versions.recommended : packageVersion;
+                    _targetVersion = package?.versions?.installed?.uniqueId == packageInfo.packageId ? package.versions.recommended : packageVersion;
                     if (_targetVersion != null)
                     {
                         _updateButton.text = _updateButton.text.Replace(_targetVersion.version.ToString(), _targetVersion.versionString);
@@ -122,7 +122,7 @@ namespace Coffee.UpmGitExtension
                 else
                 {
                     var package = GitPackageDatabase.GetPackage(packageInfo.name);
-                    _targetVersion = package.versions.installed != null ? package.versions.recommended : package.versions.primary;
+                    _targetVersion = package?.versions?.installed != null ? package?.versions?.recommended : package?.versions?.primary;
                 }
 
 #if UNITY_2022_2_OR_NEWER
