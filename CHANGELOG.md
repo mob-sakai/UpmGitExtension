@@ -1,3 +1,11 @@
+# [2.0.0-preview.5](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0-preview.4...2.0.0-preview.5) (2022-06-18)
+
+
+### Bug Fixes
+
+* newer packages version not updating unless restarting editor ([0c7179d](https://github.com/mob-sakai/UpmGitExtension/commit/0c7179dd87f6c685af80ac42ecb766f9912a3040)), closes [#121](https://github.com/mob-sakai/UpmGitExtension/issues/121)
+* null pointer exception on package manager window opend ([b46e7ef](https://github.com/mob-sakai/UpmGitExtension/commit/b46e7ef0ec14a5769765dbd4ed2a7626832298ea))
+
 # [2.0.0-preview.4](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0-preview.3...2.0.0-preview.4) (2022-05-21)
 
 
