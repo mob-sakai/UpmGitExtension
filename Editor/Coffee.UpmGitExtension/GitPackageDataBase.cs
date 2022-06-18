@@ -156,6 +156,18 @@ namespace Coffee.UpmGitExtension
             WatchResultJson();
         }
 
+        public static void ResetCacheTime()
+        {
+            isPaused = true;
+            var resultDir = Path.GetFullPath(_resultsDir);
+            foreach (var file in Directory.GetFiles(resultDir, "*.json"))
+            {
+                File.SetLastWriteTime(file, DateTime.Now.AddMinutes(-10));
+                Debug.Log($"ResetCacheTime: {file}");
+            }
+            isPaused = false;
+        }
+
         public static IEnumerable<UpmPackageVersionEx> GetAvailablePackageVersions(string packageId = null, string repoUrl = null, bool preRelease = false)
         {
             return _resultCaches
@@ -174,6 +186,7 @@ namespace Coffee.UpmGitExtension
         private static string _serializeVersion => "2.0.0";
         private static string _resultsDir => _workingDirectory + "/Results-" + _serializeVersion;
         private static FileSystemWatcher _watcher;
+        private static bool isPaused;
         private static readonly HashSet<FetchResult> _resultCaches = new HashSet<FetchResult>();
         private static PackageManagerProjectSettings _settings => ScriptableSingleton<PackageManagerProjectSettings>.instance;
 #if UNITY_2020_2_OR_NEWER
@@ -256,7 +269,7 @@ namespace Coffee.UpmGitExtension
 
         private static void OnResultFileCreated(string file)
         {
-            if (string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
+            if (isPaused || string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
                 return;
 
             try
