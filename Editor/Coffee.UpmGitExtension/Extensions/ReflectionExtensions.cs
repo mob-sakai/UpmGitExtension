@@ -1,3 +1,4 @@
+using System.Text;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -116,6 +117,14 @@ namespace Coffee.UpmGitExtension
                         && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]))
                         && typeof(T).IsAssignableFrom(x.ReturnType);
                 });
+        }
+
+        public static void Debug(this object self)
+        {
+            var sb = new StringBuilder($"{self.Type().FullName}:\n");
+            UnityEngine.Debug.Log(self.Type().GetMembers(FLAGS)
+                .Select(m => m.ToString())
+                .Aggregate(sb, (b, s) => b.AppendLine(s)));
         }
     }
 }

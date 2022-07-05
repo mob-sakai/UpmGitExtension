@@ -163,7 +163,6 @@ namespace Coffee.UpmGitExtension
             foreach (var file in Directory.GetFiles(resultDir, "*.json"))
             {
                 File.SetLastWriteTime(file, DateTime.Now.AddMinutes(-10));
-                Debug.Log($"ResetCacheTime: {file}");
             }
             isPaused = false;
         }
