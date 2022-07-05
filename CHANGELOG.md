@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.0...2.0.1) (2022-07-05)
+
+
+### Bug Fixes
+
+* m_Clickable is not found ([7b01c9d](https://github.com/mob-sakai/UpmGitExtension/commit/7b01c9d75d48b8325d2702fcf87db00229b7954f))
+
 # [2.0.0](https://github.com/mob-sakai/UpmGitExtension/compare/1.3.4...2.0.0) (2022-07-01)
 
 
