@@ -181,8 +181,7 @@ namespace Coffee.UpmGitExtension
         // Private Members.
         //################################
         private static string _workingDirectory => InternalEditorUtility.unityPreferencesFolder + "/GitPackageDatabase";
-        //private static string _workingDirectory => "Library/GitPackageDatabase";
-        private static string _serializeVersion => "2.0.0";
+        private static string _serializeVersion => "2.0.2";
         private static string _resultsDir => _workingDirectory + "/Results-" + _serializeVersion;
         private static FileSystemWatcher _watcher;
         private static bool isPaused;

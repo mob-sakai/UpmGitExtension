@@ -10,7 +10,7 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { hashCode, mkdirSyncRecrusive, shouldFetch, lock, unlock, loadJs, touch } = require("./utils");
-const version = '2.0.0'
+const version = '2.0.2'
 
 // Input
 console.log(`cwd: ${process.cwd()}\nInput`);
@@ -81,6 +81,7 @@ const parseRef = text => {
       m_MinimumUnityVersion: `${unity}.${unityRelease}`,
       m_DisplayName: p.displayName,
       m_Description: p.description,
+      m_Name: p.name,
       m_PackageUniqueId: p.name,
       m_PackageId: `${p.name}@${repositoryUrlWithPath}#${refName}`,
       m_IsUnityPackage: false,
@@ -89,6 +90,7 @@ const parseRef = text => {
       m_Author: author,
       m_VersionString: p.version,
       m_Tag: 4,
+      m_UpmErrors: [],
       m_PackageInfo: {
         m_PackageId: `${p.name}@${repositoryUrlWithPath}#${refName}`,
         m_Name: p.name,
@@ -96,6 +98,7 @@ const parseRef = text => {
         m_Description: p.description,
         m_Version: p.version,
         m_Source: 5,
+        m_Errors: [],
         m_Dependencies,
         m_Git: {
           m_Hash: hash,
