@@ -153,8 +153,15 @@ namespace Coffee.UpmGitExtension
             // Setup toolbar menus
             OnPackageManagerToolbarSetup(root.Q<PackageManagerToolbar>());
 #endif
-            var refleshButton = root.Q<VisualElement>("refreshButton").Get("clickable") as Clickable;
-            refleshButton.clicked += GitPackageDatabase.ResetCacheTime;
+            var refreshButton = root.Q<VisualElement>("refreshButton").Get("clickable") as Clickable;
+            refreshButton.clicked += Refresh;
+            EditorApplication.delayCall += Refresh;
+        }
+
+        private static void Refresh()
+        {
+            GitPackageDatabase.ResetCacheTime();
+            GitPackageDatabase.Fetch();
         }
     }
 }

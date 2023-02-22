@@ -190,11 +190,9 @@ namespace Coffee.UpmGitExtension
 #if UNITY_2020_2_OR_NEWER
         internal static UpmClient _upmClient => ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmClient>();
         internal static PackageDatabase _packageDatabase => ScriptableSingleton<ServicesContainer>.instance.Resolve<PackageDatabase>();
-        internal static PageManager _pageManager => ScriptableSingleton<ServicesContainer>.instance.Resolve<PageManager>();
 #else
         internal static IUpmClient _upmClient => UpmClient.instance;
         internal static IPackageDatabase _packageDatabase => PackageDatabase.instance;
-        internal static IPageManager _pageManager => PageManager.instance;
 #endif
 
 #if UNITY_2021_1_OR_NEWER
@@ -312,10 +310,6 @@ namespace Coffee.UpmGitExtension
 
             _watcher.Created += (s, e) => EditorApplication.delayCall += () => OnResultFileCreated(e.FullPath);
 
-            _pageManager.onRefreshOperationStart += Fetch;
-            _pageManager.onRefreshOperationFinish += Fetch;
-
-            _upmClient.onPackagesChanged += _ => RequestUpdateGitPackageVersions();
 
 #if UNITY_2021_1_OR_NEWER
             _settings.onEnablePreReleasePackagesChanged += _ => RequestUpdateGitPackageVersions();
