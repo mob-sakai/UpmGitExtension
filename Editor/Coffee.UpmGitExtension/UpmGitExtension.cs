@@ -162,6 +162,7 @@ namespace Coffee.UpmGitExtension
         {
             GitPackageDatabase.ResetCacheTime();
             GitPackageDatabase.Fetch();
+            GitPackageDatabase.RequestUpdateGitPackageVersions();
         }
     }
 }

@@ -74,7 +74,7 @@ namespace Coffee.UpmGitExtension
             _closeButton.clickable.clicked += OnClick_Close;
 
             // Search view.
-            root.Add(new SearchResultListView(_repoUrlText, () => GitPackageDatabase.GetCachedRepositoryUrls()));
+            root.Add(new SearchResultListView(_repoUrlText, GitRepositoryUrlList.GetUrls));
 
             OnClick_Close();
 
@@ -195,11 +195,8 @@ namespace Coffee.UpmGitExtension
             var repoUrl = GetRepoUrl(_repoUrlText.value, _pathText.value);
             GitPackageDatabase.Fetch(repoUrl, exitCode =>
             {
-                EditorApplication.delayCall += () =>
-                {
-                    SetState(State.NonBusy);
-                    SetState(exitCode == 0 ? State.VersionFound : State.Error);
-                };
+                SetState(State.NonBusy);
+                SetState(exitCode == 0 ? State.VersionFound : State.Error);
             });
         }
 
@@ -215,7 +212,7 @@ namespace Coffee.UpmGitExtension
             };
 
             var repoUrl = GetRepoUrl(_repoUrlText.value, _pathText.value);
-            foreach (var version in GitPackageDatabase.GetAvailablePackageVersions(repoUrl: repoUrl, preRelease: true).OrderByDescending(v => v.semVersion))
+            foreach (var version in GitPackageDatabase.GetAvailablePackageVersions(repoUrl: repoUrl).OrderByDescending(v => v.semVersion))
             {
                 var text = GetShortPackageId(version);
                 menu.AddItem(new GUIContent(text), _versionSelectButton.text == text, callback, version);
@@ -248,8 +245,8 @@ namespace Coffee.UpmGitExtension
             var semver = self.semVersion.ToString();
             var revision = self.packageInfo.git.revision;
             return revision.Contains(semver)
-                ? $"{self.packageUniqueId}/{semver}"
-                : $"{self.packageUniqueId}/{semver} ({revision})";
+                ? $"{self.name}/{semver}"
+                : $"{self.name}/{semver} ({revision})";
         }
     }
 }

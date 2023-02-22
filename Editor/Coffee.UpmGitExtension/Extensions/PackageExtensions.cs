@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
@@ -5,9 +6,37 @@ using UnityEditor.PackageManager.UI.Internal;
 using UnityEditor.PackageManager.UI;
 #endif
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
+#if UNITY_2023_1_OR_NEWER
+using UpmPackage = UnityEditor.PackageManager.UI.Internal.Package;
+#endif
 
 namespace Coffee.UpmGitExtension
 {
+    internal static class IPackageVersionExtensions
+    {
+        public static PackageInfo GetPackageInfo(this IPackageVersion self)
+        {
+            return self is UpmPackageVersionEx ex
+                ? ex.packageInfo
+                : PackageInfo.FindForAssetPath($"Packages/{self.name}");
+        }
+    }
+
+    internal static class UpmPackageExtensions
+    {
+        public static void UpdateVersionsSafety(this UpmPackage self, IEnumerable<UpmPackageVersion> updatedVersions)
+        {
+            if (self.Has("UpdateVersions", updatedVersions, 0))
+            {
+                self.Call("UpdateVersions", updatedVersions, 0);
+            }
+            else
+            {
+                self.Call("UpdateVersions", updatedVersions);
+            }
+        }
+    }
+
     internal static class PackageExtensions
     {
         static readonly Regex kRegexPackageId = new Regex("^([^@]+)@([^#]+)(#(.+))?$", RegexOptions.Compiled);

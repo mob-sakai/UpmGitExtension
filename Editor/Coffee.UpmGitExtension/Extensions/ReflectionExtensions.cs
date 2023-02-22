@@ -92,7 +92,7 @@ namespace Coffee.UpmGitExtension
             }
         }
 
-        public static bool Has(this object self, string methodName, object[] args)
+        public static bool Has(this object self, string methodName, params object[] args)
         {
             var types = args.Select(x => x.GetType()).ToArray();
             return self.Type().GetMethods(FLAGS)
@@ -105,7 +105,7 @@ namespace Coffee.UpmGitExtension
                 });
         }
 
-        public static bool Has<T>(this object self, string methodName, object[] args)
+        public static bool Has<T>(this object self, string methodName, params object[] args)
         {
             var types = args.Select(x => x.GetType()).ToArray();
             return self.Type().GetMethods(FLAGS)

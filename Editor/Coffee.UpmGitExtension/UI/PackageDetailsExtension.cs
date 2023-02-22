@@ -38,7 +38,7 @@ namespace Coffee.UpmGitExtension
             }
 
             // Update/Install button.
-            _updateButton = _packageDetails.Q<Button>("PackageAddButton") ?? _packageDetails.Q<Button>("update");
+            _updateButton = _packageDetails.Q<Button>("PackageGitUpdateButton") ?? _packageDetails.Q<Button>("PackageAddButton") ?? _packageDetails.Q<Button>("update");
             if (_clickableToUpdate == null)
             {
                 _clickableToUpdate = _updateButton.clickable;
@@ -68,6 +68,16 @@ namespace Coffee.UpmGitExtension
                 _pageManager.onListUpdate += (_, __, ___, ____) => RefreshVersionItems();
 #endif
             };
+
+#if UNITY_2022_2_OR_NEWER
+            _root.Q<PackageDetailsVersionsTab>().RegisterCallback<GeometryChangedEvent>(ev =>
+            {
+                if ((ev.target as VisualElement).style.visibility.value == Visibility.Visible)
+                {
+                    RefreshVersionItems();
+                }
+            });
+#endif
         }
 
         public void OnPackageSelectionChange(PackageInfo packageInfo)
@@ -100,24 +110,24 @@ namespace Coffee.UpmGitExtension
                 var button = new Button(ViewRepoOnBrowser) { text = "View repository" };
                 button.AddClasses("link");
 
-#if UNITY_2021_2_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
                 var links = _packageDetails.Q<PackageDetailsLinks>();
                 var left = links.Q(classes: new[] { "left" });
+                links.Call("AddToParentWithSeparator", left, button);
+#elif UNITY_2021_2_OR_NEWER
+                var links = _packageDetails.Q<PackageDetailsLinks>();
+                var left = links.Q("packageDetailHeaderUPMLinks", classes: new[] { "left" }) ?? links.Q(classes: new[] { "left" });
                 links.Call("AddToLinks", left, button, true);
 #else
                 _packageDetails.Call("AddToLinks", button);
 #endif
 
                 _targetVersion = null;
-                var packageVersion = GitPackageDatabase.GetAvailablePackageVersions(preRelease: true).FirstOrDefault(v => v.packageInfo.packageId == packageInfo.packageId);
+                var packageVersion = GitPackageDatabase.GetAvailablePackageVersions().FirstOrDefault(v => v.packageInfo.packageId == packageInfo.packageId);
                 if (packageVersion != null)
                 {
                     var package = GitPackageDatabase.GetPackage(packageVersion);
                     _targetVersion = package?.versions?.installed?.uniqueId == packageInfo.packageId ? package.versions.recommended : packageVersion;
-                    if (_targetVersion != null)
-                    {
-                        _updateButton.text = _updateButton.text.Replace(_targetVersion.version.ToString(), _targetVersion.versionString);
-                    }
                 }
                 else
                 {
@@ -126,7 +136,7 @@ namespace Coffee.UpmGitExtension
                 }
 
 #if UNITY_2022_2_OR_NEWER
-                RefreshVersionItems();
+                EditorApplication.delayCall += RefreshVersionItems;
 #endif
             }
         }
@@ -183,14 +193,14 @@ namespace Coffee.UpmGitExtension
         {
             if (_targetVersion != null)
             {
-                Application.OpenURL(_targetVersion.packageInfo.GetRepositoryUrlForBrowser());
+                Application.OpenURL(_targetVersion.GetPackageInfo().GetRepositoryUrlForBrowser());
             }
         }
 
         private void UpdatePackage()
         {
-            if (_targetVersion?.packageInfo?.source == PackageSource.Git)
-                GitPackageDatabase.Install(_targetVersion.packageInfo.packageId);
+            if (_targetVersion?.GetPackageInfo()?.source == PackageSource.Git)
+                GitPackageDatabase.Install(_targetVersion.GetPackageInfo().packageId);
             else
                 _clickableToUpdate?.Call("Invoke", new MouseDownEvent());
         }
