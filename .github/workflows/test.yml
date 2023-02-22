@@ -2,6 +2,10 @@
 #   UNITY_LICENSE:
 name: test
 
+env:
+  LTS_VERSIONS_2020_3: "[\"2020.3.10f1\", \"2020.3.20f1\", \"2020.3.30f1\", \"2020.3.40f1\" ]"
+  LTS_VERSIONS_2021_3: "[\"2021.3.10f1\" ]"
+
 on:
   push:
     branches:
@@ -23,10 +27,12 @@ jobs:
     steps:
       - id: setup
         run: |
-          VERSIONS=`npx unity-changeset list --versions --all --latest-patch --min 2020.1 --json`
+          VERSIONS_LATEST=`npx unity-changeset list --versions --all --latest-patch --min 2020.1 --json`
+          VERSIONS_OLDEST=`npx unity-changeset list --versions --oldest-patch --min 2020.1 --json`
+          VERSIONS=`echo "[$VERSIONS_LATEST, $VERSIONS_OLDEST, $LTS_VERSIONS_2020_3, $LTS_VERSIONS_2021_3]" | jq -c 'flatten|sort'`
           echo "==== Target Unity Versions ===="
           echo "${VERSIONS}"
-          echo "::set-output name=versions::${VERSIONS}"
+          echo "versions=${VERSIONS}" >> $GITHUB_OUTPUT
 
   test:
     runs-on: ubuntu-latest
@@ -38,7 +44,7 @@ jobs:
 
     steps:
       # Checkout sandbox project
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: sandbox
           submodules: true
@@ -50,7 +56,7 @@ jobs:
         run: git checkout ${{ github.sha }}
 
       # Cache
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: Library
           key: Library-${{ matrix.version }}-${{ github.sha }}
