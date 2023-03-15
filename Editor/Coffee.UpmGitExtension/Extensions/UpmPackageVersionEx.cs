@@ -10,7 +10,10 @@
 #if UNITY_2020_1_0 || UNITY_2020_1_1 || UNITY_2020_1_2 || UNITY_2020_1_3 || UNITY_2020_1_4
 #define CONSTRACTOR_V1
 #endif
-    
+#if UNITY_2021_3_21 || UNITY_2022_2_10 || UNITY_2023_1_0 || UNITY_2023_2_0
+#define REGISTRY_TYPE_HAS_BEEN_ADDED
+#endif
+
 using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -34,21 +37,33 @@ namespace Coffee.UpmGitExtension
         private UnityEditor.PackageManager.PackageInfo m_PackageInfo;
         public UnityEditor.PackageManager.PackageInfo packageInfo => m_PackageInfo;
 #endif
-        
+
+#if !REGISTRY_TYPE_HAS_BEEN_ADDED
         public UpmPackageVersionEx(UnityEditor.PackageManager.PackageInfo packageInfo, bool isInstalled, bool isUnityPackage)
+#else
+        public UpmPackageVersionEx(UnityEditor.PackageManager.PackageInfo packageInfo, bool isInstalled, RegistryType availableRegistry)
+#endif
 #if CONSTRACTOR_V1
             : base(packageInfo, isInstalled)
-#else
+#elif !REGISTRY_TYPE_HAS_BEEN_ADDED
             : base(packageInfo, isInstalled, isUnityPackage)
+#else
+            : base(packageInfo, isInstalled, availableRegistry)
 #endif
         {
         }
 
+#if !REGISTRY_TYPE_HAS_BEEN_ADDED
         public UpmPackageVersionEx(UnityEditor.PackageManager.PackageInfo packageInfo, bool isInstalled, SemVersion? version, string displayName, bool isUnityPackage)
+#else
+        public UpmPackageVersionEx(UnityEditor.PackageManager.PackageInfo packageInfo, bool isInstalled, SemVersion? version, string displayName, RegistryType availableRegistry)
+#endif
 #if CONSTRACTOR_V1
             : base(packageInfo, isInstalled, version, displayName)
-#else
+#elif !REGISTRY_TYPE_HAS_BEEN_ADDED
             : base(packageInfo, isInstalled, version, displayName, isUnityPackage)
+#else
+            : base(packageInfo, isInstalled, version, displayName, availableRegistry)
 #endif
         {
         }
@@ -56,8 +71,10 @@ namespace Coffee.UpmGitExtension
         public UpmPackageVersionEx(UpmPackageVersion packageVersion)
 #if CONSTRACTOR_V1
             : base(packageVersion.GetPackageInfo(), packageVersion.isInstalled)
-#else
+#elif !REGISTRY_TYPE_HAS_BEEN_ADDED
             : base(packageVersion.GetPackageInfo(), packageVersion.isInstalled, packageVersion.isUnityPackage)
+#else
+            : base(packageVersion.GetPackageInfo(), packageVersion.isInstalled, packageVersion.availableRegistry)
 #endif
         {
 #if PACKAGE_INFO_HAS_BEEN_REMOVED
