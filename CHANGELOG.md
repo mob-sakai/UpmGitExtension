@@ -1,3 +1,11 @@
+## [2.0.3](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.2...2.0.3) (2023-03-16)
+
+
+### Bug Fixes
+
+* fix constructor parameter error ([24af7ec](https://github.com/mob-sakai/UpmGitExtension/commit/24af7ec1549cb3963c4dc1e1622da0c160d84adc))
+* support future Unity versions ([c32998e](https://github.com/mob-sakai/UpmGitExtension/commit/c32998e2abe94e39c57c761e39c98d69088d3e3d))
+
 ## [2.0.2](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.1...2.0.2) (2023-02-24)
 
 
