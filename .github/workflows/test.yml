@@ -1,14 +1,29 @@
-# Secrets
-#   UNITY_LICENSE:
+# Required repository secrets
+#   UNITY_LICENSE: Unity License File (*.ulf)
 name: test
 
 env:
-  LTS_VERSIONS_2020_3: "[\"2020.3.10f1\", \"2020.3.20f1\", \"2020.3.30f1\", \"2020.3.40f1\" ]"
-  LTS_VERSIONS_2021_3: "[\"2021.3.10f1\" ]"
+  # BETA: Included beta versions of Unity.
+  BETA: true
+  # MINIMUM_VERSION: The minimum version of Unity.
+  MINIMUM_VERSION: 2020.1
+  # MODULES: Included specific modules of Unity. base|windows-mono|mac-mono|linux-il2cpp|webgl|android|ios
+  MODULES: |
+    base
+  # ADDITIONAL_VERSIONS: Included specific versions of Unity.
+  ADDITIONAL_VERSIONS: |
+    2020.3.10f1
+    2020.3.20f1
+    2020.3.30f1
+    2020.3.40f1
+    2021.3.10f1
+    2021.3.20f1
+    2022.2.10f1
 
 on:
   push:
     branches:
+      - main
       - develop
     tags:
       - "!*"
@@ -24,15 +39,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       versions: ${{ steps.setup.outputs.versions }}
+      modules: ${{ steps.setup.outputs.modules }}
     steps:
       - id: setup
         run: |
-          VERSIONS_LATEST=`npx unity-changeset list --versions --all --latest-patch --min 2020.1 --json`
-          VERSIONS_OLDEST=`npx unity-changeset list --versions --oldest-patch --min 2020.1 --json`
-          VERSIONS=`echo "[$VERSIONS_LATEST, $VERSIONS_OLDEST, $LTS_VERSIONS_2020_3, $LTS_VERSIONS_2021_3]" | jq -c 'flatten|sort'`
           echo "==== Target Unity Versions ===="
+          [ ${BETA} ] && OPT="--all"
+          LATEST_VERSIONS=`npx unity-changeset list --versions --latest-patch --min ${MINIMUM_VERSION} --json ${OPT}`
+          OLDEST_VERSIONS=`npx unity-changeset list --versions --oldest-patch --min ${MINIMUM_VERSION} --json`
+          ADDITIONAL_VERSIONS=`echo "${ADDITIONAL_VERSIONS}" | jq -R | jq -sc 'map(select(length > 0))'`
+          VERSIONS=`echo "[${LATEST_VERSIONS}, ${OLDEST_VERSIONS}, ${ADDITIONAL_VERSIONS}]" | jq -c 'flatten|sort|unique'`
           echo "${VERSIONS}"
           echo "versions=${VERSIONS}" >> $GITHUB_OUTPUT
+          
+          echo "==== Target Unity Modules ===="
+          MODULES=`echo ${MODULES} | jq -R | jq -sc 'map(select(length > 0))'`
+          echo "${MODULES}"
+          echo "modules=${MODULES}" >> $GITHUB_OUTPUT
 
   test:
     runs-on: ubuntu-latest
@@ -41,6 +64,7 @@ jobs:
       fail-fast: false
       matrix:
         version: ${{ fromJson(needs.setup.outputs.versions) }}
+        module: ${{ fromJson(needs.setup.outputs.modules) }}
 
     steps:
       # Checkout sandbox project
@@ -59,19 +83,17 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: Library
-          key: Library-${{ matrix.version }}-${{ github.sha }}
+          key: Library-${{ matrix.version }}-${{ matrix.module }}-${{ github.sha }}
           restore-keys: |
-            Library-${{ matrix.version }}-
-            Library-
+            Library-${{ matrix.version }}-${{ matrix.module }}
 
       # Run tests
       - name: "Run tests"
         uses: game-ci/unity-test-runner@v2
         with:
-          customImage: mobsakai/unity3d:${{ matrix.version }}
+          customImage: mobsakai/unity3d:${{ matrix.version }}-${{ matrix.module }}
           customParameters: -nographics
-          # unityVersion: ${{ matrix.version }}
-          checkName: ${{ matrix.version }} Test Results
+          checkName: ${{ matrix.version }}-${{ matrix.module }} Test Results
           githubToken: ${{ github.token }}
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
