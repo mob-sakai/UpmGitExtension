@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.3...2.0.4) (2023-10-25)
+
+
+### Bug Fixes
+
+* support 2022.3 ([22b1a7a](https://github.com/mob-sakai/UpmGitExtension/commit/22b1a7a8edb8113f04d743c2485ec52dbc71aeb4)), closes [#132](https://github.com/mob-sakai/UpmGitExtension/issues/132) [#134](https://github.com/mob-sakai/UpmGitExtension/issues/134)
+
 ## [2.0.3](https://github.com/mob-sakai/UpmGitExtension/compare/2.0.2...2.0.3) (2023-03-16)
 
 
