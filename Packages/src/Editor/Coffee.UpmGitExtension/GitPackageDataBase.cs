@@ -187,7 +187,7 @@ namespace Coffee.UpmGitExtension
         private static string _resultsDir => _workingDirectory + "/Results-" + _serializeVersion;
         private static FileSystemWatcher _watcher;
         private static bool isPaused;
-        private static readonly HashSet<FetchResult> _resultCaches = new();
+        private static readonly HashSet<FetchResult> _resultCaches = new HashSet<FetchResult>();
         private static PackageManagerProjectSettings _settings =>
             ScriptableSingleton<PackageManagerProjectSettings>.instance;
 #if UNITY_2020_2_OR_NEWER

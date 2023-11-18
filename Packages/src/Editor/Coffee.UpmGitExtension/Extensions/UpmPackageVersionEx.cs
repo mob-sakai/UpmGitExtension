@@ -45,7 +45,7 @@ namespace Coffee.UpmGitExtension
     [Serializable]
     internal class UpmPackageVersionEx : UpmPackageVersion
     {
-        private static readonly Regex regex = new("^(\\d +)\\.(\\d +)\\.(\\d +)(.*)$", RegexOptions.Compiled);
+        private static readonly Regex regex = new Regex("^(\\d +)\\.(\\d +)\\.(\\d +)(.*)$", RegexOptions.Compiled);
         private static SemVersion? unityVersion;
 
         [SerializeField]

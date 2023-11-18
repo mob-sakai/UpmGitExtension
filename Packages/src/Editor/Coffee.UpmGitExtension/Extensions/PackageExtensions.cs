@@ -39,8 +39,8 @@ namespace Coffee.UpmGitExtension
 
     internal static class PackageExtensions
     {
-        private static readonly Regex kRegexPackageId = new("^([^@]+)@([^#]+)(#(.+))?$", RegexOptions.Compiled);
-        private static readonly Regex kRegexScpToSsh = new("^(git@[^/]+):", RegexOptions.Compiled);
+        private static readonly Regex kRegexPackageId = new Regex("^([^@]+)@([^#]+)(#(.+))?$", RegexOptions.Compiled);
+        private static readonly Regex kRegexScpToSsh = new Regex("^(git@[^/]+):", RegexOptions.Compiled);
 
         public static string GetSourceUrl(this PackageInfo self)
         {
