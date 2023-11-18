@@ -1,0 +1,19 @@
+{
+  "name": "com.coffee.upm-git-extension",
+  "version": "2.0.4",
+  "description": "This package extends the UI of Unity Package Manager (UPM) for the packages installed from git repository.\n\n - Support GitHub,  GitLab, Bitbucket, etc.\n - Link to the repogitory and offline documents\n - Install the package from git repository with UI\n - Update the package with a specific tag/branch\n - Remove the package",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mob-sakai/UpmGitExtension.git"
+  },
+  "author": "mob-sakai <sakai861104@gmail.com> (https://github.com/mob-sakai)",
+  "keywords": [
+    "upm",
+    "git",
+    "editor"
+  ],
+  "displayName": "UPM Git Extension",
+  "unity": "2020.1",
+  "type": "tool"
+}

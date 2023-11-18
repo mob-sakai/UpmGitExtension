@@ -1,0 +1,66 @@
+name: 🔖 Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - preview
+      - release
+      - v*.x
+    tags-ignore:
+      - "**"
+
+jobs:
+  release:
+    name: 🔖 Release (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    outputs:
+      channel: ${{ steps.release.outputs.new_release_channel }}
+      released: ${{ steps.release.outputs.new_release_published }}
+      tag: ${{ steps.release.outputs.new_release_git_tag }}
+    steps:
+      - name: 🚚 Checkout (${{ github.ref_name }})
+        uses: actions/checkout@v4
+
+      - name: 🔖 Run semantic release
+        uses: cycjimmy/semantic-release-action@v4
+        id: release
+        with:
+          working_directory: Packages/src
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - run: |
+          echo "🔖 New release published: '${{ steps.release.outputs.new_release_published }}'" | tee -a $GITHUB_STEP_SUMMARY
+          echo "🔖 New release channel: '${{ steps.release.outputs.new_release_channel }}'" | tee -a $GITHUB_STEP_SUMMARY
+          echo "🔖 New release git tag: '${{ steps.release.outputs.new_release_git_tag }}'" | tee -a $GITHUB_STEP_SUMMARY
+
+  merge-to-develop:
+    name: 🔀 Merge to develop
+    needs: release
+    if: needs.release.outputs.released == 'true' && (github.ref_name == 'release' || github.ref_name == 'preview')
+    uses: ./.github/workflows/merge.yml
+    with:
+      from: ${{ needs.release.outputs.tag }}
+      to: develop
+    permissions:
+      contents: write
+
+  snapshot-to-main:
+    name: 📷 Snapshot to main
+    needs: release
+    if: needs.release.outputs.released == 'true' && (github.ref_name == 'release' || github.ref_name == 'preview')
+    uses: ./.github/workflows/snapshot.yml
+    with:
+      from: ${{ needs.release.outputs.tag }}
+      to: main_sandbox
+      path: Packages/src
+    permissions:
+      contents: write

@@ -1,0 +1,87 @@
+.maximized {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+.installationWindow {
+    opacity: 0.9;
+    align-items: center;
+    justify-content: center;
+}
+
+.installationWindow.dark {
+    background-color: #333;
+}
+
+.installationWindow.right {
+    background-color: #aaa;
+}
+
+.installationWindow .horizontal {
+    flex-direction: row;
+    position: relative;
+    width: 650px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+
+.installationWindow .fixed {
+    width: 100px;
+}
+
+.installationWindow .expandable {
+    flex: 1 0 0;
+}
+
+.installationWindow .button {
+    width: 100px;
+}
+
+.installationWindow .dropdown-button {
+    flex: 1 0 0;
+    flex-direction: row-reverse;
+    -unity-text-align: middle-left;
+}
+
+.installationWindow .dropdown-arrow {
+    width: 12px;
+    height: 12px;
+    background-image: resource("d_dropdown")
+}
+
+.installationWindow .h-spaced {
+    margin-left: 4px;
+}
+
+.installationWindow .v-spaced {
+    margin-top: 4px;
+}
+
+.installationWindow .error {
+    width: 22px;
+    height: 22px;
+    background-image: resource("console.erroricon")
+}
+
+.installationWindow .error-hidden {
+    width: 22px;
+    height: 22px;
+}
+
+.installationWindow .git-image {
+    width: 14px;
+    height: 14px;
+    margin-right: 2px;
+    background-image: resource("giticon")
+}
+
+.installationWindow .history {
+    --unity-item-height: 16;
+    height: 100px;
+    background-color: red
+}

@@ -1,0 +1,55 @@
+name: 📷 Snapshot
+
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        required: true
+      to:
+        required: true
+      path:
+        required: true
+  workflow_call:
+    inputs:
+      from:
+        required: true
+        type: string
+      to:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+
+jobs:
+  merge:
+    name: 📷 Snapshot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 🚚 Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.from }}
+          path: from
+
+      - name: 🚚 Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.to }}
+          path: to
+
+      - name: 📷 Take Snapshot '${{ inputs.path }}' from '${{ inputs.from }}' to '${{ inputs.to }}'
+        working-directory: to
+        shell: bash -xe {0}
+        run: |
+          git rm -rf --ignore-unmatch .
+          cp -RT ../from/${{ inputs.path }} .
+
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git add -A
+          git commit -m "📷 Snapshot '${{ inputs.path }}' from '${{ inputs.from }}' to '${{ inputs.to }}'"
+          git push origin ${{ inputs.to }}
