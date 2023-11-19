@@ -40,7 +40,7 @@ namespace Coffee.UpmGitExtension
             // Update/Install button.
             _updateButton = _packageDetails.Q<Button>("PackageGitUpdateButton") ??
                             _packageDetails.Q<Button>("PackageAddButton") ?? _packageDetails.Q<Button>("update");
-            if (_clickableToUpdate == null)
+            if (_updateButton != null &&_clickableToUpdate == null)
             {
                 _clickableToUpdate = _updateButton.clickable;
                 _updateButton.RemoveManipulator(_updateButton.clickable);
@@ -109,13 +109,21 @@ namespace Coffee.UpmGitExtension
 
             if (isGit)
             {
+                // Add button to view repository in browser.
                 var button = new Button(ViewRepoOnBrowser) { text = "View repository" };
                 button.AddClasses("link");
 
 #if UNITY_2023_1_OR_NEWER
-                var links = _packageDetails.Q<PackageDetailsLinks>();
-                var left = links.Q(classes: new[] { "left" });
-                links.Call("AddToParentWithSeparator", left, button);
+                var links = _packageDetails
+                    .Q<PackageDetailsLinks>()
+                    ?.Q(classes: new[] { "left" });
+                if (links != null)
+                {
+                    var separator = new Label("|");
+                    separator.AddToClassList("separator");
+                    links.Add(separator);
+                    links.Add(button);
+                }
 #elif UNITY_2021_2_OR_NEWER
                 var links = _packageDetails.Q<PackageDetailsLinks>();
                 var left = links.Q("packageDetailHeaderUPMLinks", new[] { "left" }) ??

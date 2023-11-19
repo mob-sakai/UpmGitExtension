@@ -274,7 +274,7 @@ namespace Coffee.UpmGitExtension
         private static void UpdatePackages(IEnumerable<IPackage> packages)
         {
 #if UNITY_2023_1_OR_NEWER
-            _packageDatabase.UpdatePackages(packages);
+            _packageDatabase.UpdatePackages(packages.ToList());
 #else
             _packageDatabase.Call("OnPackagesChanged", packages);
 #endif

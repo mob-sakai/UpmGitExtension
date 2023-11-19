@@ -23,6 +23,11 @@ namespace Coffee.UpmGitExtension
             image.AddToClassList("git-button-image");
 
             Add(image);
+
+#if UNITY_2023_2_OR_NEWER
+            image.style.width = new StyleLength(18);
+            image.style.height = new StyleLength(18);
+#endif
         }
 
         public static bool IsResourceReady()

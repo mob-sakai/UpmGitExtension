@@ -27,7 +27,7 @@ namespace Coffee.UpmGitExtension
         private static void InitializeOnLoadMethod()
         {
             var ext = new UpmGitExtension();
-            PackageManagerExtensions.RegisterExtension(ext);
+            PackageManagerExtensions.RegisterExtension(ext as IPackageManagerExtension);
 #if SUPPORT_MENU_EXTENSIONS
             PackageManagerExtensions.RegisterExtension(ext as IPackageManagerMenuExtensions);
 #endif

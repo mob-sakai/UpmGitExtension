@@ -1,7 +1,7 @@
 ﻿.git-button {
     align-items: center;
     justify-content: center;
-    height: 19px;
+    height: 100%;
     padding-top: 3px;
     padding-bottom: 2px;
     padding-left: 4px;
