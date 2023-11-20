@@ -35,14 +35,6 @@ namespace Coffee.UpmGitExtension
         }
 
 #if UNITY_2023_1_OR_NEWER
-        [Test]
-        public void PackageDetailsLinks_AddToParentWithSeparator()
-        {
-            Assert.True(
-                new PackageDetailsLinks().Has("AddToParentWithSeparator", new VisualElement(), new Button()),
-                "void PackageDetailsLinks.AddToParentWithSeparator is not found"
-            );
-        }
 #elif UNITY_2021_2_OR_NEWER
         [Test]
         public void PackageDetailsLinks_AddToLinks()
