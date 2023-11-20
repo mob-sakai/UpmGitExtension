@@ -4,17 +4,17 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Reflection;
+using Unity.CodeEditor;
 using UnityEditor;
 using UnityEditor.PackageManager.UI;
-using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UnityEngine.UIElements;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
 #endif
 
 // For tests
-[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("Unity.InternalAPIEngineBridgeDev.001")]
+[assembly: InternalsVisibleToAttribute("Unity.InternalAPIEngineBridgeDev.001")]
 
 namespace Coffee.UpmGitExtension
 {
@@ -120,7 +120,7 @@ namespace Coffee.UpmGitExtension
             }
 
             // Open manifest.json with current code editor.
-            Unity.CodeEditor.CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath("./Packages/manifest.json"));
+            CodeEditor.CurrentEditor.OpenProject(Path.GetFullPath("./Packages/manifest.json"));
         }
 
         /// <summary>

@@ -1,13 +1,13 @@
+using System;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
 #else
 using UnityEditor.PackageManager.UI;
 #endif
-using System;
-using System.Linq;
-using UnityEngine;
-using UnityEditor;
 
 namespace Coffee.UpmGitExtension
 {
@@ -15,10 +15,14 @@ namespace Coffee.UpmGitExtension
     {
         private string _searchText = "";
         private string[] _searchedItems = new string[0];
-        private readonly Func<string[]> _searchFunc = null;
+        private readonly Func<string[]> _searchFunc;
 
 #if UNITY_2021_2_OR_NEWER
-        private float _itemHeight { get { return fixedItemHeight; } set { fixedItemHeight = value; } }
+        private float _itemHeight
+        {
+            get => fixedItemHeight;
+            set => fixedItemHeight = value;
+        }
 #else
         private float _itemHeight { get { return itemHeight; } set { itemHeight = (int)value; } }
 #endif
@@ -38,9 +42,13 @@ namespace Coffee.UpmGitExtension
 
             var count = _searchedItems.Length;
             if (count == 0)
+            {
                 UIUtils.SetElementDisplay(this, false);
+            }
             else
+            {
                 style.height = Mathf.Min(count, 5) * _itemHeight;
+            }
 
             itemsSource = _searchedItems;
 
@@ -56,10 +64,12 @@ namespace Coffee.UpmGitExtension
             style.left = r.x;
             style.top = r.y;
             style.width = r.width;
-            style.backgroundColor = EditorGUIUtility.isProSkin ? new Color(0.098f, 0.098f, 0.098f, 0.85f) : new Color(0.541f, 0.541f, 0.541f, 0.85f);
+            style.backgroundColor = EditorGUIUtility.isProSkin
+                ? new Color(0.098f, 0.098f, 0.098f, 0.85f)
+                : new Color(0.541f, 0.541f, 0.541f, 0.85f);
         }
 
-        public SearchResultListView(TextField textField, Func<string[]> searchFunc) : base()
+        public SearchResultListView(TextField textField, Func<string[]> searchFunc)
         {
             UIUtils.SetElementDisplay(this, false);
             _searchFunc = searchFunc;

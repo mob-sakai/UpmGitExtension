@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using UnityEditor.PackageManager.UI;
-using UnityEngine;
 using UnityEditorInternal;
+using UnityEngine;
 
 namespace Coffee.UpmGitExtension
 {
@@ -12,12 +12,6 @@ namespace Coffee.UpmGitExtension
     {
         private static string _workingDirectory => InternalEditorUtility.unityPreferencesFolder + "/GitPackageDatabase";
         private static string _cacheFile => _workingDirectory + "/GitRepositoryUrlList.txt";
-
-        [Serializable]
-        internal class FetchResultUrl
-        {
-            public string url;
-        }
 
         public static void AddUrl(string url)
         {
@@ -34,7 +28,7 @@ namespace Coffee.UpmGitExtension
             {
                 var urls = Directory.GetDirectories(_workingDirectory, "Results*")
                     .SelectMany(dir => Directory.GetFiles(dir, "*.json"))
-                    .Select(file => File.ReadAllText(file, System.Text.Encoding.UTF8))
+                    .Select(file => File.ReadAllText(file, Encoding.UTF8))
                     .Select(text => JsonUtility.FromJson<FetchResultUrl>(text))
                     .Select(result => Regex.Replace(result.url, "(#.*)$", ""))
                     .Distinct();
@@ -47,6 +41,12 @@ namespace Coffee.UpmGitExtension
                     .Distinct()
                     .ToArray()
                 : Array.Empty<string>();
+        }
+
+        [Serializable]
+        internal class FetchResultUrl
+        {
+            public string url;
         }
     }
 }

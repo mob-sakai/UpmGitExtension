@@ -1,22 +1,23 @@
-using System.Text;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Coffee.UpmGitExtension
 {
     internal static class ReflectionExtensions
     {
-        const BindingFlags FLAGS = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+        private const BindingFlags FLAGS = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+                                           BindingFlags.NonPublic;
 
         private static object Inst(this object self)
         {
-            return (self is Type) ? null : self;
+            return self is Type ? null : self;
         }
 
         private static Type Type(this object self)
         {
-            return (self as Type) ?? self.GetType();
+            return self as Type ?? self.GetType();
         }
 
         public static object New(this Type self, params object[] args)
@@ -35,7 +36,7 @@ namespace Coffee.UpmGitExtension
                 {
                     var pTypes = x.GetParameters().Select(y => y.ParameterType).ToArray();
                     return pTypes.Length == types.Length
-                        && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]));
+                           && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]));
                 })
                 .Invoke(self.Inst(), args);
         }
@@ -50,7 +51,8 @@ namespace Coffee.UpmGitExtension
 
         public static object Get(this object self, string memberName, MemberInfo mi = null)
         {
-            mi = mi ?? self.Type().GetProperty(memberName, FLAGS) ?? (MemberInfo)self.Type().GetField(memberName, FLAGS);
+            mi = mi ?? self.Type().GetProperty(memberName, FLAGS) ??
+                (MemberInfo)self.Type().GetField(memberName, FLAGS);
             switch (mi)
             {
                 case PropertyInfo pi:
@@ -64,7 +66,8 @@ namespace Coffee.UpmGitExtension
 
         public static void Set(this object self, string memberName, object value, MemberInfo mi = null)
         {
-            mi = mi ?? self.Type().GetProperty(memberName, FLAGS) ?? (MemberInfo)self.Type().GetField(memberName, FLAGS);
+            mi = mi ?? self.Type().GetProperty(memberName, FLAGS) ??
+                (MemberInfo)self.Type().GetField(memberName, FLAGS);
             switch (mi)
             {
                 case PropertyInfo pi:
@@ -101,7 +104,7 @@ namespace Coffee.UpmGitExtension
                 {
                     var pTypes = x.GetParameters().Select(y => y.ParameterType).ToArray();
                     return pTypes.Length == types.Length
-                        && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]));
+                           && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]));
                 });
         }
 
@@ -114,8 +117,8 @@ namespace Coffee.UpmGitExtension
                 {
                     var pTypes = x.GetParameters().Select(y => y.ParameterType).ToArray();
                     return pTypes.Length == types.Length
-                        && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]))
-                        && typeof(T).IsAssignableFrom(x.ReturnType);
+                           && Enumerable.Range(0, types.Length).All(i => pTypes[i].IsAssignableFrom(types[i]))
+                           && typeof(T).IsAssignableFrom(x.ReturnType);
                 });
         }
 
@@ -128,4 +131,3 @@ namespace Coffee.UpmGitExtension
         }
     }
 }
-

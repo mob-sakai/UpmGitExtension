@@ -1,4 +1,4 @@
-<UXML xmlns="UnityEngine.UIElements" xmlns:pui="UnityEditor.PackageManager.UI">
+<UXML xmlns="UnityEngine.UIElements">
     <!-- Root -->
     <VisualElement name="rootContainer">
 
@@ -13,9 +13,9 @@
             <Label text="Repository URL" class="fixed"/>
             <TextField name="repoUrlText" class="expandable"/>
             <Button name="findVersionsButton" text="Find Versions" class="button h-spaced"
-                        tooltip="Fetch all tags/branches from the repository as package versions."/>
+                    tooltip="Fetch all tags/branches from the repository as package versions."/>
             <Label name="findVersionsError" class="error"
-                        tooltip="No package found in repository. Make sure that the git repository url and access permissions are correct."/>
+                   tooltip="No package found in repository. Make sure that the git repository url and access permissions are correct."/>
         </VisualElement>
 
         <!-- Path -->
@@ -33,7 +33,7 @@
                 <VisualElement name="arrow" class="dropdown-arrow"/>
             </Button>
             <Button name="installPackageButton" text="Install Package" class="button h-spaced"
-                        tooltip="Install the package to this project."/>
+                    tooltip="Install the package to this project."/>
             <Label name="findPackageError" class="error-hidden" tooltip=""/>
         </VisualElement>
 

@@ -1,13 +1,12 @@
+using System.Linq;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
 #else
 using UnityEditor.PackageManager.UI;
 #endif
-using System.Linq;
-using UnityEngine;
-using System.Text.RegularExpressions;
 
 namespace Coffee.UpmGitExtension
 {
@@ -16,21 +15,31 @@ namespace Coffee.UpmGitExtension
         //################################
         // Constant or Static Members.
         //################################
-        const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
-        const string TemplatePath = ResourcesPath + "GitPackageInstallationWindow.uxml";
-        const string StylePath = ResourcesPath + "GitPackageInstallationWindow.uss";
+        private const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
+        private const string TemplatePath = ResourcesPath + "GitPackageInstallationWindow.uxml";
+        private const string StylePath = ResourcesPath + "GitPackageInstallationWindow.uss";
+        private readonly Button _closeButton;
+        private readonly Button _findVersionsButton;
+        private readonly VisualElement _findVersionsError;
+        private readonly Button _installPackageButton;
+        private readonly LoadingSpinner _loadingSpinner;
+        private readonly Label _packageNameLabel;
+        private readonly TextField _pathText;
+        private readonly TextField _repoUrlText;
 
-        public static bool IsResourceReady()
-        {
-            return EditorGUIUtility.Load(TemplatePath) && EditorGUIUtility.Load(StylePath);
-        }
+        private readonly VisualElement _rootContainer;
+        private readonly VisualElement _subDirContainer;
+        private readonly VisualElement _urlContainer;
+        private readonly VisualElement _versionContainer;
+        private readonly Button _versionSelectButton;
+        private UpmPackageVersion _currentVersion;
 
         //################################
         // Public Members.
         //################################
         public GitPackageInstallationWindow()
         {
-            VisualTreeAsset asset = EditorGUIUtility.Load(TemplatePath) as VisualTreeAsset;
+            var asset = EditorGUIUtility.Load(TemplatePath) as VisualTreeAsset;
 
             var root = asset.CloneTree();
             styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
@@ -65,8 +74,8 @@ namespace Coffee.UpmGitExtension
             _closeButton = root.Q<Button>("closeButton");
 
             // Url container
-            _repoUrlText.RegisterValueChangedCallback((evt) => OnChange_RepoUrl(evt.newValue));
-            _pathText.RegisterValueChangedCallback((evt) => OnChange_RepoUrl(_repoUrlText.value));
+            _repoUrlText.RegisterValueChangedCallback(evt => OnChange_RepoUrl(evt.newValue));
+            _pathText.RegisterValueChangedCallback(evt => OnChange_RepoUrl(_repoUrlText.value));
 
             _findVersionsButton.clickable.clicked += OnClick_FindVersions;
             _versionSelectButton.clickable.clicked += OnClick_SelectVersions;
@@ -79,7 +88,8 @@ namespace Coffee.UpmGitExtension
             OnClick_Close();
 
             // 
-            GitPackageDatabase._upmClient.onAddOperation += op => {
+            GitPackageDatabase._upmClient.onAddOperation += op =>
+            {
                 _loadingSpinner.Start();
                 _rootContainer.SetEnabled(false);
 
@@ -92,6 +102,11 @@ namespace Coffee.UpmGitExtension
             };
         }
 
+        public static bool IsResourceReady()
+        {
+            return EditorGUIUtility.Load(TemplatePath) && EditorGUIUtility.Load(StylePath);
+        }
+
         public void Open()
         {
             _loadingSpinner.Stop();
@@ -100,35 +115,6 @@ namespace Coffee.UpmGitExtension
 
             EditorApplication.delayCall += _repoUrlText.Focus;
         }
-
-        //################################
-        // Private Members.
-        //################################
-        private enum State
-        {
-            None,
-            UrlEntered,
-            VersionFound,
-            VersionSelected,
-            Error,
-            Busy,
-            NonBusy,
-        }
-
-        private readonly VisualElement _rootContainer;
-        private readonly VisualElement _urlContainer;
-        private readonly VisualElement _subDirContainer;
-        private readonly VisualElement _versionContainer;
-        private readonly VisualElement _findVersionsError;
-        private readonly LoadingSpinner _loadingSpinner;
-        private readonly Button _closeButton;
-        private readonly Button _installPackageButton;
-        private readonly Button _findVersionsButton;
-        private readonly Button _versionSelectButton;
-        private readonly Label _packageNameLabel;
-        private readonly TextField _repoUrlText;
-        private readonly TextField _pathText;
-        private UpmPackageVersion _currentVersion = null;
 
         private void SetState(State state)
         {
@@ -203,7 +189,7 @@ namespace Coffee.UpmGitExtension
         private void OnClick_SelectVersions()
         {
             var menu = new GenericMenu();
-            GenericMenu.MenuFunction2 callback = (v) =>
+            GenericMenu.MenuFunction2 callback = v =>
             {
                 var version = v as UpmPackageVersionEx;
                 _currentVersion = version;
@@ -212,7 +198,8 @@ namespace Coffee.UpmGitExtension
             };
 
             var repoUrl = GetRepoUrl(_repoUrlText.value, _pathText.value);
-            foreach (var version in GitPackageDatabase.GetAvailablePackageVersions(repoUrl: repoUrl).OrderByDescending(v => v.semVersion))
+            foreach (var version in GitPackageDatabase.GetAvailablePackageVersions(repoUrl)
+                         .OrderByDescending(v => v.semVersion))
             {
                 var text = GetShortPackageId(version);
                 menu.AddItem(new GUIContent(text), _versionSelectButton.text == text, callback, version);
@@ -231,7 +218,9 @@ namespace Coffee.UpmGitExtension
             // Trim revision from url.
             var sharp = url.IndexOf('#');
             if (0 <= sharp)
+            {
                 url = url.Substring(0, sharp);
+            }
 
             // scp to ssh
             url = PackageExtensions.GetSourceUrl(url);
@@ -247,6 +236,20 @@ namespace Coffee.UpmGitExtension
             return revision.Contains(semver)
                 ? $"{self.name}/{semver}"
                 : $"{self.name}/{semver} ({revision})";
+        }
+
+        //################################
+        // Private Members.
+        //################################
+        private enum State
+        {
+            None,
+            UrlEntered,
+            VersionFound,
+            VersionSelected,
+            Error,
+            Busy,
+            NonBusy
         }
     }
 }

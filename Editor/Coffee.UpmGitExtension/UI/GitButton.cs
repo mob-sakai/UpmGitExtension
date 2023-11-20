@@ -1,6 +1,7 @@
+using System;
 using UnityEditor;
-using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace Coffee.UpmGitExtension
 {
@@ -12,14 +13,9 @@ namespace Coffee.UpmGitExtension
         private const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
         private const string StylePath = ResourcesPath + "GitButton.uss";
 
-        public static bool IsResourceReady()
+        public GitButton(Action action) : base(action)
         {
-            return EditorGUIUtility.Load(StylePath);
-        }
-
-        public GitButton(System.Action action) : base(action)
-        {
-            styleSheets.Add(UnityEditor.AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
+            styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
 
             AddToClassList("git-button");
 
@@ -27,6 +23,16 @@ namespace Coffee.UpmGitExtension
             image.AddToClassList("git-button-image");
 
             Add(image);
+
+#if UNITY_2023_2_OR_NEWER
+            image.style.width = new StyleLength(18);
+            image.style.height = new StyleLength(18);
+#endif
+        }
+
+        public static bool IsResourceReady()
+        {
+            return EditorGUIUtility.Load(StylePath);
         }
     }
 }

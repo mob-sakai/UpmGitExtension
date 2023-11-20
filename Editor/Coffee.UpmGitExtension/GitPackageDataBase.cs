@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using UnityEngine;
+using System.Text;
 using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEditorInternal;
-using Debug = UnityEngine.Debug;
+using UnityEngine;
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
+
 #else
 using UnityEditor.PackageManager.UI;
 #endif
@@ -27,16 +28,6 @@ namespace Coffee.UpmGitExtension
         public int hash;
         public UpmPackageVersionEx[] versions;
 
-        public override int GetHashCode()
-        {
-            return hash;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return (obj as FetchResult)?.hash == hash;
-        }
-
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
         }
@@ -46,6 +37,16 @@ namespace Coffee.UpmGitExtension
             versions = versions
                 .Where(v => v.isValid)
                 .ToArray();
+        }
+
+        public override int GetHashCode()
+        {
+            return hash;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return (obj as FetchResult)?.hash == hash;
         }
     }
 
@@ -94,7 +95,10 @@ namespace Coffee.UpmGitExtension
             NodeJs.Run(_workingDirectory, Path.GetFullPath(kFetchPackagesJs), url, code =>
             {
                 if (code == 0)
+                {
                     GitRepositoryUrlList.AddUrl(url);
+                }
+
                 callback?.Invoke(code);
             });
         }
@@ -132,7 +136,9 @@ namespace Coffee.UpmGitExtension
         public static void OpenCacheDirectory()
         {
             if (Directory.Exists(_workingDirectory))
+            {
                 EditorUtility.RevealInFinder(_workingDirectory);
+            }
         }
 
         public static void ClearCache()
@@ -147,7 +153,7 @@ namespace Coffee.UpmGitExtension
                 }
             }
 
-            UnityEngine.Debug.Log("[GitPackageDatabase] Clear Cache");
+            Debug.Log("[GitPackageDatabase] Clear Cache");
             WatchResultJson();
         }
 
@@ -182,10 +188,12 @@ namespace Coffee.UpmGitExtension
         private static FileSystemWatcher _watcher;
         private static bool isPaused;
         private static readonly HashSet<FetchResult> _resultCaches = new HashSet<FetchResult>();
-        private static PackageManagerProjectSettings _settings => ScriptableSingleton<PackageManagerProjectSettings>.instance;
+        private static PackageManagerProjectSettings _settings =>
+            ScriptableSingleton<PackageManagerProjectSettings>.instance;
 #if UNITY_2020_2_OR_NEWER
         internal static UpmClient _upmClient => ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmClient>();
-        internal static PackageDatabase _packageDatabase => ScriptableSingleton<ServicesContainer>.instance.Resolve<PackageDatabase>();
+        internal static PackageDatabase _packageDatabase =>
+            ScriptableSingleton<ServicesContainer>.instance.Resolve<PackageDatabase>();
 #else
         internal static IUpmClient _upmClient => UpmClient.instance;
         internal static IPackageDatabase _packageDatabase => PackageDatabase.instance;
@@ -222,28 +230,20 @@ namespace Coffee.UpmGitExtension
                         // Git mode: Register all installable package versions.
                         var upmPackage = _packageDatabase.GetPackage(versions.Key) as UpmPackage;
                         var installedVersion = upmPackage.versions.installed as UpmPackageVersion;
-                        if (installedVersion.GetPackageInfo().source != UnityEditor.PackageManager.PackageSource.Git)
+                        if (installedVersion.GetPackageInfo().source != PackageSource.Git)
+                        {
                             return upmPackage;
+                        }
 
                         // Unlock.
                         installedVersion.UnlockVersion();
 
                         var newVersions = new[] { new UpmPackageVersionEx(installedVersion) }
-                                .Concat(versions.Where(v => v.uniqueId != installedVersion.uniqueId))
-                                .OrderBy(v => v.semVersion)
-                                .ThenBy(v => v.isInstalled)
-                                .ToArray();
-
-#if UNITY_2023_1_OR_NEWER
-                        var factory = ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmPackageFactory>();
-                        var versionList = new UpmVersionList(newVersions.OrderBy(v => v.version));
-                        upmPackage = factory.CreatePackage(upmPackage.name, versionList);
-#elif UNITY_2022_2_OR_NEWER
-                        var versionList = new UpmVersionList(newVersions.OrderBy(v => v.version));
-                        upmPackage = new UpmPackage(upmPackage.uniqueId, true, versionList);
-#else
-                        upmPackage.UpdateVersionsSafety(newVersions);
-#endif
+                            .Concat(versions.Where(v => v.uniqueId != installedVersion.uniqueId))
+                            .OrderBy(v => v.semVersion)
+                            .ThenBy(v => v.isInstalled)
+                            .ToArray();
+                        upmPackage = upmPackage.UpdateVersionsSafety(newVersions);
 
                         return upmPackage;
                     }
@@ -264,7 +264,7 @@ namespace Coffee.UpmGitExtension
         private static void UpdatePackages(IEnumerable<IPackage> packages)
         {
 #if UNITY_2023_1_OR_NEWER
-            _packageDatabase.UpdatePackages(packages);
+            _packageDatabase.UpdatePackages(packages.ToList());
 #else
             _packageDatabase.Call("OnPackagesChanged", packages);
 #endif
@@ -273,11 +273,13 @@ namespace Coffee.UpmGitExtension
         private static void OnResultFileCreated(string file)
         {
             if (isPaused || string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
+            {
                 return;
+            }
 
             try
             {
-                var text = File.ReadAllText(file, System.Text.Encoding.UTF8);
+                var text = File.ReadAllText(file, Encoding.UTF8);
                 var result = JsonUtility.FromJson<FetchResult>(text);
 
                 _resultCaches.RemoveWhere(r => r.url == result.url);
@@ -300,19 +302,23 @@ namespace Coffee.UpmGitExtension
 #endif
             var resultDir = Path.GetFullPath(_resultsDir);
             if (!Directory.Exists(resultDir))
+            {
                 Directory.CreateDirectory(resultDir);
+            }
 
-            GitPackageDatabase.RequestUpdateGitPackageVersions();
+            RequestUpdateGitPackageVersions();
             foreach (var file in Directory.GetFiles(resultDir, "*.json"))
+            {
                 EditorApplication.delayCall += () => OnResultFileCreated(Path.Combine(resultDir, file));
+            }
 
             _watcher?.Dispose();
-            _watcher = new FileSystemWatcher()
+            _watcher = new FileSystemWatcher
             {
                 Path = resultDir,
                 NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite,
                 IncludeSubdirectories = false,
-                EnableRaisingEvents = true,
+                EnableRaisingEvents = true
             };
 
             _watcher.Created += (s, e) => EditorApplication.delayCall += () => OnResultFileCreated(e.FullPath);
