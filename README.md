@@ -21,7 +21,7 @@
     - `test:` add or update tests
     - `chore:` changes to the build process or auxiliary tools and libraries such as documentation generation
 
-7. Create a pull request on GitHub.
+7. Create a pull request on GitHub. Fill out the description, link any related issues and submit your pull request.
 
 For details, refer to [CONTRIBUTING](https://github.com/mob-sakai/ParticleEffectForUGUI/blob/main/CONTRIBUTING.md)
 and [CODE_OF_CONDUCT](https://github.com/mob-sakai/ParticleEffectForUGUI/blob/main/CODE_OF_CONDUCT.md).

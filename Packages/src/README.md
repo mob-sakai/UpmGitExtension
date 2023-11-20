@@ -154,7 +154,7 @@ Issues are incredibly valuable to this project:
 ### Pull Requests
 
 Pull requests offer a fantastic way to contribute your ideas to this repository.  
-Please refer to [CONTRIBUTING.md](/../../blob/main/CONTRIBUTING.md) for guidelines.
+Please refer to [CONTRIBUTING.md](/../../blob/main/CONTRIBUTING.md) and [develop branch](https://github.com/mob-sakai/UpmGitExtension/tree/develop) for guidelines.
 
 ### Support
 
