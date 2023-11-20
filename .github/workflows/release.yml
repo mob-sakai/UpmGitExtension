@@ -22,6 +22,8 @@ jobs:
       channel: ${{ steps.release.outputs.new_release_channel }}
       released: ${{ steps.release.outputs.new_release_published }}
       tag: ${{ steps.release.outputs.new_release_git_tag }}
+      version: ${{ steps.release.outputs.new_release_version }}
+      notes: ${{ steps.release.outputs.new_release_notes }}
     steps:
       - name: 🚚 Checkout (${{ github.ref_name }})
         uses: actions/checkout@v4
@@ -39,8 +41,10 @@ jobs:
 
       - run: |
           echo "🔖 New release published: '${{ steps.release.outputs.new_release_published }}'" | tee -a $GITHUB_STEP_SUMMARY
+          echo "🔖 New release version: '${{ steps.release.outputs.new_release_version }}'" | tee -a $GITHUB_STEP_SUMMARY
           echo "🔖 New release channel: '${{ steps.release.outputs.new_release_channel }}'" | tee -a $GITHUB_STEP_SUMMARY
           echo "🔖 New release git tag: '${{ steps.release.outputs.new_release_git_tag }}'" | tee -a $GITHUB_STEP_SUMMARY
+          echo '${{ steps.release.outputs.new_release_notes }}' | tee -a $GITHUB_STEP_SUMMARY
 
   merge-to-develop:
     name: 🔀 Merge to develop
@@ -60,7 +64,9 @@ jobs:
     uses: ./.github/workflows/snapshot.yml
     with:
       from: ${{ needs.release.outputs.tag }}
-      to: main_sandbox
+      to: main
       path: Packages/src
+      tag: ${{ needs.release.outputs.version }}
+      message: "chore(release): ${{ needs.release.outputs.version }} [skip ci]"
     permissions:
       contents: write
