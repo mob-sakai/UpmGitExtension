@@ -53,7 +53,7 @@ This project addresses these issues by extending the UI of the Unity Package Man
 
 ## ⚙ Installation
 
-_This package requires as following:
+This package requires as following:
 
 - **v1.x**: Unity 2018.3 to 2019.4
 - **v2.x**: Unity 2020.1 or later

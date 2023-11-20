@@ -243,17 +243,7 @@ namespace Coffee.UpmGitExtension
                             .OrderBy(v => v.semVersion)
                             .ThenBy(v => v.isInstalled)
                             .ToArray();
-
-#if UNITY_2023_1_OR_NEWER
-                        var factory = ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmPackageFactory>();
-                        var versionList = new UpmVersionList(newVersions.OrderBy(v => v.version));
-                        upmPackage = factory.CreatePackage(upmPackage.name, versionList);
-#elif UNITY_2022_2_OR_NEWER
-                        var versionList = new UpmVersionList(newVersions.OrderBy(v => v.version));
-                        upmPackage = new UpmPackage(upmPackage.uniqueId, true, versionList);
-#else
-                        upmPackage.UpdateVersionsSafety(newVersions);
-#endif
+                        upmPackage = upmPackage.UpdateVersionsSafety(newVersions);
 
                         return upmPackage;
                     }

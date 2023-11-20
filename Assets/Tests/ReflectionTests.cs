@@ -9,6 +9,9 @@ using UnityEditor.PackageManager.UI.Internal;
 #else
 using UnityEditor.PackageManager.UI;
 #endif
+#if UNITY_2023_1_OR_NEWER
+using UpmPackage = UnityEditor.PackageManager.UI.Internal.Package;
+#endif
 
 namespace Coffee.UpmGitExtension
 {
@@ -32,6 +35,22 @@ namespace Coffee.UpmGitExtension
                 JsonUtility.FromJson<UpmPackageVersion>("{}").Has<PackageTag>("m_Tag"),
                 "PackageTag UpmPackageVersion.m_Tag is not found"
             );
+        }
+
+        [Test]
+        public void UpmPackage_UpdateVersions()
+        {
+            if (Application.isBatchMode) return;   // Skip in batch mode.
+#if UNITY_2020_1
+            var upmClient = UpmClient.instance;
+            var database = PackageDatabase.instance;
+#else
+            var upmClient = UnityEditor.ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmClient>();
+            var database = UnityEditor.ScriptableSingleton<ServicesContainer>.instance.Resolve<PackageDatabase>();
+#endif
+
+            var package = database.GetPackage("com.coffee.softmask-for-ugui") as UpmPackage;
+            package.UpdateVersionsSafety(new[] { package.GetInstalledVersion() });
         }
 
 #if UNITY_2023_1_OR_NEWER

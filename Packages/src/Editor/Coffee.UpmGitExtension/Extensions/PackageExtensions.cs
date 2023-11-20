@@ -1,4 +1,14 @@
+// UpmPackage.UpdateVersions is removed from Unity 2021.3.26
+
+#if UNITY_2021_3_0 || UNITY_2021_3_1 || UNITY_2021_3_2 || UNITY_2021_3_3 || UNITY_2021_3_4 || UNITY_2021_3_5 || UNITY_2021_3_6 || UNITY_2021_3_7 || UNITY_2021_3_8 || UNITY_2021_3_9
+#elif UNITY_2021_3_10 || UNITY_2021_3_11 || UNITY_2021_3_12 || UNITY_2021_3_13 || UNITY_2021_3_14 || UNITY_2021_3_15 || UNITY_2021_3_16 || UNITY_2021_3_17 || UNITY_2021_3_18 || UNITY_2021_3_19
+#elif UNITY_2021_3_20 || UNITY_2021_3_21 || UNITY_2021_3_22 || UNITY_2021_3_23 || UNITY_2021_3_24 || UNITY_2021_3_25
+#elif UNITY_2021_3
+#define UNITY_2021_3_26_OR_NEWER
+#endif
+
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor.PackageManager;
 #if UNITY_2021_1_OR_NEWER
@@ -24,16 +34,30 @@ namespace Coffee.UpmGitExtension
 
     internal static class UpmPackageExtensions
     {
-        public static void UpdateVersionsSafety(this UpmPackage self, IEnumerable<UpmPackageVersion> updatedVersions)
+        public static UpmPackage UpdateVersionsSafety(this UpmPackage self, IEnumerable<UpmPackageVersion> versions)
         {
-            if (self.Has("UpdateVersions", updatedVersions, 0))
+#if UNITY_2023_1_OR_NEWER
+            var factory = UnityEditor.ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmPackageFactory>();
+            self = factory.CreatePackage(self.name, new UpmVersionList(versions.OrderBy(v => v.version)));
+#elif UNITY_2022_2_OR_NEWER || UNITY_2021_3_26_OR_NEWER
+            self = new UpmPackage(self.uniqueId, true, new UpmVersionList(versions.OrderBy(v => v.version)));
+#else
+            if (self.Has("UpdateVersions", versions, 0))
             {
-                self.Call("UpdateVersions", updatedVersions, 0);
+                self.Call("UpdateVersions", versions, 0);
+            }
+            else if (self.Has("UpdateVersions", versions))
+            {
+                self.Call("UpdateVersions", versions);
             }
             else
             {
-                self.Call("UpdateVersions", updatedVersions);
+                throw new System.NotImplementedException(
+                    "void UpmPackage.UpdateVersions(IEnumerable<UpmPackageVersion>, int) or void UpmPackage.UpdateVersions(IEnumerable<UpmPackageVersion>) is not found");
             }
+#endif
+
+            return self;
         }
     }
 
