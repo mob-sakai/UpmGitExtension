@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/mob-sakai/UpmGitExtension/compare/v2.1.0...v2.1.1) (2023-11-21)
+
+
+### Bug Fixes
+
+* fix readme ([29acbc3](https://github.com/mob-sakai/UpmGitExtension/commit/29acbc3536d92cab59af5ba569c41c5d83e03149))
+
 # [2.1.0](https://github.com/mob-sakai/UpmGitExtension/compare/v2.0.4...v2.1.0) (2023-11-20)
 
 
