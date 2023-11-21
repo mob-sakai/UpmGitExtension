@@ -7,7 +7,7 @@ from a git repository.
 
 [![](https://img.shields.io/npm/v/com.coffee.upm-git-extension?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.coffee.upm-git-extension/)
 [![](https://img.shields.io/github/v/release/mob-sakai/UpmGitExtension?include_prereleases)](https://github.com/mob-sakai/UpmGitExtension/releases)
-[![](https://img.shields.io/github/license/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/blob/upm/LICENSE.txt)  
+[![](https://img.shields.io/github/license/mob-sakai/UpmGitExtension.svg)](https://github.com/mob-sakai/UpmGitExtension/blob/main/LICENSE.txt)  
 ![](https://img.shields.io/badge/Unity-2018.3+-57b9d3.svg?style=flat&logo=unity)
 ![](https://github.com/mob-sakai/UpmGitExtension/actions/workflows/test.yml/badge.svg?branch=develop)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
@@ -66,11 +66,10 @@ This is the preferred method of installation, as you can easily receive updates 
 If you have [openupm-cli](https://github.com/openupm/openupm-cli) installed, then run the following command in your
 project's directory:
 
-```
-// for Unity 2020 or later
+```sh
+# for Unity 2020 or later
 openupm add com.coffee.upm-git-extension
-
-// for Unity 2018 or 2019
+# for Unity 2018 or 2019
 openupm add com.coffee.upm-git-extension@v1 
 ```
 
@@ -79,23 +78,15 @@ openupm add com.coffee.upm-git-extension@v1
 Navigate to your project's Packages folder and open the `manifest.json` file. Then add this package somewhere in
 the `dependencies` block:
 
-```js
+```json
 {
-    "dependencies"
-:
-    {
-        // for Unity 2020 or later
-        "com.coffee.upm-git-extension"
-    :
-        "https://github.com/mob-sakai/UpmGitExtension.git",
-
-            // for Unity 2018 or 2019
-            "com.coffee.upm-git-extension"
-    :
-        "https://github.com/mob-sakai/UpmGitExtension.git#v1",
+  "dependencies": {
+    // for Unity 2020 or later
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
+    // for Unity 2018 or 2019
+    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#v1",
     ...
-    }
-,
+  },
 }
 ```
 
@@ -154,7 +145,7 @@ Issues are incredibly valuable to this project:
 ### Pull Requests
 
 Pull requests offer a fantastic way to contribute your ideas to this repository.  
-Please refer to [CONTRIBUTING.md](/../../blob/main/CONTRIBUTING.md) and [develop branch](https://github.com/mob-sakai/UpmGitExtension/tree/develop) for guidelines.
+Please refer to [CONTRIBUTING.md](https://github.com/mob-sakai/UpmGitExtension/tree/develop/CONTRIBUTING.md) and [develop branch](https://github.com/mob-sakai/UpmGitExtension/tree/develop) for guidelines.
 
 ### Support
 
@@ -181,4 +172,4 @@ Your support allows me to dedicate more time to development. 😊
 - Releases : https://github.com/mob-sakai/UpmGitExtension/releases
 - Issue tracker : https://github.com/mob-sakai/UpmGitExtension/issues
 - Current project : https://github.com/mob-sakai/UpmGitExtension/projects/1
-- Change log : https://github.com/mob-sakai/UpmGitExtension/blob/upm/CHANGELOG.md
+- Change log : https://github.com/mob-sakai/UpmGitExtension/blob/main/CHANGELOG.md
