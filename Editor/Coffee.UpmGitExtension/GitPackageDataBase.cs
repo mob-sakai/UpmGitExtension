@@ -117,7 +117,12 @@ namespace Coffee.UpmGitExtension
         {
             IPackage package;
             IPackageVersion version;
-            _packageDatabase.GetPackageAndVersion(packageUniqueId, versionUniqueId, out package, out version);
+#if UNITY_6000_0_OR_NEWER
+            package = GetPackage(packageUniqueId);
+            version = package?.versions.FirstOrDefault((IPackageVersion v) => v.uniqueId == versionUniqueId);
+#else
+           _packageDatabase.GetPackageAndVersion(packageUniqueId, versionUniqueId, out package, out version);
+#endif
             return version;
         }
 
