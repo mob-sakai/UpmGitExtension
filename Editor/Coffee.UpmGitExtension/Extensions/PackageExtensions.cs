@@ -36,7 +36,22 @@ namespace Coffee.UpmGitExtension
     {
         public static UpmPackage UpdateVersionsSafety(this UpmPackage self, IEnumerable<UpmPackageVersion> versions)
         {
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
+            var factory = UnityEditor.ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmPackageFactory>();
+            var cache = factory.Get("m_UpmCache") as IUpmCache;
+            var m_UpmClient = factory.Get("m_UpmClient") as IUpmClient;
+            var packageName = self.name;
+
+            PackageInfo installedPackageInfo = cache.GetInstalledPackageInfo(packageName);
+            PackageInfo searchPackageInfo = cache.GetSearchPackageInfo(packageName);
+            bool flag = searchPackageInfo?.unityLifecycle?.isDeprecated ?? (installedPackageInfo?.unityLifecycle?.isDeprecated).GetValueOrDefault();
+            string deprecationMessage = ((!flag) ? null : (searchPackageInfo?.unityLifecycle?.deprecationMessage ?? installedPackageInfo?.unityLifecycle?.deprecationMessage));
+            RegistryType availableRegistryType = m_UpmClient.GetAvailableRegistryType(searchPackageInfo ?? installedPackageInfo);
+            Dictionary<string, PackageInfo> extraPackageInfos = cache.GetExtraPackageInfos(packageName);
+            UpmVersionList upmVersionList = new UpmVersionList(searchPackageInfo, installedPackageInfo, availableRegistryType, PackageTag.None, cache.IsLoadAllVersions(packageName), extraPackageInfos);
+
+            self = factory.CreatePackage(self.name, upmVersionList);
+#elif UNITY_2023_1_OR_NEWER
             var factory = UnityEditor.ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmPackageFactory>();
             self = factory.CreatePackage(self.name, new UpmVersionList(versions.OrderBy(v => v.version)));
 #elif UNITY_2022_2_OR_NEWER || UNITY_2021_3_26_OR_NEWER
@@ -123,13 +138,15 @@ namespace Coffee.UpmGitExtension
         //    }
         //    return null;
         //}
-
         public static void UnlockVersion(this UpmPackageVersion self)
         {
+#if UNITY_6000_0_OR_NEWER
+            var tag = (PackageTag)self.Get("m_Tag");
+#else
             var tag = (PackageTag)self.Get("m_Tag") & ~PackageTag.VersionLocked;
+#endif
             self.Set("m_Tag", tag);
         }
-
         public static UpmPackageVersion GetInstalledVersion(this UpmPackage self)
         {
 #if UNITY_2020_1_OR_NEWER
