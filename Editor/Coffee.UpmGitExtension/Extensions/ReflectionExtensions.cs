@@ -58,9 +58,10 @@ namespace Coffee.UpmGitExtension
                 case PropertyInfo pi:
                     return pi.GetValue(self.Inst(), new object[0]);
                 case FieldInfo fi:
-                    return fi.GetValue(self.Inst());
+                    var result = fi.GetValue(self.Inst());
+                    return result;
                 default:
-                    throw new MissingFieldException(self.Type().FullName, memberName);
+                    return null;
             }
         }
 

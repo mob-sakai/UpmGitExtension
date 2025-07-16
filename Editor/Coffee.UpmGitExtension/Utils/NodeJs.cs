@@ -196,10 +196,11 @@ namespace Coffee.UpmGitExtension
         private static string[] GetExtractArchiveCommand(string archivePath, string extractTo, RuntimePlatform platform)
         {
             var contentsPath = EditorApplication.applicationContentsPath;
+            var path = Path.GetDirectoryName(extractTo) ?? string.Empty;
             switch (platform)
             {
                 case RuntimePlatform.WindowsEditor:
-                    Directory.CreateDirectory(Path.GetDirectoryName(extractTo));
+                    Directory.CreateDirectory(path);
                     return new[] { Path.Combine(contentsPath, "Tools", "7z.exe"), $"x {archivePath} -o{extractTo}" };
                 case RuntimePlatform.OSXEditor:
                 case RuntimePlatform.LinuxEditor:
@@ -209,7 +210,7 @@ namespace Coffee.UpmGitExtension
                         return new[] { "tar", $"-pzxf {archivePath} -C {extractTo}" };
                     }
 
-                    Directory.CreateDirectory(Path.GetDirectoryName(extractTo));
+                    Directory.CreateDirectory(path);
                     return new[] { Path.Combine(contentsPath, "Tools", "7za"), $"x {archivePath} -o{extractTo}" };
                 default:
                     throw new NotSupportedException($"{Application.platform} is not supported");

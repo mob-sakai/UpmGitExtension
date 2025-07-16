@@ -191,17 +191,17 @@ namespace Coffee.UpmGitExtension
             var menu = new GenericMenu();
             GenericMenu.MenuFunction2 callback = v =>
             {
-                var version = v as UpmPackageVersionEx;
+                var version = v as UpmPackageVersion;
                 _currentVersion = version;
-                _versionSelectButton.text = GetShortPackageId(version);
+                _versionSelectButton.text = GitPackageDatabase.GetShortPackageId(version);
                 SetState(State.VersionSelected);
             };
 
             var repoUrl = GetRepoUrl(_repoUrlText.value, _pathText.value);
             foreach (var version in GitPackageDatabase.GetAvailablePackageVersions(repoUrl)
-                         .OrderByDescending(v => v.semVersion))
+                         .OrderByDescending(v => v.version))
             {
-                var text = GetShortPackageId(version);
+                var text = GitPackageDatabase.GetShortPackageId(version);
                 menu.AddItem(new GUIContent(text), _versionSelectButton.text == text, callback, version);
             }
 
@@ -228,19 +228,7 @@ namespace Coffee.UpmGitExtension
             path = path.Trim('/');
             return 0 < path.Length ? url + "?path=" + path : url;
         }
-
-        private static string GetShortPackageId(UpmPackageVersionEx self)
-        {
-            var semver = self.semVersion.ToString();
-            var revision = self.packageInfo.git.revision;
-            return revision.Contains(semver)
-                ? $"{self.name}/{semver}"
-                : $"{self.name}/{semver} ({revision})";
-        }
-
-        //################################
-        // Private Members.
-        //################################
+        
         private enum State
         {
             None,
