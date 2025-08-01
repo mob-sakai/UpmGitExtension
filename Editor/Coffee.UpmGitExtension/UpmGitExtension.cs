@@ -33,7 +33,9 @@ namespace Coffee.UpmGitExtension
 #endif
         }
 
-        
+        //################################
+        // IPackageManagerExtension Members.
+        //################################
         VisualElement IPackageManagerExtension.CreateExtensionUI()
         {
             _initialized = false;

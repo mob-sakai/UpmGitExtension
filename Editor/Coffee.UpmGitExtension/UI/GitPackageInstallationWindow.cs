@@ -191,7 +191,11 @@ namespace Coffee.UpmGitExtension
             var menu = new GenericMenu();
             GenericMenu.MenuFunction2 callback = v =>
             {
+#if UNITY_6000_0_OR_NEWER
                 var version = v as UpmPackageVersion;
+#else
+                var version = v as UpmPackageVersionEx;
+#endif
                 _currentVersion = version;
                 _versionSelectButton.text = GitPackageDatabase.GetShortPackageId(version);
                 SetState(State.VersionSelected);
@@ -199,7 +203,11 @@ namespace Coffee.UpmGitExtension
 
             var repoUrl = GetRepoUrl(_repoUrlText.value, _pathText.value);
             foreach (var version in GitPackageDatabase.GetAvailablePackageVersions(repoUrl)
+#if UNITY_6000_0_OR_NEWER
                          .OrderByDescending(v => v.version))
+#else
+                         .OrderByDescending(v => v.semVersion))
+#endif
             {
                 var text = GitPackageDatabase.GetShortPackageId(version);
                 menu.AddItem(new GUIContent(text), _versionSelectButton.text == text, callback, version);

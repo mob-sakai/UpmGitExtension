@@ -27,15 +27,15 @@ namespace Coffee.UpmGitExtension
     {
         public static PackageInfo GetPackageInfo(this IPackageVersion self)
         {
-            var info = PackageInfo.FindForAssetPath($"Packages/{self.name}");
-            
-            return info;
+            return self is UpmPackageVersionEx ex
+                ? ex.packageInfo
+                : PackageInfo.FindForAssetPath($"Packages/{self.name}");
         }
     }
 
     internal static class UpmPackageExtensions
     {
-        public static UpmPackage UpdateVersionsSafety(this UpmPackage self)
+        public static UpmPackage UpdateVersionsSafety(this UpmPackage self, IEnumerable<UpmPackageVersion> versions = null)
         {
 #if UNITY_6000_0_OR_NEWER
             var factory = UnityEditor.ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmPackageFactory>();

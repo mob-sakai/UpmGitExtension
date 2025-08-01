@@ -7,9 +7,9 @@ using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditorInternal;
 using UnityEngine;
+
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
-
 #else
 using UnityEditor.PackageManager.UI;
 #endif
@@ -26,7 +26,12 @@ namespace Coffee.UpmGitExtension
         public string id;
         public string url;
         public int hash;
+        
+#if UNITY_6000_0_OR_NEWER
         public UpmPackageVersion[] versions;
+#else
+        public UpmPackageVersionEx[] versions;
+#endif
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
@@ -34,7 +39,13 @@ namespace Coffee.UpmGitExtension
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
+#if UNITY_6000_0_OR_NEWER
             versions = versions.ToArray();
+#else
+            versions = versions
+                .Where(v => v.isValid)
+                .ToArray();
+#endif
         }
 
         public override int GetHashCode()
@@ -108,7 +119,8 @@ namespace Coffee.UpmGitExtension
         {
             return _packageDatabase.GetPackage(packageName);
         }
-
+        
+#if UNITY_6000_0_OR_NEWER
         internal static List<UpmPackageVersion> GetPackageVersion(string packageName, string versionUniqueId)
         {
             var result = _resultCaches
@@ -117,6 +129,15 @@ namespace Coffee.UpmGitExtension
 
             return result;
         }
+#else
+        internal static IPackageVersion GetPackageVersion(string packageUniqueId, string versionUniqueId)
+        {
+            IPackage package;
+            IPackageVersion version;
+            _packageDatabase.GetPackageAndVersion(packageUniqueId, versionUniqueId, out package, out version);
+            return version;
+        }
+#endif
         
         public static void Fetch()
         {
@@ -168,7 +189,8 @@ namespace Coffee.UpmGitExtension
 
             _isPaused = false;
         }
-
+        
+#if UNITY_6000_0_OR_NEWER
         public static IEnumerable<UpmPackageVersion> GetAvailablePackageVersions(string repoUrl = null)
         {
             var result = _resultCaches
@@ -177,6 +199,13 @@ namespace Coffee.UpmGitExtension
 
             return result;
         }
+#else
+        public static IEnumerable<UpmPackageVersionEx> GetAvailablePackageVersions(string repoUrl = null)
+        {
+            return _resultCaches.SelectMany(r => r.versions)
+                .Where(v => v.isValid && (string.IsNullOrEmpty(repoUrl) || v.uniqueId.Contains(repoUrl)));
+        }
+#endif
         
         public static void RequestUpdateGitPackageVersions()
         {
@@ -197,22 +226,35 @@ namespace Coffee.UpmGitExtension
                 .Select(versions =>
                 {
                     var isInstalled = installedIds.Contains(versions.Key);
-                    if (!isInstalled) return null;
-
+                    if (!isInstalled)
                     {
-                        var upmPackage = _packageDatabase.GetPackage(versions.Key) as UpmPackage;
-                        var installedVersion = upmPackage.versions.installed as UpmPackageVersion;
-                        if (installedVersion.GetPackageInfo().source != PackageSource.Git)
-                        {
-                            return upmPackage;
-                        }
-
-                        installedVersion.UnlockVersion();
-                        
-                        upmPackage = upmPackage.UpdateVersionsSafety();
-
+                        return null;
+                    }
+                    
+                    // Git mode: Register all installable package versions.
+                    
+                    var upmPackage = _packageDatabase.GetPackage(versions.Key) as UpmPackage;
+                    var installedVersion = upmPackage?.versions.installed as UpmPackageVersion;
+                    if (installedVersion.GetPackageInfo().source != PackageSource.Git)
+                    {
                         return upmPackage;
                     }
+                    
+                    // Unlock.
+                    installedVersion.UnlockVersion();
+                    
+#if UNITY_6000_0_OR_NEWER
+                    upmPackage = upmPackage.UpdateVersionsSafety();
+#else
+                    var newVersions = new[] { new UpmPackageVersionEx(installedVersion) }
+                        .Concat(versions.Where(v => v.uniqueId != installedVersion.uniqueId))
+                        .OrderBy(v => v.semVersion)
+                        .ThenBy(v => v.isInstalled)
+                        .ToArray();
+                    upmPackage = upmPackage.UpdateVersionsSafety(newVersions);
+#endif
+
+                    return upmPackage;
                 })
                 .Where(p => p != null);
 

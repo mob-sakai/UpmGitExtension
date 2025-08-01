@@ -5,12 +5,20 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UIElements;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
+
+#if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
+#else
+using UnityEditor.PackageManager.UI;
+#endif
 
 namespace Coffee.UpmGitExtension
 {
     internal class PackageDetailsExtension
     {
+        //################################
+        // Public Members.
+        //################################
         public void Setup(VisualElement root)
         {
             _root = root;
@@ -31,17 +39,44 @@ namespace Coffee.UpmGitExtension
                 root.Q("detailVersion").parent.Add(hostButton);
             }
 
+#if! UNITY_6000_0_OR_NEWER
+            // Update/Install button.
+            _updateButton = _packageDetails.Q<Button>("PackageGitUpdateButton") ??
+                            _packageDetails.Q<Button>("PackageAddButton") ?? _packageDetails.Q<Button>("update");
+            if (_updateButton != null &&_clickableToUpdate == null)
+            {
+                _clickableToUpdate = _updateButton.clickable;
+                _updateButton.RemoveManipulator(_updateButton.clickable);
+                _updateButton.clickable = new Clickable(UpdatePackage);
+                _updateButton.AddManipulator(_updateButton.clickable);
+            }
+#endif
+
+            // Register callbacks.
             EditorApplication.delayCall += () =>
             {
+#if UNITY_6000_0_OR_NEWER
                 _pageManager.onVisualStateChange += _ => EditorApplication.delayCall += RefreshAllGitPackages;
                 _pageManager.onListUpdate += _ => EditorApplication.delayCall += RefreshAllGitPackages;
+#elif UNITY_2021_2_OR_NEWER || UNITY_2021_1_20 || UNITY_2021_1_21 || UNITY_2021_1_22 || UNITY_2021_1_23 || UNITY_2021_1_24 || UNITY_2021_1_25 || UNITY_2021_1_26 || UNITY_2021_1_27 || UNITY_2021_1_28
+                _pageManager.onVisualStateChange += _ => EditorApplication.delayCall += RefreshVersionItems;
+                _pageManager.onListUpdate += _ => EditorApplication.delayCall += RefreshVersionItems;
+#else
+                _pageManager.onVisualStateChange += _ => RefreshVersionItems();
+                _pageManager.onListUpdate += (_, __, ___, ____) => RefreshVersionItems();
+#endif
+                
             };
 
             _root.Q<PackageDetailsVersionsTab>().RegisterCallback<GeometryChangedEvent>(ev =>
             {
                 if ((ev.target as VisualElement).style.visibility.value == Visibility.Visible)
                 {
+#if UNITY_6000_0_OR_NEWER
                     RefreshAllGitPackages();
+#else
+                    RefreshVersionItems();
+#endif
                 }
             });
         }
@@ -52,6 +87,7 @@ namespace Coffee.UpmGitExtension
 
             var isGit = packageInfo.source == PackageSource.Git;
 
+            // Show/hide hosting service logo.
             var hostButton = _packageDetails.Q<Button>("hostButton");
             if (hostButton != null)
             {
@@ -59,11 +95,23 @@ namespace Coffee.UpmGitExtension
                 UIUtils.SetElementDisplay(hostButton, isGit);
             }
 
+#if !UNITY_2020_2_OR_NEWER
+            // Show/hide source path.
+            var detailSourcePath = _packageDetails.Q<Label>("detailSourcePath");
+            if (detailSourcePath != null)
+            {
+                detailSourcePath.text = packageInfo.GetSourceUrl();
+                UIUtils.SetElementDisplay(_packageDetails.Q<UpmGitExtension>(), isGit);
+            }
+#endif
+            
             if (isGit)
             {
+                // Add button to view repository in browser.
                 var button = new Button(ViewRepoOnBrowser) { text = "View repository" };
                 button.AddClasses("link");
 
+#if UNITY_6000_0_OR_NEWER
                 var links = _packageDetails
                     .Q<PackageDetailsLinks>()
                     ?.Q(classes: new[] { "left" });
@@ -74,38 +122,85 @@ namespace Coffee.UpmGitExtension
                     links.Add(separator);
                     links.Add(button);
                 }
-
+#elif UNITY_2023_1_OR_NEWER
+                var links = _packageDetails
+                        .Q<PackageDetailsLinks>()
+                        ?.Q(classes: new[] { "left" });
+                    @@ -124,58 +74,38 @@ namespace Coffee.UpmGitExtension
+                links.Add(separator);
+                links.Add(button);
+#elif UNITY_2021_2_OR_NEWER
+                var links = _packageDetails.Q<PackageDetailsLinks>();
+                var left = links.Q("packageDetailHeaderUPMLinks", new[] { "left" }) ??
+                           links.Q(classes: new[] { "left" });
+                links.Call("AddToLinks", left, button, true);
+#else
+                _packageDetails.Call("AddToLinks", button);
+#endif
+                
                 _targetVersion = null;
+                
+#if UNITY_6000_0_OR_NEWER
                 var packageVersion = GitPackageDatabase.GetAvailablePackageVersions().FirstOrDefault(v => v.GetPackageInfo()?.packageId == packageInfo?.packageId);
+#else
+                var packageVersion = GitPackageDatabase.GetAvailablePackageVersions().FirstOrDefault(v => v.packageInfo.packageId == packageInfo.packageId);
+#endif
+                
+                var package = packageVersion != null ? GitPackageDatabase.GetPackage(packageVersion) : GitPackageDatabase.GetPackage(packageInfo.name);
+                
+#if UNITY_6000_0_OR_NEWER
+                _targetVersion = package?.versions?.installed;
+#else
                 if (packageVersion != null)
                 {
-                    var package = GitPackageDatabase.GetPackage(packageVersion);
-                    _targetVersion = package?.versions?.installed;
+                    _targetVersion = package?.versions?.installed?.uniqueId == packageInfo.packageId
+                        ? package.versions.recommended
+                        : packageVersion;
                 }
                 else
                 {
-                    var package = GitPackageDatabase.GetPackage(packageInfo.name);
-                    _targetVersion = package?.versions?.installed;
+                    _targetVersion = package?.versions?.installed != null
+                        ? package?.versions?.recommended
+                        : package?.versions?.primary;
                 }
-
-                EditorApplication.delayCall += RefreshVersionItem;
+#endif
+                EditorApplication.delayCall +=
+#if UNITY_6000_0_OR_NEWER
+                RefreshVersionItem;
+#elif UNITY_2022_2_OR_NEWER
+                RefreshVersionItems;
+#endif
             }
+            
+#if UNITY_6000_0_OR_NEWER
             else
             {
                 RemoveVisualElement();
             }
+#endif
         }
 
+        //################################
+        // Private Members.
+        //################################
         private PackageDetails _packageDetails;
         private IPackageVersion _targetVersion;
         private Clickable _clickableToUpdate;
         private Button _updateButton;
         private VisualElement _root;
+        
+#if UNITY_2020_2_OR_NEWER
         private readonly List<VisualElement> _gitVersionRows = new();
 
         private static PageManager _pageManager =>
             ScriptableSingleton<ServicesContainer>.instance.Resolve<PageManager>();
-
+#else
+        private static IPageManager _pageManager => PageManager.instance;
+#endif
+        
+        /// <summary>
+        /// Get hosting service logo.
+        /// </summary>
         private Texture2D GetHostLogo(string packageId)
         {
             const string packageDir = "Packages/com.coffee.upm-git-extension/Editor/Resources/Logos/";
@@ -136,6 +231,9 @@ namespace Coffee.UpmGitExtension
                 : EditorGUIUtility.FindTexture("buildsettings.web.small");
         }
 
+        /// <summary>
+        /// On click 'View repository' callback.
+        /// </summary>
         private void ViewRepoOnBrowser()
         {
             if (_targetVersion != null)
@@ -143,7 +241,8 @@ namespace Coffee.UpmGitExtension
                 Application.OpenURL(_targetVersion.GetPackageInfo().GetRepositoryUrlForBrowser());
             }
         }
-
+       
+#if UNITY_6000_0_OR_NEWER
         private void UpdatePackage(string packageId)
         {
             if (_targetVersion?.GetPackageInfo()?.source == PackageSource.Git)
@@ -155,6 +254,19 @@ namespace Coffee.UpmGitExtension
                 _clickableToUpdate?.Call("Invoke", new MouseDownEvent());
             }
         }
+#else
+        private void UpdatePackage()
+        {
+            if (_targetVersion?.GetPackageInfo()?.source == PackageSource.Git)
+            {
+                GitPackageDatabase.Install(_targetVersion.GetPackageInfo().packageId);
+            }
+            else
+            {
+                _clickableToUpdate?.Call("Invoke", new MouseDownEvent());
+            }
+        }
+#endif
 
         private void RemovePackage(string packageId)
         {
@@ -167,7 +279,8 @@ namespace Coffee.UpmGitExtension
                 _clickableToUpdate?.Call("Invoke", new MouseDownEvent());
             }
         }
-
+        
+#if UNITY_6000_0_OR_NEWER
         private void RefreshAllGitPackages()
         {
             var allPackages = GitPackageDatabase.GetUpmPackages();
@@ -315,6 +428,32 @@ namespace Coffee.UpmGitExtension
                 AddVisualElement(versionRow);
             }
         }
+#endif
+
+#if !UNITY_6000_0_OR_NEWER
+        private void RefreshVersionItems()
+        {
+#if UNITY_2022_2_OR_NEWER
+            var items = _root.Query<PackageDetailsVersionHistoryItem>().Build()
+                .Select(item => new
+                {
+                    label = item.Q<Toggle>("versionHistoryItemToggle")?.Q<Label>(),
+                    version = item.version as UpmPackageVersionEx
+                });
+#else
+            var items = _root.Query<PackageVersionItem>().Build().ToList()
+                .Select(item => new { label = item.Q<Label>("versionLabel"), version =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     item.version as UpmPackageVersionEx });
+#endif
+            foreach (var item in items)
+            {
+                if (item.label != null && item.version != null)
+                {
+                    item.label.text = item.version.fullVersionString;
+                }
+            }
+        }
+#endif
         
         private void AddVisualElement(VisualElement versionRow)
         {
