@@ -20,7 +20,7 @@ namespace Coffee.UpmGitExtension
 {
     internal class UpmGitExtension : VisualElement, IPackageManagerExtension
 #if SUPPORT_MENU_EXTENSIONS
-    , IPackageManagerMenuExtensions
+        , IPackageManagerMenuExtensions
 #endif
     {
         [InitializeOnLoadMethod]
@@ -62,9 +62,12 @@ namespace Coffee.UpmGitExtension
         void IPackageManagerMenuExtensions.OnAdvancedMenuCreate(DropdownMenu menu)
         {
             menu.AppendAction("Open manifest.json", _ => OpenManifestJson(), DropdownMenuAction.Status.Normal);
-            menu.AppendAction("UpmGitExtensions/Open cache directory", _ => GitPackageDatabase.OpenCacheDirectory(), DropdownMenuAction.Status.Normal);
-            menu.AppendAction("UpmGitExtensions/Clear cache", _ => GitPackageDatabase.ClearCache(), DropdownMenuAction.Status.Normal);
-            menu.AppendAction("UpmGitExtensions/Fetch packages", _ => GitPackageDatabase.Fetch(), DropdownMenuAction.Status.Normal);
+            menu.AppendAction("UpmGitExtensions/Open cache directory", _ => GitPackageDatabase.OpenCacheDirectory(),
+                DropdownMenuAction.Status.Normal);
+            menu.AppendAction("UpmGitExtensions/Clear cache", _ => GitPackageDatabase.ClearCache(),
+                DropdownMenuAction.Status.Normal);
+            menu.AppendAction("UpmGitExtensions/Fetch packages", _ => GitPackageDatabase.Fetch(),
+                DropdownMenuAction.Status.Normal);
         }
 
         void IPackageManagerMenuExtensions.OnAddMenuCreate(DropdownMenu menu)

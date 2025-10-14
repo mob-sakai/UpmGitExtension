@@ -24,8 +24,10 @@
 #define CONSTRACTOR_V2
 #elif UNITY_2022_2_0 || UNITY_2022_2_1 || UNITY_2022_2_2 || UNITY_2022_2_3 || UNITY_2022_2_4 || UNITY_2022_2_5 || UNITY_2022_2_6 || UNITY_2022_2_7 || UNITY_2022_2_8 || UNITY_2022_2_9
 #define CONSTRACTOR_V2
-#elif UNITY_2021_3 || UNITY_2022_2 || UNITY_2022_3 || UNITY_2023_1_OR_NEWER || UNITY_2023_2_OR_NEWER
+#elif UNITY_2021_3 || UNITY_2022_2 || UNITY_2022_3 || UNITY_2023_1 || UNITY_2023_2 || UNITY_2023_3
 #define CONSTRACTOR_V3
+#elif UNITY_6000 || UNITY_6000_0 || UNITY_6000_0_OR_NEWER
+#define CONSTRACTOR_V4
 #endif
 
 using System;
@@ -35,7 +37,6 @@ using UnityEditor.Scripting.ScriptCompilation;
 using UnityEngine;
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
-
 #else
 using UnityEditor.PackageManager.UI;
 #endif
@@ -43,8 +44,14 @@ using UnityEditor.PackageManager.UI;
 namespace Coffee.UpmGitExtension
 {
     [Serializable]
+#if CONSTRACTOR_V4
+    internal class UpmPackageVersionEx
+#else
     internal class UpmPackageVersionEx : UpmPackageVersion
+#endif
+
     {
+#if !CONSTRACTOR_V4
         private static readonly Regex regex = new Regex("^(\\d +)\\.(\\d +)\\.(\\d +)(.*)$", RegexOptions.Compiled);
         private static SemVersion? unityVersion;
 
@@ -143,6 +150,7 @@ namespace Coffee.UpmGitExtension
                 Debug.LogException(e);
             }
         }
+#endif
 
 #if PACKAGE_INFO_HAS_BEEN_REMOVED
         [SerializeField]

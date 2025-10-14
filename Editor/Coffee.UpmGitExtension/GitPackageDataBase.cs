@@ -7,9 +7,9 @@ using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditorInternal;
 using UnityEngine;
+
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
-
 #else
 using UnityEditor.PackageManager.UI;
 #endif
@@ -26,7 +26,12 @@ namespace Coffee.UpmGitExtension
         public string id;
         public string url;
         public int hash;
+
+#if UNITY_6000_0_OR_NEWER
+        public UpmPackageVersion[] versions;
+#else
         public UpmPackageVersionEx[] versions;
+#endif
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
@@ -34,9 +39,13 @@ namespace Coffee.UpmGitExtension
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
+#if UNITY_6000_0_OR_NEWER
+            versions = versions.ToArray();
+#else
             versions = versions
                 .Where(v => v.isValid)
                 .ToArray();
+#endif
         }
 
         public override int GetHashCode()
@@ -50,16 +59,26 @@ namespace Coffee.UpmGitExtension
         }
     }
 
-    /// <summary>
-    /// Database of packages installed via Git
-    /// </summary>
-    //[FilePath("GitPackageDatabase.asset", FilePathAttribute.Location.PreferencesFolder)]
     internal class GitPackageDatabase : ScriptableSingleton<GitPackageDatabase>
     {
-        //################################
-        // Public Members.
-        //################################
-        // public static event Action OnChangedPackages;
+        private static string _workingDirectory => InternalEditorUtility.unityPreferencesFolder + "/GitPackageDatabase";
+        private static string _serializeVersion => "2.0.2";
+        private static string _resultsDir => _workingDirectory + "/Results-" + _serializeVersion;
+        private static FileSystemWatcher _watcher;
+        private static bool _isPaused;
+        private static readonly HashSet<FetchResult> _resultCaches = new HashSet<FetchResult>();
+
+        private static PackageManagerProjectSettings _settings =>
+            ScriptableSingleton<PackageManagerProjectSettings>.instance;
+
+#if UNITY_2020_1
+        internal static IUpmClient _upmClient => UpmClient.instance;
+        internal static IPackageDatabase _packageDatabase => PackageDatabase.instance;
+#else
+        internal static UpmClient _upmClient => ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmClient>();
+        internal static PackageDatabase _packageDatabase =>
+            ScriptableSingleton<ServicesContainer>.instance.Resolve<PackageDatabase>();
+#endif
 
         public static void Install(string packageId)
         {
@@ -86,9 +105,6 @@ namespace Coffee.UpmGitExtension
                 .Where(p => p.GetInstalledVersion()?.HasTag(PackageTag.Git) == true);
         }
 
-        /// <summary>
-        /// Fetch the available git package versions.
-        /// </summary>
         public static void Fetch(string url, Action<int> callback = null)
         {
             const string kFetchPackagesJs = "Packages/com.coffee.upm-git-extension/Editor/Commands/fetch-packages.js";
@@ -113,6 +129,16 @@ namespace Coffee.UpmGitExtension
             return _packageDatabase.GetPackage(packageName);
         }
 
+#if UNITY_6000_0_OR_NEWER
+        internal static List<UpmPackageVersion> GetPackageVersion(string packageName, string versionUniqueId)
+        {
+            var result = _resultCaches
+                .SelectMany(r => r.versions)
+                .Where(v => v.name == packageName).ToList();
+
+            return result;
+        }
+#else
         internal static IPackageVersion GetPackageVersion(string packageUniqueId, string versionUniqueId)
         {
             IPackage package;
@@ -120,10 +146,8 @@ namespace Coffee.UpmGitExtension
             _packageDatabase.GetPackageAndVersion(packageUniqueId, versionUniqueId, out package, out version);
             return version;
         }
+#endif
 
-        /// <summary>
-        /// Update available versions for git packages.
-        /// </summary>
         public static void Fetch()
         {
             GetInstalledGitPackages()
@@ -149,7 +173,10 @@ namespace Coffee.UpmGitExtension
             {
                 foreach (var dir in Directory.GetDirectories(_workingDirectory))
                 {
-                    Directory.Delete(dir, true);
+                    if (Directory.Exists(dir))
+                    {
+                        Directory.Delete(dir, true);
+                    }
                 }
             }
 
@@ -159,7 +186,7 @@ namespace Coffee.UpmGitExtension
 
         public static void ResetCacheTime()
         {
-            isPaused = true;
+            _isPaused = true;
             var resultDir = Path.GetFullPath(_resultsDir);
             if (Directory.Exists(resultDir))
             {
@@ -169,40 +196,24 @@ namespace Coffee.UpmGitExtension
                 }
             }
 
-            isPaused = false;
+            _isPaused = false;
         }
 
+#if UNITY_6000_0_OR_NEWER
+        public static IEnumerable<UpmPackageVersion> GetAvailablePackageVersions(string repoUrl = null)
+        {
+            var result = _resultCaches
+                .SelectMany(r => r.versions)
+                .Where(v => string.IsNullOrEmpty(repoUrl) || v.uniqueId.Contains(repoUrl));
+
+            return result;
+        }
+#else
         public static IEnumerable<UpmPackageVersionEx> GetAvailablePackageVersions(string repoUrl = null)
         {
-            return _resultCaches
-                .SelectMany(r => r.versions)
+            return _resultCaches.SelectMany(r => r.versions)
                 .Where(v => v.isValid && (string.IsNullOrEmpty(repoUrl) || v.uniqueId.Contains(repoUrl)));
         }
-
-        //################################
-        // Private Members.
-        //################################
-        private static string _workingDirectory => InternalEditorUtility.unityPreferencesFolder + "/GitPackageDatabase";
-        private static string _serializeVersion => "2.0.2";
-        private static string _resultsDir => _workingDirectory + "/Results-" + _serializeVersion;
-        private static FileSystemWatcher _watcher;
-        private static bool isPaused;
-        private static readonly HashSet<FetchResult> _resultCaches = new HashSet<FetchResult>();
-        private static PackageManagerProjectSettings _settings =>
-            ScriptableSingleton<PackageManagerProjectSettings>.instance;
-#if UNITY_2020_2_OR_NEWER
-        internal static UpmClient _upmClient => ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmClient>();
-        internal static PackageDatabase _packageDatabase =>
-            ScriptableSingleton<ServicesContainer>.instance.Resolve<PackageDatabase>();
-#else
-        internal static IUpmClient _upmClient => UpmClient.instance;
-        internal static IPackageDatabase _packageDatabase => PackageDatabase.instance;
-#endif
-
-#if UNITY_2021_1_OR_NEWER
-        private static bool _enablePreReleasePackages => _settings.enablePreReleasePackages;
-#else
-        private static bool _enablePreReleasePackages => _settings.enablePreviewPackages;
 #endif
 
         public static void RequestUpdateGitPackageVersions()
@@ -224,29 +235,35 @@ namespace Coffee.UpmGitExtension
                 .Select(versions =>
                 {
                     var isInstalled = installedIds.Contains(versions.Key);
-                    if (!isInstalled) return null;
-
+                    if (!isInstalled)
                     {
-                        // Git mode: Register all installable package versions.
-                        var upmPackage = _packageDatabase.GetPackage(versions.Key) as UpmPackage;
-                        var installedVersion = upmPackage.versions.installed as UpmPackageVersion;
-                        if (installedVersion.GetPackageInfo().source != PackageSource.Git)
-                        {
-                            return upmPackage;
-                        }
+                        return null;
+                    }
 
-                        // Unlock.
-                        installedVersion.UnlockVersion();
+                    // Git mode: Register all installable package versions.
 
-                        var newVersions = new[] { new UpmPackageVersionEx(installedVersion) }
-                            .Concat(versions.Where(v => v.uniqueId != installedVersion.uniqueId))
-                            .OrderBy(v => v.semVersion)
-                            .ThenBy(v => v.isInstalled)
-                            .ToArray();
-                        upmPackage = upmPackage.UpdateVersionsSafety(newVersions);
-
+                    var upmPackage = _packageDatabase.GetPackage(versions.Key) as UpmPackage;
+                    var installedVersion = upmPackage?.versions.installed as UpmPackageVersion;
+                    if (installedVersion.GetPackageInfo().source != PackageSource.Git)
+                    {
                         return upmPackage;
                     }
+
+                    // Unlock.
+                    installedVersion.UnlockVersion();
+
+#if UNITY_6000_0_OR_NEWER
+                    upmPackage = upmPackage.UpdateVersionsSafety();
+#else
+                    var newVersions = new[] { new UpmPackageVersionEx(installedVersion) }
+                        .Concat(versions.Where(v => v.uniqueId != installedVersion.uniqueId))
+                        .OrderBy(v => v.semVersion)
+                        .ThenBy(v => v.isInstalled)
+                        .ToArray();
+                    upmPackage = upmPackage.UpdateVersionsSafety(newVersions);
+#endif
+
+                    return upmPackage;
                 })
                 .Where(p => p != null);
 
@@ -272,7 +289,7 @@ namespace Coffee.UpmGitExtension
 
         private static void OnResultFileCreated(string file)
         {
-            if (isPaused || string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
+            if (_isPaused || string.IsNullOrEmpty(file) || Path.GetExtension(file) != ".json" || !File.Exists(file))
             {
                 return;
             }
@@ -323,7 +340,54 @@ namespace Coffee.UpmGitExtension
 
             _watcher.Created += (s, e) => EditorApplication.delayCall += () => OnResultFileCreated(e.FullPath);
 
+#if UNITY_6000_3_OR_NEWER
+            var addOp = _upmClient.Get("addAndRemoveOperation") as UpmAddAndRemoveOperation;
+            if (addOp != null)
+            {
+                addOp.onOperationFinalized += _ =>
+                {
+                    RequestUpdateGitPackageVersions();
+                };
+            }
+#else
             _upmClient.onAddOperation += op => op.onOperationFinalized += _ => RequestUpdateGitPackageVersions();
+#endif
+        }
+
+        public static string GetShortPackageId(UpmPackageVersion self)
+        {
+            var semver = self.versionString;
+            var revision = ExtractGitRevision(self.uniqueId);
+
+            return !string.IsNullOrEmpty(revision) && !revision.Contains(semver)
+                ? $"{self.name}/{revision} ({semver})"
+                : $"{self.name}/{semver}";
+        }
+
+        public static string GetShortVersion(UpmPackageVersion self)
+        {
+            var semver = self.versionString;
+            var revision = ExtractGitRevision(self.uniqueId);
+
+            return !string.IsNullOrEmpty(revision) && !revision.Contains(semver)
+                ? $"{revision} ({semver})"
+                : $"{semver}";
+        }
+
+        private static string ExtractGitRevision(string uniqueId)
+        {
+            if (string.IsNullOrEmpty(uniqueId))
+            {
+                return null;
+            }
+
+            var hashIndex = uniqueId.LastIndexOf('#');
+            if (hashIndex < 0 || hashIndex == uniqueId.Length - 1)
+            {
+                return null;
+            }
+
+            return uniqueId.Substring(hashIndex + 1);
         }
     }
 }

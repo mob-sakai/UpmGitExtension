@@ -10,12 +10,12 @@ namespace Coffee.UpmGitExtension
         //################################
         // Constant or static members.
         //################################
-        private const string ResourcesPath = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
-        private const string StylePath = ResourcesPath + "GitButton.uss";
+        private const string RESOURCES_PATH = "Packages/com.coffee.upm-git-extension/Editor/Resources/";
+        private const string STYLE_PATH = RESOURCES_PATH + "GitButton.uss";
 
         public GitButton(Action action) : base(action)
         {
-            styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath));
+            styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(STYLE_PATH));
 
             AddToClassList("git-button");
 
@@ -32,7 +32,7 @@ namespace Coffee.UpmGitExtension
 
         public static bool IsResourceReady()
         {
-            return EditorGUIUtility.Load(StylePath);
+            return EditorGUIUtility.Load(STYLE_PATH);
         }
     }
 }

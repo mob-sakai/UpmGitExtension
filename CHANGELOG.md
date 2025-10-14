@@ -1,3 +1,11 @@
+# [2.2.0](https://github.com/mob-sakai/UpmGitExtension/compare/v2.1.1...v2.2.0) (2025-10-14)
+
+
+### Features
+
+* add support for Unity 6000.0 or later ([007dbcb](https://github.com/mob-sakai/UpmGitExtension/commit/007dbcb183779ea82bdfca679c8edd9f1b099fae)), closes [#141](https://github.com/mob-sakai/UpmGitExtension/issues/141)
+* add support for Unity 6000.3 or later ([df6d989](https://github.com/mob-sakai/UpmGitExtension/commit/df6d989b68802c86e0d00edb6d19c78a1f3d2b89))
+
 ## [2.1.1](https://github.com/mob-sakai/UpmGitExtension/compare/v2.1.0...v2.1.1) (2023-11-21)
 
 
