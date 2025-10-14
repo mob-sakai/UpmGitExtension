@@ -24,7 +24,11 @@ namespace Coffee.UpmGitExtension
             set => fixedItemHeight = value;
         }
 #else
-        private float _itemHeight { get { return itemHeight; } set { itemHeight = (int)value; } }
+        private float _itemHeight
+        {
+            get => itemHeight;
+            set => itemHeight = (int)value;
+        }
 #endif
 
         public void UpdateSearchText(string text = "")

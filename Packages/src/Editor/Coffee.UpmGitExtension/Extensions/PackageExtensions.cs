@@ -17,6 +17,7 @@ using UnityEditor.PackageManager.UI.Internal;
 #else
 using UnityEditor.PackageManager.UI;
 #endif
+
 #if UNITY_2023_1_OR_NEWER
 using UpmPackage = UnityEditor.PackageManager.UI.Internal.Package;
 #endif
@@ -35,7 +36,8 @@ namespace Coffee.UpmGitExtension
 
     internal static class UpmPackageExtensions
     {
-        public static UpmPackage UpdateVersionsSafety(this UpmPackage self, IEnumerable<UpmPackageVersion> versions = null)
+        public static UpmPackage UpdateVersionsSafety(this UpmPackage self,
+            IEnumerable<UpmPackageVersion> versions = null)
         {
 #if UNITY_6000_0_OR_NEWER
             var factory = UnityEditor.ScriptableSingleton<ServicesContainer>.instance.Resolve<UpmPackageFactory>();
@@ -43,7 +45,7 @@ namespace Coffee.UpmGitExtension
             var packageName = self.name;
 
             var data = cache.GetPackageData(packageName);
-            UpmVersionList upmVersionList = new UpmVersionList(data,PackageTag.None);
+            var upmVersionList = new UpmVersionList(data, PackageTag.None);
 
             self = factory.CreatePackage(self.name, upmVersionList);
 #elif UNITY_2023_1_OR_NEWER

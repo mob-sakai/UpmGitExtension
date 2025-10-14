@@ -37,7 +37,6 @@ using UnityEditor.Scripting.ScriptCompilation;
 using UnityEngine;
 #if UNITY_2021_1_OR_NEWER
 using UnityEditor.PackageManager.UI.Internal;
-
 #else
 using UnityEditor.PackageManager.UI;
 #endif
@@ -50,10 +49,9 @@ namespace Coffee.UpmGitExtension
 #else
     internal class UpmPackageVersionEx : UpmPackageVersion
 #endif
-    
+
     {
 #if !CONSTRACTOR_V4
-
         private static readonly Regex regex = new Regex("^(\\d +)\\.(\\d +)\\.(\\d +)(.*)$", RegexOptions.Compiled);
         private static SemVersion? unityVersion;
 
@@ -153,12 +151,12 @@ namespace Coffee.UpmGitExtension
             }
         }
 #endif
-        
+
 #if PACKAGE_INFO_HAS_BEEN_REMOVED
         [SerializeField]
         private PackageInfo m_PackageInfo;
+
         public PackageInfo packageInfo => m_PackageInfo;
 #endif
-        
     }
 }

@@ -236,7 +236,7 @@ namespace Coffee.UpmGitExtension
             path = path.Trim('/');
             return 0 < path.Length ? url + "?path=" + path : url;
         }
-        
+
         private enum State
         {
             None,
