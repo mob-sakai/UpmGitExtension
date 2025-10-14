@@ -39,13 +39,13 @@ jobs:
       contents: write
     steps:
       - name: 🚚 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.from }}
           path: from
 
       - name: 🚚 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.to }}
           path: to

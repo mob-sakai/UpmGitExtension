@@ -26,10 +26,10 @@ jobs:
       notes: ${{ steps.release.outputs.new_release_notes }}
     steps:
       - name: 🚚 Checkout (${{ github.ref_name }})
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🔖 Run semantic release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v5
         id: release
         with:
           working_directory: Packages/src
