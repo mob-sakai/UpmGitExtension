@@ -340,7 +340,18 @@ namespace Coffee.UpmGitExtension
 
             _watcher.Created += (s, e) => EditorApplication.delayCall += () => OnResultFileCreated(e.FullPath);
 
+#if UNITY_6000_3_OR_NEWER
+            var addOp = _upmClient.Get("addAndRemoveOperation") as UpmAddAndRemoveOperation;
+            if (addOp != null)
+            {
+                addOp.onOperationFinalized += _ =>
+                {
+                    RequestUpdateGitPackageVersions();
+                };
+            }
+#else
             _upmClient.onAddOperation += op => op.onOperationFinalized += _ => RequestUpdateGitPackageVersions();
+#endif
         }
 
         public static string GetShortPackageId(UpmPackageVersion self)

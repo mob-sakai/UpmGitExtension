@@ -87,12 +87,27 @@ namespace Coffee.UpmGitExtension
 
             OnClick_Close();
 
-            // 
+#if UNITY_6000_3_OR_NEWER
+            var addOp = GitPackageDatabase._upmClient.Get("addAndRemoveOperation") as UpmAddAndRemoveOperation;
+            if (addOp != null)
+            {
+                addOp.onOperationFinalized += _ =>
+                {
+                    _loadingSpinner.Stop();
+                    _rootContainer.SetEnabled(true);
+                    OnClick_Close();
+                };
+
+                addOp.onOperationError += (_, __) =>
+                {
+                    _loadingSpinner.Stop();
+                    _rootContainer.SetEnabled(true);
+                    OnClick_Close();
+                };
+            }
+#else
             GitPackageDatabase._upmClient.onAddOperation += op =>
             {
-                _loadingSpinner.Start();
-                _rootContainer.SetEnabled(false);
-
                 op.onOperationFinalized += _ =>
                 {
                     _loadingSpinner.Stop();
@@ -100,6 +115,7 @@ namespace Coffee.UpmGitExtension
                     OnClick_Close();
                 };
             };
+#endif
         }
 
         public static bool IsResourceReady()
@@ -219,6 +235,9 @@ namespace Coffee.UpmGitExtension
         private void OnClick_InstallPackage()
         {
             GitPackageDatabase.Install(_currentVersion.uniqueId);
+
+            _loadingSpinner.Start();
+            _rootContainer.SetEnabled(false);
         }
 
         private static string GetRepoUrl(string url, string path)
