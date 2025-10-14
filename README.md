@@ -73,7 +73,15 @@ openupm add com.coffee.upm-git-extension
 openupm add com.coffee.upm-git-extension@v1 
 ```
 
-#### Install via UPM (using Git URL)
+### Install via UPM (with Package Manager UI)
+
+- Click `Window > Package Manager` to open Package Manager UI.
+- Click `+ > Add package from git URL...` and input the repository URL: `https://github.com/mob-sakai/UpmGitExtension.git`  
+  ![](https://github.com/mob-sakai/mob-sakai/releases/download/docs/upm-add-from-url.png)
+- To update the package, change suffix `#{version}` to the target version.
+    - e.g. `https://github.com/mob-sakai/UpmGitExtension.git#2.2.0`
+
+#### Install via UPM (Manually)
 
 Navigate to your project's Packages folder and open the `manifest.json` file. Then add this package somewhere in
 the `dependencies` block:
@@ -92,7 +100,7 @@ the `dependencies` block:
 
 To update the package, change suffix `#{version}` to the target version.
 
-* e.g. `"com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#2.1.0",`
+* e.g. `"com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#2.2.0",`
 
 <br><br>
 
