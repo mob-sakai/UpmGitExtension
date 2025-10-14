@@ -68,6 +68,7 @@ namespace Coffee.UpmGitExtension
                 
             };
 
+#if UNITY_2022_2_OR_NEWER
             _root.Q<PackageDetailsVersionsTab>().RegisterCallback<GeometryChangedEvent>(ev =>
             {
                 if ((ev.target as VisualElement).style.visibility.value == Visibility.Visible)
@@ -79,6 +80,7 @@ namespace Coffee.UpmGitExtension
 #endif
                 }
             });
+#endif
         }
 
         public void OnPackageSelectionChange(PackageInfo packageInfo)
@@ -111,7 +113,7 @@ namespace Coffee.UpmGitExtension
                 var button = new Button(ViewRepoOnBrowser) { text = "View repository" };
                 button.AddClasses("link");
 
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
                 var links = _packageDetails
                     .Q<PackageDetailsLinks>()
                     ?.Q(classes: new[] { "left" });
@@ -122,13 +124,6 @@ namespace Coffee.UpmGitExtension
                     links.Add(separator);
                     links.Add(button);
                 }
-#elif UNITY_2023_1_OR_NEWER
-                var links = _packageDetails
-                        .Q<PackageDetailsLinks>()
-                        ?.Q(classes: new[] { "left" });
-                    @@ -124,58 +74,38 @@ namespace Coffee.UpmGitExtension
-                links.Add(separator);
-                links.Add(button);
 #elif UNITY_2021_2_OR_NEWER
                 var links = _packageDetails.Q<PackageDetailsLinks>();
                 var left = links.Q("packageDetailHeaderUPMLinks", new[] { "left" }) ??
@@ -164,11 +159,11 @@ namespace Coffee.UpmGitExtension
                         : package?.versions?.primary;
                 }
 #endif
-                EditorApplication.delayCall +=
+
 #if UNITY_6000_0_OR_NEWER
-                RefreshVersionItem;
+                EditorApplication.delayCall += RefreshVersionItem;
 #elif UNITY_2022_2_OR_NEWER
-                RefreshVersionItems;
+                EditorApplication.delayCall += RefreshVersionItems;
 #endif
             }
             
@@ -190,7 +185,7 @@ namespace Coffee.UpmGitExtension
         private VisualElement _root;
         
 #if UNITY_2020_2_OR_NEWER
-        private readonly List<VisualElement> _gitVersionRows = new();
+        private readonly List<VisualElement> _gitVersionRows = new List<VisualElement>();
 
         private static PageManager _pageManager =>
             ScriptableSingleton<ServicesContainer>.instance.Resolve<PageManager>();
@@ -428,6 +423,26 @@ namespace Coffee.UpmGitExtension
                 AddVisualElement(versionRow);
             }
         }
+
+        private void AddVisualElement(VisualElement versionRow)
+        {
+            var versionTab = _root.Q<PackageDetailsVersionsTab>();
+
+            versionTab.Add(versionRow);
+            _gitVersionRows.Add(versionRow);
+        }
+
+        private void RemoveVisualElement(bool clear = false)
+        {
+            var versionTab = _root.Q<PackageDetailsVersionsTab>();
+
+            foreach (var row in _gitVersionRows)
+            {
+                versionTab.Remove(row);
+            }
+
+            _gitVersionRows.Clear();
+        }
 #endif
 
 #if !UNITY_6000_0_OR_NEWER
@@ -454,25 +469,5 @@ namespace Coffee.UpmGitExtension
             }
         }
 #endif
-        
-        private void AddVisualElement(VisualElement versionRow)
-        {
-            var versionTab = _root.Q<PackageDetailsVersionsTab>();
-
-            versionTab.Add(versionRow);
-            _gitVersionRows.Add(versionRow);
-        }
-
-        private void RemoveVisualElement(bool clear = false)
-        {
-            var versionTab = _root.Q<PackageDetailsVersionsTab>();
-
-            foreach (var row in _gitVersionRows)
-            {
-                versionTab.Remove(row);
-            }
-
-            _gitVersionRows.Clear();
-        }
     }
 }
