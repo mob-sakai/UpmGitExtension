@@ -58,41 +58,57 @@ This package requires as following:
 - **v1.x**: Unity 2018.3 to 2019.4
 - **v2.x**: Unity 2020.1 or later
 
-#### Install via OpenUPM
+### Install via OpenUPM
 
-This package is available on [OpenUPM](https://openupm.com) package registry.
-This is the preferred method of installation, as you can easily receive updates as they're released.
+- This package is available on [OpenUPM](https://openupm.com/packages/com.coffee.upm-git-extension/) package registry.
+- This is the preferred method of installation, as you can easily receive updates as they're released.
+- If you have [openupm-cli](https://github.com/openupm/openupm-cli) installed, then run the following command in your project's directory:
+  ```
+  # for Unity 2020 or later
+  openupm add com.coffee.upm-git-extension
+  # for Unity 2018 or 2019
+  openupm add com.coffee.upm-git-extension@v1
+  ```
+- To update the package, use Package Manager UI (`Window > Package Manager`) or run the following command with `@{version}`:
+  ```
+  openupm add com.coffee.upm-git-extension@2.2.0
+  ```
 
-If you have [openupm-cli](https://github.com/openupm/openupm-cli) installed, then run the following command in your
-project's directory:
+### Install via UPM (with Package Manager UI)
 
-```sh
-# for Unity 2020 or later
-openupm add com.coffee.upm-git-extension
-# for Unity 2018 or 2019
-openupm add com.coffee.upm-git-extension@v1 
-```
+- Click `Window > Package Manager` to open Package Manager UI.
+- Click `+ > Add package from git URL...` and input the repository URL: `https://github.com/mob-sakai/UpmGitExtension.git`  
+  ![](https://github.com/mob-sakai/mob-sakai/releases/download/docs/upm-add-from-url.png)
+- To update the package, change suffix `#{version}` to the target version.
+    - e.g. `https://github.com/mob-sakai/UpmGitExtension.git#2.2.0`
 
-#### Install via UPM (using Git URL)
+### Install via UPM (Manually)
 
-Navigate to your project's Packages folder and open the `manifest.json` file. Then add this package somewhere in
-the `dependencies` block:
+- Open the `Packages/manifest.json` file in your project. Then add this package somewhere in the `dependencies` block:
+  ```json
+  {
+    "dependencies": {
+      // for Unity 2020 or later
+      "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
+      // for Unity 2018 or 2019
+      "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#v1",
+      ...
+    }
+  }
+  ```
 
-```json
-{
-  "dependencies": {
-    // for Unity 2020 or later
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
-    // for Unity 2018 or 2019
-    "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#v1",
-    ...
-  },
-}
-```
+- To update the package, change suffix `#{version}` to the target version.
+    - e.g. `"com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#2.2.0",`
 
-To update the package, change suffix `#{version}` to the target version.
+### Install as Embedded Package
 
-* e.g. `"com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git#2.1.0",`
+1. Download the `Source code (zip)` file from [Releases](https://github.com/mob-sakai/UpmGitExtension/releases) and
+   extract it.
+2. Move the `<extracted_dir>/Packages/src` directory into your project's `Packages` directory.  
+   ![](https://github.com/mob-sakai/mob-sakai/releases/download/docs/upm-add-as-embedded.png)
+    - You can rename the `src` directory if needed.
+    - If you intend to fix bugs or add features, installing it as an embedded package is recommended.
+    - To update the package, re-download it and replace the existing contents.
 
 <br><br>
 

@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/mob-sakai/UpmGitExtension/compare/v2.2.0...v2.2.1) (2025-10-15)
+
+
+### Bug Fixes
+
+* Update REDME ([540e2ef](https://github.com/mob-sakai/UpmGitExtension/commit/540e2ef9faa10d89d71197bb67c92ccfdab487a9))
+
 # [2.2.0](https://github.com/mob-sakai/UpmGitExtension/compare/v2.1.1...v2.2.0) (2025-10-14)
 
 
